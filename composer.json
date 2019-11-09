@@ -1,0 +1,54 @@
+{
+    "name": "fivelab/amqp",
+    "description": "The library for publish/receive messages from broker (RabbitMQ).",
+    "keywords": ["event", "broker", "receiver", "publisher"],
+    "type": "library",
+    "license": "MIT",
+
+    "authors": [
+        {
+            "name": "Vitaliy Zhuk",
+            "email": "v.zhuk@fivelab.org"
+        },
+
+        {
+            "name": "FiveLab Team",
+            "email": "dev@fivelab.org",
+            "homepage": "http://fivelab.org"
+        }
+    ],
+
+    "require": {
+        "php": "^7.1"
+    },
+
+    "require-dev": {
+        "ext-amqp": "*",
+        "phpunit/phpunit": "~8.0.0",
+        "phpmetrics/phpmetrics": "^2.0",
+        "escapestudios/symfony2-coding-standard": "~3.5.0",
+        "guzzlehttp/guzzle": "~6.3.0",
+        "symfony/console": "~2.3|~4.0"
+    },
+
+    "suggest": {
+        "ext-amqp": "For use amqp extension.",
+        "symfony/console": "For configure console commands for run consumer."
+    },
+
+    "autoload": {
+        "psr-4": {
+            "FiveLab\\Component\\Amqp\\": "src/"
+        }
+    },
+
+    "autoload-dev": {
+        "psr-4": {
+            "FiveLab\\Component\\Amqp\\Tests\\": "tests/"
+        }
+    },
+
+    "config": {
+        "bin-dir": "bin"
+    }
+}
