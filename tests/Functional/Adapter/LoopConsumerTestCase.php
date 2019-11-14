@@ -17,6 +17,7 @@ use FiveLab\Component\Amqp\Consumer\Loop\LoopConsumer;
 use FiveLab\Component\Amqp\Consumer\Loop\LoopConsumerConfiguration;
 use FiveLab\Component\Amqp\Consumer\Middleware\MiddlewareCollection;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
+use FiveLab\Component\Amqp\Queue\Definition\QueueBindingCollection;
 use FiveLab\Component\Amqp\Queue\Definition\QueueBindingDefinition;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
@@ -48,9 +49,7 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
 
         $definition = new QueueDefinition(
             'some',
-            [
-                new QueueBindingDefinition('test.direct', 'test'),
-            ]
+            new QueueBindingCollection(new QueueBindingDefinition('test.direct', 'test'))
         );
 
         $this->queueFactory = $this->createQueueFactory($definition);

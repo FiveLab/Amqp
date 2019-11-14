@@ -13,6 +13,8 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Functional\Adapter;
 
+use FiveLab\Component\Amqp\Argument\ArgumentCollection;
+use FiveLab\Component\Amqp\Exchange\Definition\Arguments\AlternateExchangeArgument;
 use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
 use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
 use FiveLab\Component\Amqp\Message\Message;
@@ -93,6 +95,32 @@ abstract class ExchangeFactoryTestCase extends RabbitMqTestCase
         $this->management->exchangeByName('some');
 
         $this->expectNotToPerformAssertions();
+    }
+
+    /**
+     * @test
+     */
+    public function shouldSuccessCreateWithArguments(): void
+    {
+        $definition = new ExchangeDefinition(
+            'some',
+            AMQP_EX_TYPE_DIRECT,
+            true,
+            false,
+            new ArgumentCollection(
+                new AlternateExchangeArgument('foo-bar')
+            )
+        );
+
+        $factory = $this->createExchangeFactory($definition);
+        $factory->create();
+
+        $exchangeInfo = $this->management->exchangeByName('some');
+        $arguments = $exchangeInfo['arguments'];
+
+        self::assertEquals([
+            'alternate-exchange' => 'foo-bar',
+        ], $arguments);
     }
 
     /**

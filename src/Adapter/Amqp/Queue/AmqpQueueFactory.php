@@ -80,6 +80,7 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
 
         $queue->setName($this->definition->getName());
         $queue->setFlags($flags);
+        $queue->setArguments($this->definition->getArguments()->toArray());
 
         $queue->declareQueue();
 

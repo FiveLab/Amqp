@@ -13,6 +13,9 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Exchange\Definition;
 
+use FiveLab\Component\Amqp\Argument\ArgumentCollection;
+use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
+
 /**
  * Exchange definition.
  */
@@ -39,14 +42,20 @@ class ExchangeDefinition
     private $passive;
 
     /**
+     * @var ArgumentCollection
+     */
+    private $arguments;
+
+    /**
      * Constructor.
      *
-     * @param string $name
-     * @param string $type
-     * @param bool   $durable
-     * @param bool   $passive
+     * @param string             $name
+     * @param string             $type
+     * @param bool               $durable
+     * @param bool               $passive
+     * @param ArgumentCollection $arguments
      */
-    public function __construct(string $name, string $type, bool $durable = true, bool $passive = false)
+    public function __construct(string $name, string $type, bool $durable = true, bool $passive = false, ArgumentCollection $arguments = null)
     {
         $possibleTypes = [
             'direct',
@@ -67,6 +76,7 @@ class ExchangeDefinition
         $this->type = $type;
         $this->durable = $durable;
         $this->passive = $passive;
+        $this->arguments = $arguments ?: new ArgumentCollection();
     }
 
     /**
@@ -107,5 +117,15 @@ class ExchangeDefinition
     public function isPassive(): bool
     {
         return $this->passive;
+    }
+
+    /**
+     * Get arguments
+     *
+     * @return ArgumentCollection|ArgumentDefinition[]
+     */
+    public function getArguments(): ArgumentCollection
+    {
+        return $this->arguments;
     }
 }

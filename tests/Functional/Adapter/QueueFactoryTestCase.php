@@ -13,9 +13,13 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Functional\Adapter;
 
+use FiveLab\Component\Amqp\Argument\ArgumentCollection;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Message\Payload;
 use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Queue\Definition\Arguments\QueueMasterLocatorArgument;
+use FiveLab\Component\Amqp\Queue\Definition\Arguments\QueueModeArgument;
+use FiveLab\Component\Amqp\Queue\Definition\QueueBindingCollection;
 use FiveLab\Component\Amqp\Queue\Definition\QueueBindingDefinition;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
@@ -37,10 +41,7 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
      */
     public function shouldSuccessCreateWithDefaults(): void
     {
-        $definition = new QueueDefinition(
-            'some',
-            []
-        );
+        $definition = new QueueDefinition('some');
 
         $factory = $this->createQueueFactory($definition);
         $factory->create();
@@ -58,8 +59,8 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
     {
         $definition = new QueueDefinition(
             'some',
-            [],
-            [],
+            null,
+            null,
             false
         );
 
@@ -80,8 +81,8 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
 
         $definition = new QueueDefinition(
             'foo',
-            [],
-            [],
+            null,
+            null,
             true,
             true
         );
@@ -107,8 +108,8 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
 
         $definition = new QueueDefinition(
             'foo',
-            [],
-            [],
+            null,
+            null,
             true,
             true
         );
@@ -124,8 +125,8 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
     {
         $definition = new QueueDefinition(
             'test_queue_exclusive',
-            [],
-            [],
+            null,
+            null,
             true,
             false,
             true
@@ -146,8 +147,8 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
     {
         $definition = new QueueDefinition(
             'test_queue_auto_delete',
-            [],
-            [],
+            null,
+            null,
             false,
             false,
             false,
@@ -172,11 +173,11 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
 
         $definition = new QueueDefinition(
             'some',
-            [
+            new QueueBindingCollection(
                 new QueueBindingDefinition('test.direct1', 'key1'),
                 new QueueBindingDefinition('test.direct2', 'key1'),
-                new QueueBindingDefinition('test.direct2', 'key2'),
-            ]
+                new QueueBindingDefinition('test.direct2', 'key2')
+            )
         );
 
         $factory = $this->createQueueFactory($definition);
@@ -205,12 +206,12 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
 
         $definition = new QueueDefinition(
             'some',
-            [],
-            [
+            null,
+            new QueueBindingCollection(
                 new QueueBindingDefinition('test.direct1', 'key1'),
                 new QueueBindingDefinition('test.direct2', 'key1'),
-                new QueueBindingDefinition('test.direct2', 'key2'),
-            ]
+                new QueueBindingDefinition('test.direct2', 'key2')
+            )
         );
 
         $factory = $this->createQueueFactory($definition);
@@ -219,6 +220,37 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
         $bindings = $this->management->queueBindings('some');
 
         self::assertCount(1, $bindings);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldSuccessCreateWithArguments(): void
+    {
+        $definition = new QueueDefinition(
+            'some',
+            null,
+            null,
+            false,
+            false,
+            false,
+            false,
+            new ArgumentCollection(
+                new QueueModeArgument('default'),
+                new QueueMasterLocatorArgument('random')
+            )
+        );
+
+        $factory = $this->createQueueFactory($definition);
+        $factory->create();
+
+        $queueInfo = $this->management->queueByName('some');
+        $arguments = $queueInfo['arguments'];
+
+        self::assertEquals([
+            'x-queue-master-locator' => 'random',
+            'x-queue-mode'           => 'default',
+        ], $arguments);
     }
 
     /**
@@ -234,9 +266,9 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
 
         $definition = new QueueDefinition(
             'some',
-            [
-                new QueueBindingDefinition('test.direct', 'test'),
-            ]
+            new QueueBindingCollection(
+                new QueueBindingDefinition('test.direct', 'test')
+            )
         );
 
         $factory = $this->createQueueFactory($definition);

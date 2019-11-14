@@ -15,9 +15,7 @@ use FiveLab\Component\Amqp\Adapter\Amqp\Exchange\AmqpExchangeFactory;
 use FiveLab\Component\Amqp\Adapter\Amqp\Queue\AmqpQueueFactory;
 use FiveLab\Component\Amqp\Channel\Definition\ChannelDefinition;
 use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
-use FiveLab\Component\Amqp\Message\Message;
-use FiveLab\Component\Amqp\Message\Payload;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Queue\Definition\QueueBindingCollection;
 use FiveLab\Component\Amqp\Queue\Definition\QueueBindingDefinition;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 
@@ -32,15 +30,15 @@ $connectionFactory = new AmqpConnectionFactory([
 $channelFactory = new AmqpChannelFactory($connectionFactory, new ChannelDefinition());
 
 // Create exchange
-$exchangeDefinition = new ExchangeDefinition('new-exchange', AMQP_EX_TYPE_DIRECT);
+$exchangeDefinition = new ExchangeDefinition('new-exchange', 'direct');
 $exchangeFactory = new AmqpExchangeFactory($channelFactory, $exchangeDefinition);
 $exchange = $exchangeFactory->create();
 
 // Create queue
-$queueDefinition = new QueueDefinition('new-queue', [
+$queueDefinition = new QueueDefinition('new-queue', new QueueBindingCollection(
     new QueueBindingDefinition('new-exchange', 'route-1'),
     new QueueBindingDefinition('new-exchange', 'route-2')
-]);
+));
 
 $queueFactory = new AmqpQueueFactory($channelFactory, $queueDefinition);
 $queue = $queueFactory->create();

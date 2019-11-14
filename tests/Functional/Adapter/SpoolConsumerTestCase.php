@@ -18,6 +18,7 @@ use FiveLab\Component\Amqp\Consumer\Spool\SpoolConsumer;
 use FiveLab\Component\Amqp\Consumer\Spool\SpoolConsumerConfiguration;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Queue\Definition\QueueBindingCollection;
 use FiveLab\Component\Amqp\Queue\Definition\QueueBindingDefinition;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
@@ -49,9 +50,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
 
         $definition = new QueueDefinition(
             'some',
-            [
-                new QueueBindingDefinition('test.direct', 'test'),
-            ]
+            new QueueBindingCollection(new QueueBindingDefinition('test.direct', 'test'))
         );
 
         $this->queueFactory = $this->createQueueFactory($definition);

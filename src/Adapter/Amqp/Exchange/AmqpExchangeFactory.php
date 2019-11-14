@@ -81,6 +81,7 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
         $exchange->setName($this->definition->getName());
         $exchange->setType($this->definition->getType());
         $exchange->setFlags($flags);
+        $exchange->setArguments($this->definition->getArguments()->toArray());
 
         $exchange->declareExchange();
 

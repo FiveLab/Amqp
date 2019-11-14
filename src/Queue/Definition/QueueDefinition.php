@@ -13,6 +13,9 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Queue\Definition;
 
+use FiveLab\Component\Amqp\Argument\ArgumentCollection;
+use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
+
 /**
  * The definition for describe queue.
  */
@@ -54,25 +57,32 @@ class QueueDefinition
     private $unBindings;
 
     /**
+     * @var array
+     */
+    private $arguments;
+
+    /**
      * Constructor.
      *
-     * @param string                         $name
-     * @param array|QueueBindingDefinition[] $bindings
-     * @param array|QueueBindingDefinition[] $unBindings
-     * @param bool                           $durable
-     * @param bool                           $passive
-     * @param bool                           $exclusive
-     * @param bool                           $autoDelete
+     * @param string                 $name
+     * @param QueueBindingCollection $bindings
+     * @param QueueBindingCollection $unBindings
+     * @param bool                   $durable
+     * @param bool                   $passive
+     * @param bool                   $exclusive
+     * @param bool                   $autoDelete
+     * @param ArgumentCollection     $arguments
      */
-    public function __construct(string $name, array $bindings, array $unBindings = [], bool $durable = true, bool $passive = false, bool $exclusive = false, bool $autoDelete = false)
+    public function __construct(string $name, QueueBindingCollection $bindings = null, QueueBindingCollection $unBindings = null, bool $durable = true, bool $passive = false, bool $exclusive = false, bool $autoDelete = false, ArgumentCollection $arguments = null)
     {
         $this->name = $name;
-        $this->bindings = $bindings;
-        $this->unBindings = $unBindings;
+        $this->bindings = $bindings ?: new QueueBindingCollection();
+        $this->unBindings = $unBindings ?: new QueueBindingCollection();
         $this->durable = $durable;
         $this->passive = $passive;
         $this->exclusive = $exclusive;
         $this->autoDelete = $autoDelete;
+        $this->arguments = $arguments ?: new ArgumentCollection();
     }
 
     /**
@@ -132,7 +142,7 @@ class QueueDefinition
      */
     public function getBindings(): QueueBindingCollection
     {
-        return new QueueBindingCollection(...$this->bindings);
+        return $this->bindings;
     }
 
     /**
@@ -142,6 +152,16 @@ class QueueDefinition
      */
     public function getUnBindings(): QueueBindingCollection
     {
-        return new QueueBindingCollection(...$this->unBindings);
+        return $this->unBindings;
+    }
+
+    /**
+     * Get arguments
+     *
+     * @return ArgumentCollection|ArgumentDefinition[]
+     */
+    public function getArguments(): ArgumentCollection
+    {
+        return $this->arguments;
     }
 }

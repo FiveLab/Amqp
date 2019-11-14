@@ -23,6 +23,7 @@ use FiveLab\Component\Amqp\Consumer\SingleConsumer;
 use FiveLab\Component\Amqp\Consumer\RoundRobin\RoundRobinConsumer;
 use FiveLab\Component\Amqp\Consumer\RoundRobin\RoundRobinConsumerConfiguration;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
+use FiveLab\Component\Amqp\Queue\Definition\QueueBindingCollection;
 use FiveLab\Component\Amqp\Queue\Definition\QueueBindingDefinition;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Tests\Functional\Consumer\Handler\MessageHandlerMock;
@@ -78,13 +79,13 @@ class RoundRobinConsumerTest extends RabbitMqTestCase
 
         $channelFactory = new AmqpChannelFactory($connectionFactory, new ChannelDefinition());
 
-        $this->queueFactory1 = new AmqpQueueFactory($channelFactory, new QueueDefinition('queue1', [
-            new QueueBindingDefinition('exchange1', 'foo1'),
-        ]));
+        $this->queueFactory1 = new AmqpQueueFactory($channelFactory, new QueueDefinition('queue1', new QueueBindingCollection(
+            new QueueBindingDefinition('exchange1', 'foo1')
+        )));
 
-        $this->queueFactory2 = new AmqpQueueFactory($channelFactory, new QueueDefinition('queue2', [
-            new QueueBindingDefinition('exchange2', 'foo2'),
-        ]));
+        $this->queueFactory2 = new AmqpQueueFactory($channelFactory, new QueueDefinition('queue2', new QueueBindingCollection(
+            new QueueBindingDefinition('exchange2', 'foo2')
+        )));
     }
 
     /**

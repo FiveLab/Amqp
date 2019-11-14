@@ -13,6 +13,8 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Unit\Queue\Definition;
 
+use FiveLab\Component\Amqp\Argument\ArgumentCollection;
+use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 use FiveLab\Component\Amqp\Queue\Definition\QueueBindingDefinition;
 use FiveLab\Component\Amqp\Queue\Definition\QueueBindingCollection;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
@@ -25,7 +27,7 @@ class QueueDefinitionTest extends TestCase
      */
     public function shouldSuccessCreateWithDefaults(): void
     {
-        $def = new QueueDefinition('some', []);
+        $def = new QueueDefinition('some');
 
         self::assertEquals('some', $def->getName());
         self::assertEquals(new QueueBindingCollection(), $def->getBindings());
@@ -43,7 +45,7 @@ class QueueDefinitionTest extends TestCase
         $bind1 = new QueueBindingDefinition('ex1', 'rout1');
         $bind2 = new QueueBindingDefinition('ex2', 'rout2');
 
-        $def = new QueueDefinition('some', [$bind1, $bind2]);
+        $def = new QueueDefinition('some', new QueueBindingCollection($bind1, $bind2));
 
         self::assertEquals(new QueueBindingCollection($bind1, $bind2), $def->getBindings());
     }
@@ -56,7 +58,7 @@ class QueueDefinitionTest extends TestCase
         $bind1 = new QueueBindingDefinition('ex1', 'rout1');
         $bind2 = new QueueBindingDefinition('ex2', 'rout2');
 
-        $def = new QueueDefinition('some', [], [$bind1, $bind2]);
+        $def = new QueueDefinition('some', new QueueBindingCollection(), new QueueBindingCollection($bind1, $bind2));
 
         self::assertEquals(new QueueBindingCollection($bind1, $bind2), $def->getUnBindings());
     }
@@ -66,7 +68,7 @@ class QueueDefinitionTest extends TestCase
      */
     public function shouldSuccessCreateWithoutDurable(): void
     {
-        $def = new QueueDefinition('some', [], [], false);
+        $def = new QueueDefinition('some', null, null, false);
 
         self::assertFalse($def->isDurable());
     }
@@ -76,7 +78,7 @@ class QueueDefinitionTest extends TestCase
      */
     public function shouldSuccessCreateWithPassive(): void
     {
-        $def = new QueueDefinition('some', [], [], true, true);
+        $def = new QueueDefinition('some', null, null, true, true);
 
         self::assertTrue($def->isPassive());
     }
@@ -86,7 +88,7 @@ class QueueDefinitionTest extends TestCase
      */
     public function shouldSuccessCreateWithExclusive(): void
     {
-        $def = new QueueDefinition('some', [], [], true, true, true);
+        $def = new QueueDefinition('some', null, null, true, true, true);
 
         self::assertTrue($def->isExclusive());
     }
@@ -96,8 +98,20 @@ class QueueDefinitionTest extends TestCase
      */
     public function shouldSuccessCreateWithAutoDelete(): void
     {
-        $def = new QueueDefinition('some', [], [], true, true, true, true);
+        $def = new QueueDefinition('some', null, null, true, true, true, true);
 
         self::assertTrue($def->isAutoDelete());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldSuccessCreateWithArguments(): void
+    {
+        $def = new QueueDefinition('some', null, null, false, false, false, false, new ArgumentCollection(
+            new ArgumentDefinition('some', 'foo-bar')
+        ));
+
+        self::assertEquals(new ArgumentCollection(new ArgumentDefinition('some', 'foo-bar')), $def->getArguments());
     }
 }
