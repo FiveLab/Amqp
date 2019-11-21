@@ -151,8 +151,6 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
                     throw $e;
                 }
 
-                print 'reconnect!!'.PHP_EOL;
-
                 // Disconnect, because we can have zombie connection.
                 $connection->disconnect();
             }

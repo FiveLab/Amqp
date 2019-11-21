@@ -26,23 +26,16 @@ class LoopConsumerConfiguration extends ConsumerConfiguration
     private $readTimeout;
 
     /**
-     * @var float
-     */
-    private $timeout;
-
-    /**
      * Constructor.
      *
      * @param float $readTimeout
-     * @param float $timeout
      * @param bool  $requeueOnError
      */
-    public function __construct(float $readTimeout, float $timeout = 0.0, bool $requeueOnError = true)
+    public function __construct(float $readTimeout, bool $requeueOnError = true)
     {
         parent::__construct($requeueOnError);
 
         $this->readTimeout = $readTimeout;
-        $this->timeout = $timeout;
     }
 
     /**
@@ -53,15 +46,5 @@ class LoopConsumerConfiguration extends ConsumerConfiguration
     public function getReadTimeout(): float
     {
         return $this->readTimeout;
-    }
-
-    /**
-     * Get timeout
-     *
-     * @return float
-     */
-    public function getTimeout(): float
-    {
-        return $this->timeout;
     }
 }
