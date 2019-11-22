@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Consumer\RoundRobin;
 
 use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
+use FiveLab\Component\Amqp\Consumer\Loop\LoopConsumer;
 use FiveLab\Component\Amqp\Consumer\Middleware\StopAfterNExecutesMiddleware;
 use FiveLab\Component\Amqp\Consumer\MiddlewareAwareInterface;
 use FiveLab\Component\Amqp\Consumer\Spool\SpoolConsumer;
@@ -95,7 +96,7 @@ class RoundRobinConsumer implements ConsumerInterface
 
             $consumer->pushMiddleware(new StopAfterNExecutesMiddleware($stopAfterNExecutes));
 
-            if ($consumer instanceof SpoolConsumer) {
+            if ($consumer instanceof SpoolConsumer || $consumer instanceof LoopConsumer) {
                 $consumer->throwExceptionOnConsumerTimeoutExceed();
             }
         }
