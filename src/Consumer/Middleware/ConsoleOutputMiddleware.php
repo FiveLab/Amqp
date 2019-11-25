@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * The middleware for debug received messages in console output.
  */
-class ConsoleOutputMiddleware implements MiddlewareInterface
+class ConsoleOutputMiddleware implements ConsumerMiddlewareInterface
 {
     /**
      * @var OutputInterface

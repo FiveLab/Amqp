@@ -29,15 +29,22 @@ class Message implements MessageInterface
     private $options;
 
     /**
+     * @var array
+     */
+    private $headers;
+
+    /**
      * Constructor.
      *
      * @param Payload $payload
      * @param Options $options
+     * @param Headers $headers
      */
-    public function __construct(Payload $payload, Options $options = null)
+    public function __construct(Payload $payload, Options $options = null, Headers $headers = null)
     {
         $this->payload = $payload;
         $this->options = $options ?: new Options(true);
+        $this->headers = $headers ?: new Headers([]);
     }
 
     /**
@@ -54,5 +61,13 @@ class Message implements MessageInterface
     public function getOptions(): Options
     {
         return $this->options;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getHeaders(): Headers
+    {
+        return $this->headers;
     }
 }

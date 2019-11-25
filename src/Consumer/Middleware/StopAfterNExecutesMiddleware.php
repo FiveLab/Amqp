@@ -19,7 +19,7 @@ use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
 /**
  * Middleware for stop execution after N iteration.
  */
-class StopAfterNExecutesMiddleware implements MiddlewareInterface
+class StopAfterNExecutesMiddleware implements ConsumerMiddlewareInterface
 {
     /**
      * @var int

@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Consumer;
 
-use FiveLab\Component\Amqp\Consumer\Middleware\MiddlewareInterface;
+use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareInterface;
 
 /**
  * All services with aware middleware should implement this interface.
@@ -23,7 +23,7 @@ interface MiddlewareAwareInterface
     /**
      * Push the middleware
      *
-     * @param MiddlewareInterface $middleware
+     * @param ConsumerMiddlewareInterface $middleware
      */
-    public function pushMiddleware(MiddlewareInterface $middleware): void;
+    public function pushMiddleware(ConsumerMiddlewareInterface $middleware): void;
 }

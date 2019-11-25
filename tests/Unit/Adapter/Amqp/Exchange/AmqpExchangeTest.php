@@ -15,6 +15,7 @@ namespace FiveLab\Component\Amqp\Tests\Unit\Adapter\Amqp\Exchange;
 
 use FiveLab\Component\Amqp\Adapter\Amqp\Channel\AmqpChannel;
 use FiveLab\Component\Amqp\Adapter\Amqp\Exchange\AmqpExchange;
+use FiveLab\Component\Amqp\Message\Headers;
 use FiveLab\Component\Amqp\Message\Message;
 use FiveLab\Component\Amqp\Message\Options;
 use FiveLab\Component\Amqp\Message\Payload;
@@ -108,6 +109,32 @@ class AmqpExchangeTest extends TestCase
             ->with('<root/>', 'foo-bar', AMQP_NOPARAM, [
                 'content_type'  => 'application/xml',
                 'delivery_mode' => 1,
+            ]);
+
+        $this->exchange->publish('foo-bar', $message);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldSuccessPublishMessageWithHeaders(): void
+    {
+        $message = new Message(
+            new Payload('{}', 'application/json'),
+            new Options(),
+            new Headers([
+                'x-custom-header' => 'foo-bar',
+            ])
+        );
+
+        $this->originalExchange->expects(self::once())
+            ->method('publish')
+            ->with('{}', 'foo-bar', AMQP_NOPARAM, [
+                'content_type'  => 'application/json',
+                'delivery_mode' => 2,
+                'headers'       => [
+                    'x-custom-header' => 'foo-bar',
+                ],
             ]);
 
         $this->exchange->publish('foo-bar', $message);

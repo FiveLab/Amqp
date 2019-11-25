@@ -13,10 +13,10 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Functional\Consumer\Middleware;
 
-use FiveLab\Component\Amqp\Consumer\Middleware\MiddlewareInterface;
+use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareInterface;
 use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
 
-class MiddlewareMock implements MiddlewareInterface
+class MiddlewareMock implements ConsumerMiddlewareInterface
 {
     /**
      * @var array

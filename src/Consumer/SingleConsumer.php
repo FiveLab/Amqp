@@ -15,8 +15,8 @@ namespace FiveLab\Component\Amqp\Consumer;
 
 use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlerInterface;
 use FiveLab\Component\Amqp\Consumer\Handler\ThrowableMessageHandlerInterface;
-use FiveLab\Component\Amqp\Consumer\Middleware\MiddlewareCollection;
-use FiveLab\Component\Amqp\Consumer\Middleware\MiddlewareInterface;
+use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareCollection;
+use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareInterface;
 use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
@@ -37,7 +37,7 @@ class SingleConsumer implements ConsumerInterface, MiddlewareAwareInterface
     private $messageHandler;
 
     /**
-     * @var MiddlewareCollection
+     * @var ConsumerMiddlewareCollection
      */
     private $middlewares;
 
@@ -49,12 +49,12 @@ class SingleConsumer implements ConsumerInterface, MiddlewareAwareInterface
     /**
      * Constructor.
      *
-     * @param QueueFactoryInterface   $queueFactory
-     * @param MessageHandlerInterface $messageHandler
-     * @param MiddlewareCollection    $middlewares
-     * @param ConsumerConfiguration   $configuration
+     * @param QueueFactoryInterface        $queueFactory
+     * @param MessageHandlerInterface      $messageHandler
+     * @param ConsumerMiddlewareCollection $middlewares
+     * @param ConsumerConfiguration        $configuration
      */
-    public function __construct(QueueFactoryInterface $queueFactory, MessageHandlerInterface $messageHandler, MiddlewareCollection $middlewares, ConsumerConfiguration $configuration)
+    public function __construct(QueueFactoryInterface $queueFactory, MessageHandlerInterface $messageHandler, ConsumerMiddlewareCollection $middlewares, ConsumerConfiguration $configuration)
     {
         $this->queueFactory = $queueFactory;
         $this->messageHandler = $messageHandler;
@@ -73,7 +73,7 @@ class SingleConsumer implements ConsumerInterface, MiddlewareAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function pushMiddleware(MiddlewareInterface $middleware): void
+    public function pushMiddleware(ConsumerMiddlewareInterface $middleware): void
     {
         $this->middlewares->push($middleware);
     }

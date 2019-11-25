@@ -16,8 +16,8 @@ namespace FiveLab\Component\Amqp\Consumer\Loop;
 use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
 use FiveLab\Component\Amqp\Consumer\Handler\FlushableMessageHandlerInterface;
 use FiveLab\Component\Amqp\Consumer\Handler\ThrowableMessageHandlerInterface;
-use FiveLab\Component\Amqp\Consumer\Middleware\MiddlewareCollection;
-use FiveLab\Component\Amqp\Consumer\Middleware\MiddlewareInterface;
+use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareCollection;
+use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareInterface;
 use FiveLab\Component\Amqp\Consumer\MiddlewareAwareInterface;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
@@ -40,7 +40,7 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
     private $messageHandler;
 
     /**
-     * @var MiddlewareCollection
+     * @var ConsumerMiddlewareCollection
      */
     private $middlewares;
 
@@ -61,10 +61,10 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
      *
      * @param QueueFactoryInterface            $queueFactory
      * @param FlushableMessageHandlerInterface $messageHandler
-     * @param MiddlewareCollection             $middlewares
+     * @param ConsumerMiddlewareCollection     $middlewares
      * @param LoopConsumerConfiguration        $configuration
      */
-    public function __construct(QueueFactoryInterface $queueFactory, FlushableMessageHandlerInterface $messageHandler, MiddlewareCollection $middlewares, LoopConsumerConfiguration $configuration)
+    public function __construct(QueueFactoryInterface $queueFactory, FlushableMessageHandlerInterface $messageHandler, ConsumerMiddlewareCollection $middlewares, LoopConsumerConfiguration $configuration)
     {
         $this->queueFactory = $queueFactory;
         $this->messageHandler = $messageHandler;
@@ -83,7 +83,7 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function pushMiddleware(MiddlewareInterface $middleware): void
+    public function pushMiddleware(ConsumerMiddlewareInterface $middleware): void
     {
         $this->middlewares->push($middleware);
     }

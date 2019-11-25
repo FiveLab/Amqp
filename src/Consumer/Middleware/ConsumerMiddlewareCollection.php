@@ -18,19 +18,19 @@ use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
 /**
  * The collection for store middlewares for consumers.
  */
-class MiddlewareCollection implements \IteratorAggregate
+class ConsumerMiddlewareCollection implements \IteratorAggregate
 {
     /**
-     * @var array|MiddlewareInterface[]
+     * @var array|ConsumerMiddlewareInterface[]
      */
     private $middlewares = [];
 
     /**
      * Constructor.
      *
-     * @param MiddlewareInterface ...$middlewares
+     * @param ConsumerMiddlewareInterface ...$middlewares
      */
-    public function __construct(MiddlewareInterface ...$middlewares)
+    public function __construct(ConsumerMiddlewareInterface ...$middlewares)
     {
         $this->middlewares = $middlewares;
     }
@@ -38,9 +38,9 @@ class MiddlewareCollection implements \IteratorAggregate
     /**
      * Push middleware
      *
-     * @param MiddlewareInterface $middleware
+     * @param ConsumerMiddlewareInterface $middleware
      */
-    public function push(MiddlewareInterface $middleware): void
+    public function push(ConsumerMiddlewareInterface $middleware): void
     {
         \array_push($this->middlewares, $middleware);
     }
@@ -48,7 +48,7 @@ class MiddlewareCollection implements \IteratorAggregate
     /**
      * {@inheritdoc}
      *
-     * @return \ArrayIterator|MiddlewareInterface[]
+     * @return \ArrayIterator|ConsumerMiddlewareInterface[]
      */
     public function getIterator()
     {

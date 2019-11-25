@@ -18,7 +18,7 @@ use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
 /**
  * All middleware should implement this interface.
  */
-interface MiddlewareInterface
+interface ConsumerMiddlewareInterface
 {
     /**
      * Handle on middleware layer

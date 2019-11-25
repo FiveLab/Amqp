@@ -21,7 +21,7 @@ use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
  *
  * Note: please don't use this middleware in loop consumers. This issue can have difficult results.
  */
-class ProxyMessageToAnotherExchangeMiddleware implements MiddlewareInterface
+class ProxyMessageToAnotherExchangeMiddleware implements ConsumerMiddlewareInterface
 {
     /**
      * @var ExchangeFactoryRegistryInterface

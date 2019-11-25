@@ -66,10 +66,16 @@ class AmqpExchange implements ExchangeInterface
      */
     public function publish(string $routingKey, MessageInterface $message): void
     {
+        $headers = $message->getHeaders()->all();
+
         $options = [
             'content_type'  => $message->getPayload()->getContentType(),
             'delivery_mode' => $message->getOptions()->isPersistent() ? 2 : 1,
         ];
+
+        if (\count($headers)) {
+            $options['headers'] = $headers;
+        }
 
         $this->exchange->publish($message->getPayload()->getData(), $routingKey, AMQP_NOPARAM, $options);
     }

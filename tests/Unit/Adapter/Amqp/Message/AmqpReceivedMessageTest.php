@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Unit\Adapter\Amqp\Message;
 
 use FiveLab\Component\Amqp\Adapter\Amqp\Message\AmqpReceivedMessage;
+use FiveLab\Component\Amqp\Message\Headers;
 use FiveLab\Component\Amqp\Message\Options;
 use FiveLab\Component\Amqp\Message\Payload;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -125,6 +126,24 @@ class AmqpReceivedMessageTest extends TestCase
             ->willReturn('some');
 
         self::assertEquals('some', $this->receivedMessage->getExchangeName());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldSuccessGetHeaders(): void
+    {
+        $this->envelope->expects(self::once())
+            ->method('getHeaders')
+            ->willReturn([
+                'x-custom-header-1' => 'foo',
+                'x-custom-header-2' => 'bar',
+            ]);
+
+        self::assertEquals(new Headers([
+            'x-custom-header-1' => 'foo',
+            'x-custom-header-2' => 'bar',
+        ]), $this->receivedMessage->getHeaders());
     }
 
     /**

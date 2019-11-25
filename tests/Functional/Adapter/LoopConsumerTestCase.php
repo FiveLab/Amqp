@@ -15,7 +15,7 @@ namespace FiveLab\Component\Amqp\Tests\Functional\Adapter;
 
 use FiveLab\Component\Amqp\Consumer\Loop\LoopConsumer;
 use FiveLab\Component\Amqp\Consumer\Loop\LoopConsumerConfiguration;
-use FiveLab\Component\Amqp\Consumer\Middleware\MiddlewareCollection;
+use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareCollection;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Queue\Definition\QueueBindingCollection;
 use FiveLab\Component\Amqp\Queue\Definition\QueueBindingDefinition;
@@ -75,7 +75,7 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
         $consumer = new LoopConsumer(
             $this->queueFactory,
             $this->messageHandler,
-            new MiddlewareCollection(),
+            new ConsumerMiddlewareCollection(),
             new LoopConsumerConfiguration(2)
         );
 

@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Adapter\Amqp\Message;
 
+use FiveLab\Component\Amqp\Message\Headers;
 use FiveLab\Component\Amqp\Message\Options;
 use FiveLab\Component\Amqp\Message\Payload;
 use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
@@ -132,5 +133,13 @@ class AmqpReceivedMessage implements ReceivedMessageInterface
     public function isAnswered(): bool
     {
         return $this->answered;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getHeaders(): Headers
+    {
+        return new Headers($this->envelope->getHeaders());
     }
 }

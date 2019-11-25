@@ -31,4 +31,11 @@ interface MessageInterface
      * @return Options
      */
     public function getOptions(): Options;
+
+    /**
+     * Get headers
+     *
+     * @return Headers
+     */
+    public function getHeaders(): Headers;
 }

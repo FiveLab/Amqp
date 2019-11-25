@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Functional\Adapter;
 
-use FiveLab\Component\Amqp\Consumer\Middleware\MiddlewareCollection;
+use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareCollection;
 use FiveLab\Component\Amqp\Consumer\Spool\SpoolConsumer;
 use FiveLab\Component\Amqp\Consumer\Spool\SpoolConsumerConfiguration;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
@@ -76,7 +76,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         $consumer = new SpoolConsumer(
             $this->queueFactory,
             $this->messageHandler,
-            new MiddlewareCollection(),
+            new ConsumerMiddlewareCollection(),
             new SpoolConsumerConfiguration(10, 2)
         );
 
@@ -112,7 +112,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         $consumer = new SpoolConsumer(
             $this->queueFactory,
             $this->messageHandler,
-            new MiddlewareCollection(),
+            new ConsumerMiddlewareCollection(),
             new SpoolConsumerConfiguration(10, 2, 0, true)
         );
 
@@ -152,7 +152,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         $consumer = new SpoolConsumer(
             $this->queueFactory,
             $this->messageHandler,
-            new MiddlewareCollection(),
+            new ConsumerMiddlewareCollection(),
             new SpoolConsumerConfiguration(10, 2, 0, false)
         );
 
@@ -193,7 +193,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         $consumer = new SpoolConsumer(
             $this->queueFactory,
             $this->messageHandler,
-            new MiddlewareCollection(),
+            new ConsumerMiddlewareCollection(),
             new SpoolConsumerConfiguration(10, 2)
         );
 
@@ -224,7 +224,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         $consumer = new SpoolConsumer(
             $this->queueFactory,
             $this->messageHandler,
-            new MiddlewareCollection(),
+            new ConsumerMiddlewareCollection(),
             new SpoolConsumerConfiguration(5, 2, 0, true)
         );
 
@@ -259,7 +259,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         $consumer = new SpoolConsumer(
             $this->queueFactory,
             $this->messageHandler,
-            new MiddlewareCollection(),
+            new ConsumerMiddlewareCollection(),
             new SpoolConsumerConfiguration(5, 2, 0, false)
         );
 
