@@ -17,6 +17,7 @@ use FiveLab\Component\Amqp\Argument\ArgumentCollection;
 use FiveLab\Component\Amqp\Exchange\Definition\Arguments\AlternateExchangeArgument;
 use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
 use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
+use FiveLab\Component\Amqp\Message\Identifier;
 use FiveLab\Component\Amqp\Message\Message;
 use FiveLab\Component\Amqp\Message\Options;
 use FiveLab\Component\Amqp\Message\Payload;
@@ -138,87 +139,5 @@ abstract class ExchangeFactoryTestCase extends RabbitMqTestCase
 
         $factory = $this->createExchangeFactory($definition);
         $factory->create();
-    }
-
-    /**
-     * @test
-     */
-    public function shouldSuccessPublishWithDefaults(): void
-    {
-        $message = new Message(new Payload('some foo bar'));
-
-        $definition = new ExchangeDefinition('some', AMQP_EX_TYPE_DIRECT);
-
-        $factory = $this->createExchangeFactory($definition);
-        $exchange = $factory->create();
-
-        // Create queue for publish message and next retrieve for check.
-        $this->management->createQueue('some');
-        $this->management->queueBind('some', 'some', 'test');
-
-        $exchange->publish('test', $message);
-
-        $retrieveMessages = $this->management->queueGetMessages('some', 1);
-
-        self::assertCount(1, $retrieveMessages, 'The queue is empty. Messages not published to queue.');
-        $retrieveMessage = $retrieveMessages[0];
-
-        self::assertEquals('text/plain', $retrieveMessage['properties']['content_type']);
-        self::assertEquals(2, $retrieveMessage['properties']['delivery_mode']);
-        self::assertEquals('test', $retrieveMessage['routing_key']);
-        self::assertEquals('some foo bar', $retrieveMessage['payload']);
-    }
-
-    /**
-     * @test
-     */
-    public function shouldSuccessPublishWithCustomContentType(): void
-    {
-        $message = new Message(new Payload('{"a":"b"}', 'application/json'));
-
-        $definition = new ExchangeDefinition('some', AMQP_EX_TYPE_DIRECT);
-
-        $factory = $this->createExchangeFactory($definition);
-        $exchange = $factory->create();
-
-        // Create queue for publish message and next retrieve for check.
-        $this->management->createQueue('some');
-        $this->management->queueBind('some', 'some', 'test');
-
-        $exchange->publish('test', $message);
-
-        $retrieveMessages = $this->management->queueGetMessages('some', 1);
-
-        self::assertCount(1, $retrieveMessages, 'The queue is empty. Messages not published to queue.');
-        $retrieveMessage = $retrieveMessages[0];
-
-        self::assertEquals('application/json', $retrieveMessage['properties']['content_type']);
-        self::assertEquals('{"a":"b"}', $retrieveMessage['payload']);
-    }
-
-    /**
-     * @test
-     */
-    public function shouldSuccessPublishWithoutDurableMode(): void
-    {
-        $message = new Message(new Payload('some foo bar'), new Options(false));
-
-        $definition = new ExchangeDefinition('some', AMQP_EX_TYPE_DIRECT);
-
-        $factory = $this->createExchangeFactory($definition);
-        $exchange = $factory->create();
-
-        // Create queue for publish message and next retrieve for check.
-        $this->management->createQueue('some');
-        $this->management->queueBind('some', 'some', 'test');
-
-        $exchange->publish('test', $message);
-
-        $retrieveMessages = $this->management->queueGetMessages('some', 1);
-
-        self::assertCount(1, $retrieveMessages, 'The queue is empty. Messages not published to queue.');
-        $retrieveMessage = $retrieveMessages[0];
-
-        self::assertEquals(1, $retrieveMessage['properties']['delivery_mode']);
     }
 }

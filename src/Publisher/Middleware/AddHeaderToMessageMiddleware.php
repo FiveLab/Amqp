@@ -55,7 +55,8 @@ class AddHeaderToMessageMiddleware implements PublisherMiddlewareInterface
         $messageWithHeader = new Message(
             $message->getPayload(),
             $message->getOptions(),
-            new Headers($headers)
+            new Headers($headers),
+            $message->getIdentifier()
         );
 
         $next($routingKey, $messageWithHeader);

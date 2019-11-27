@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Adapter\Amqp\Message;
 
 use FiveLab\Component\Amqp\Message\Headers;
+use FiveLab\Component\Amqp\Message\Identifier;
 use FiveLab\Component\Amqp\Message\Options;
 use FiveLab\Component\Amqp\Message\Payload;
 use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
@@ -67,6 +68,18 @@ class AmqpReceivedMessage implements ReceivedMessageInterface
     public function getOptions(): Options
     {
         return new Options($this->envelope->getDeliveryMode() === 2);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIdentifier(): Identifier
+    {
+        return new Identifier(
+            $this->envelope->getMessageId(),
+            $this->envelope->getAppId(),
+            $this->envelope->getUserId()
+        );
     }
 
     /**

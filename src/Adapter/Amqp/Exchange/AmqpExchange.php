@@ -67,11 +67,24 @@ class AmqpExchange implements ExchangeInterface
     public function publish(string $routingKey, MessageInterface $message): void
     {
         $headers = $message->getHeaders()->all();
+        $identifier = $message->getIdentifier();
 
         $options = [
             'content_type'  => $message->getPayload()->getContentType(),
             'delivery_mode' => $message->getOptions()->isPersistent() ? 2 : 1,
         ];
+
+        if ($identifier->getId()) {
+            $options['message_id'] = $identifier->getId();
+        }
+
+        if ($identifier->getUserId()) {
+            $options['user_id'] = $identifier->getUserId();
+        }
+
+        if ($identifier->getAppId()) {
+            $options['app_id'] = $identifier->getAppId();
+        }
 
         if (\count($headers)) {
             $options['headers'] = $headers;

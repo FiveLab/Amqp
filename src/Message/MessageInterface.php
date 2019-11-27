@@ -38,4 +38,11 @@ interface MessageInterface
      * @return Headers
      */
     public function getHeaders(): Headers;
+
+    /**
+     * Get message identifier
+     *
+     * @return Identifier
+     */
+    public function getIdentifier(): Identifier;
 }

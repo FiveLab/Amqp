@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Unit\Publisher\Middleware;
 
 use FiveLab\Component\Amqp\Message\Headers;
+use FiveLab\Component\Amqp\Message\Identifier;
 use FiveLab\Component\Amqp\Message\Message;
 use FiveLab\Component\Amqp\Message\MessageInterface;
 use FiveLab\Component\Amqp\Message\Options;
@@ -38,7 +39,8 @@ class AddHeaderToMessageMiddlewareTest extends TestCase
             self::assertEquals(new Message(
                 new Payload('foo'),
                 new Options(),
-                new Headers(['x-custom-header' => 'foo-bar'])
+                new Headers(['x-custom-header' => 'foo-bar']),
+                new Identifier()
             ), $message);
         };
 

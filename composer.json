@@ -28,12 +28,14 @@
         "phpmetrics/phpmetrics": "^2.0",
         "escapestudios/symfony2-coding-standard": "~3.5.0",
         "guzzlehttp/guzzle": "~6.3.0",
-        "symfony/console": "~2.3|~4.0"
+        "symfony/console": "~2.3|~4.0",
+        "ramsey/uuid": "~3.0"
     },
 
     "suggest": {
         "ext-amqp": "For use amqp extension.",
-        "symfony/console": "For configure console commands for run consumer."
+        "symfony/console": "For configure console commands for run consumer.",
+        "ramsey/uuid": "For use UUID message generator"
     },
 
     "autoload": {

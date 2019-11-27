@@ -34,17 +34,24 @@ class Message implements MessageInterface
     private $headers;
 
     /**
+     * @var Identifier
+     */
+    private $identifier;
+
+    /**
      * Constructor.
      *
-     * @param Payload $payload
-     * @param Options $options
-     * @param Headers $headers
+     * @param Payload    $payload
+     * @param Options    $options
+     * @param Headers    $headers
+     * @param Identifier $identifier
      */
-    public function __construct(Payload $payload, Options $options = null, Headers $headers = null)
+    public function __construct(Payload $payload, Options $options = null, Headers $headers = null, Identifier $identifier = null)
     {
         $this->payload = $payload;
         $this->options = $options ?: new Options(true);
         $this->headers = $headers ?: new Headers([]);
+        $this->identifier = $identifier ?: new Identifier();
     }
 
     /**
@@ -69,5 +76,13 @@ class Message implements MessageInterface
     public function getHeaders(): Headers
     {
         return $this->headers;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIdentifier(): Identifier
+    {
+        return $this->identifier;
     }
 }

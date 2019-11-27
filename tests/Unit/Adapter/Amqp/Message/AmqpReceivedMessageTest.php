@@ -15,6 +15,7 @@ namespace FiveLab\Component\Amqp\Tests\Unit\Adapter\Amqp\Message;
 
 use FiveLab\Component\Amqp\Adapter\Amqp\Message\AmqpReceivedMessage;
 use FiveLab\Component\Amqp\Message\Headers;
+use FiveLab\Component\Amqp\Message\Identifier;
 use FiveLab\Component\Amqp\Message\Options;
 use FiveLab\Component\Amqp\Message\Payload;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -102,6 +103,28 @@ class AmqpReceivedMessageTest extends TestCase
         $options = $this->receivedMessage->getOptions();
 
         self::assertEquals(new Options(true), $options);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldSuccessGetIdentifier(): void
+    {
+        $this->envelope->expects(self::once())
+            ->method('getMessageId')
+            ->willReturn('message-id');
+
+        $this->envelope->expects(self::once())
+            ->method('getAppId')
+            ->willReturn('app-id');
+
+        $this->envelope->expects(self::once())
+            ->method('getUserId')
+            ->willReturn('user-id');
+
+        $identifier = $this->receivedMessage->getIdentifier();
+
+        self::assertEquals(new Identifier('message-id', 'app-id', 'user-id'), $identifier);
     }
 
     /**
