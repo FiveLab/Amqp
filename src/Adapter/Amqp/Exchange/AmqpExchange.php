@@ -64,7 +64,7 @@ class AmqpExchange implements ExchangeInterface
     /**
      * {@inheritdoc}
      */
-    public function publish(string $routingKey, MessageInterface $message): void
+    public function publish(MessageInterface $message, string $routingKey = ''): void
     {
         $headers = $message->getHeaders()->all();
         $identifier = $message->getIdentifier();

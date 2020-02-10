@@ -38,8 +38,8 @@ interface ExchangeInterface
     /**
      * Publish message to RabbitMQ
      *
-     * @param string           $routingKey
      * @param MessageInterface $message
+     * @param string           $routingKey
      */
-    public function publish(string $routingKey, MessageInterface $message): void;
+    public function publish(MessageInterface $message, string $routingKey = ''): void;
 }

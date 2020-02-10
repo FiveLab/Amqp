@@ -14,6 +14,8 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Functional\Adapter;
 
 use FiveLab\Component\Amqp\Argument\ArgumentCollection;
+use FiveLab\Component\Amqp\Binding\Definition\BindingCollection;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Exchange\Definition\Arguments\AlternateExchangeArgument;
 use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
 use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
@@ -122,6 +124,40 @@ abstract class ExchangeFactoryTestCase extends RabbitMqTestCase
         self::assertEquals([
             'alternate-exchange' => 'foo-bar',
         ], $arguments);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldSuccessCreateWithBindings(): void
+    {
+        $this->management->createExchange('direct', 'foo.bar');
+
+        $definition = new ExchangeDefinition(
+            'some',
+            AMQP_EX_TYPE_DIRECT,
+            true,
+            false,
+            null,
+            new BindingCollection(new BindingDefinition('foo.bar', 'some'))
+        );
+
+        $factory = $this->createExchangeFactory($definition);
+        $factory->create();
+
+        $bindings = $this->management->exchangeBindings('some');
+
+        self::assertEquals([
+            [
+                'source'           => 'foo.bar',
+                'vhost'            => $this->getRabbitMqVhost(),
+                'destination'      => 'some',
+                'destination_type' => 'exchange',
+                'routing_key'      => 'some',
+                'arguments'        => [],
+                'properties_key'   => 'some',
+            ],
+        ], $bindings);
     }
 
     /**

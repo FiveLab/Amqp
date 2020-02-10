@@ -55,7 +55,7 @@ class AddIdentifierToMessageMiddleware implements PublisherMiddlewareInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(string $routingKey, MessageInterface $message, callable $next): void
+    public function handle(MessageInterface $message, callable $next, string $routingKey = ''): void
     {
         $identifier = $message->getIdentifier();
 
@@ -82,6 +82,6 @@ class AddIdentifierToMessageMiddleware implements PublisherMiddlewareInterface
             new Identifier($messageId, $appId, $userId)
         );
 
-        $next($routingKey, $messageWithIdentifier);
+        $next($messageWithIdentifier, $routingKey);
     }
 }

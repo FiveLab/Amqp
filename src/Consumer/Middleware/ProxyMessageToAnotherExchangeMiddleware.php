@@ -62,6 +62,6 @@ class ProxyMessageToAnotherExchangeMiddleware implements ConsumerMiddlewareInter
 
         $proxyToExchange = $this->exchangeFactoryRegistry->get($this->toExchange)->create();
 
-        $proxyToExchange->publish($message->getRoutingKey(), $message);
+        $proxyToExchange->publish($message, $message->getRoutingKey());
     }
 }

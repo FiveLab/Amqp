@@ -23,8 +23,8 @@ interface PublisherInterface
     /**
      * Publish message
      *
-     * @param string           $routingKey
      * @param MessageInterface $message
+     * @param string           $routingKey
      */
-    public function publish(string $routingKey, MessageInterface $message): void;
+    public function publish(MessageInterface $message, string $routingKey = ''): void;
 }

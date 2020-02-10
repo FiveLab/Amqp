@@ -69,7 +69,7 @@ class PublisherTest extends TestCase
         $message = new Message(new Payload('some'));
         $executed = false;
 
-        $executable = static function (string $routingKey, MessageInterface $message) use (&$executed) {
+        $executable = static function (MessageInterface $message, string $routingKey = '') use (&$executed) {
             $executed = true;
 
             self::assertEquals('foo.bar', $routingKey);
@@ -81,7 +81,7 @@ class PublisherTest extends TestCase
             ->with(self::isInstanceOf(\Closure::class))
             ->willReturn($executable);
 
-        $this->publisher->publish('foo.bar', $message);
+        $this->publisher->publish($message, 'foo.bar');
 
         self::assertTrue($executed, 'The publisher don\'t execute middleware callback.');
     }

@@ -23,9 +23,9 @@ interface PublisherMiddlewareInterface
     /**
      * Handle on middleware layer
      *
-     * @param string           $routingKey
      * @param MessageInterface $message
      * @param callable         $next
+     * @param string           $routingKey
      */
-    public function handle(string $routingKey, MessageInterface $message, callable $next): void;
+    public function handle(MessageInterface $message, callable $next, string $routingKey = ''): void;
 }

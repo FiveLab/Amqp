@@ -58,8 +58,8 @@ class PublisherMiddlewareCollection implements \IteratorAggregate
         $middlewares = $this->middlewares;
 
         while ($middleware = \array_pop($middlewares)) {
-            $lastExecutable = function (string $routingKey, MessageInterface $message) use ($middleware, $lastExecutable) {
-                return $middleware->handle($routingKey, $message, $lastExecutable);
+            $lastExecutable = static function (MessageInterface $message, string $routingKey) use ($middleware, $lastExecutable) {
+                return $middleware->handle($message, $lastExecutable, $routingKey);
             };
         }
 

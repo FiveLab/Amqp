@@ -15,6 +15,8 @@ namespace FiveLab\Component\Amqp\Exchange\Definition;
 
 use FiveLab\Component\Amqp\Argument\ArgumentCollection;
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
+use FiveLab\Component\Amqp\Binding\Definition\BindingCollection;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 
 /**
  * Exchange definition.
@@ -47,15 +49,27 @@ class ExchangeDefinition
     private $arguments;
 
     /**
+     * @var BindingCollection|BindingDefinition[]
+     */
+    private $bindings;
+
+    /**
+     * @var BindingCollection|BindingDefinition[]
+     */
+    private $unbindings;
+
+    /**
      * Constructor.
      *
-     * @param string             $name
-     * @param string             $type
-     * @param bool               $durable
-     * @param bool               $passive
-     * @param ArgumentCollection $arguments
+     * @param string                  $name
+     * @param string                  $type
+     * @param bool                    $durable
+     * @param bool                    $passive
+     * @param ArgumentCollection|null $arguments
+     * @param BindingCollection|null  $bindings
+     * @param BindingCollection|null  $unbindings
      */
-    public function __construct(string $name, string $type, bool $durable = true, bool $passive = false, ArgumentCollection $arguments = null)
+    public function __construct(string $name, string $type, bool $durable = true, bool $passive = false, ArgumentCollection $arguments = null, BindingCollection $bindings = null, BindingCollection $unbindings = null)
     {
         $possibleTypes = [
             'direct',
@@ -77,6 +91,8 @@ class ExchangeDefinition
         $this->durable = $durable;
         $this->passive = $passive;
         $this->arguments = $arguments ?: new ArgumentCollection();
+        $this->bindings = $bindings ?: new BindingCollection();
+        $this->unbindings = $unbindings ?: new BindingCollection();
     }
 
     /**
@@ -127,5 +143,25 @@ class ExchangeDefinition
     public function getArguments(): ArgumentCollection
     {
         return $this->arguments;
+    }
+
+    /**
+     * Get bindings
+     *
+     * @return BindingCollection|BindingDefinition[]
+     */
+    public function getBindings(): BindingCollection
+    {
+        return $this->bindings;
+    }
+
+    /**
+     * Get unbindings
+     *
+     * @return BindingCollection|BindingDefinition[]
+     */
+    public function getUnBindings(): BindingCollection
+    {
+        return $this->unbindings;
     }
 }

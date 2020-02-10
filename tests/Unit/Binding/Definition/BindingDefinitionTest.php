@@ -11,19 +11,19 @@
 
 declare(strict_types = 1);
 
-namespace FiveLab\Component\Amqp\Tests\Unit\Queue\Definition;
+namespace FiveLab\Component\Amqp\Tests\Unit\Binding\Definition;
 
-use FiveLab\Component\Amqp\Queue\Definition\QueueBindingDefinition;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use PHPUnit\Framework\TestCase;
 
-class QueueBindingDefinitionTest extends TestCase
+class BindingDefinitionTest extends TestCase
 {
     /**
      * @test
      */
     public function shouldSuccessCreate(): void
     {
-        $def = new QueueBindingDefinition('some', 'test');
+        $def = new BindingDefinition('some', 'test');
 
         self::assertEquals('some', $def->getExchangeName());
         self::assertEquals('test', $def->getRoutingKey());

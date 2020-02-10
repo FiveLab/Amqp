@@ -91,7 +91,7 @@ class AmqpExchangeTest extends TestCase
                 'delivery_mode' => 2,
             ]);
 
-        $this->exchange->publish('some', $message);
+        $this->exchange->publish($message, 'some');
     }
 
     /**
@@ -111,7 +111,7 @@ class AmqpExchangeTest extends TestCase
                 'delivery_mode' => 1,
             ]);
 
-        $this->exchange->publish('foo-bar', $message);
+        $this->exchange->publish($message, 'foo-bar');
     }
 
     /**
@@ -137,6 +137,6 @@ class AmqpExchangeTest extends TestCase
                 ],
             ]);
 
-        $this->exchange->publish('foo-bar', $message);
+        $this->exchange->publish($message, 'foo-bar');
     }
 }

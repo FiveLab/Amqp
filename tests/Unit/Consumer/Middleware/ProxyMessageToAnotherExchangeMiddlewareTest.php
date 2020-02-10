@@ -82,11 +82,11 @@ class ProxyMessageToAnotherExchangeMiddlewareTest extends TestCase
 
         $this->exchange->expects(self::once())
             ->method('publish')
-            ->with('some', $message);
+            ->with($message, 'some');
 
         $called = false;
 
-        $this->middleware->handle($message, function () use (&$called) {
+        $this->middleware->handle($message, static function () use (&$called) {
             $called = true;
         });
 

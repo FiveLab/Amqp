@@ -15,6 +15,8 @@ namespace FiveLab\Component\Amqp\Queue\Definition;
 
 use FiveLab\Component\Amqp\Argument\ArgumentCollection;
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
+use FiveLab\Component\Amqp\Binding\Definition\BindingCollection;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 
 /**
  * The definition for describe queue.
@@ -47,12 +49,12 @@ class QueueDefinition
     private $autoDelete;
 
     /**
-     * @var array|QueueBindingDefinition[]
+     * @var array|BindingDefinition[]
      */
     private $bindings;
 
     /**
-     * @var array|QueueBindingDefinition[]
+     * @var array|BindingDefinition[]
      */
     private $unBindings;
 
@@ -64,20 +66,20 @@ class QueueDefinition
     /**
      * Constructor.
      *
-     * @param string                 $name
-     * @param QueueBindingCollection $bindings
-     * @param QueueBindingCollection $unBindings
-     * @param bool                   $durable
-     * @param bool                   $passive
-     * @param bool                   $exclusive
-     * @param bool                   $autoDelete
-     * @param ArgumentCollection     $arguments
+     * @param string             $name
+     * @param BindingCollection  $bindings
+     * @param BindingCollection  $unBindings
+     * @param bool               $durable
+     * @param bool               $passive
+     * @param bool               $exclusive
+     * @param bool               $autoDelete
+     * @param ArgumentCollection $arguments
      */
-    public function __construct(string $name, QueueBindingCollection $bindings = null, QueueBindingCollection $unBindings = null, bool $durable = true, bool $passive = false, bool $exclusive = false, bool $autoDelete = false, ArgumentCollection $arguments = null)
+    public function __construct(string $name, BindingCollection $bindings = null, BindingCollection $unBindings = null, bool $durable = true, bool $passive = false, bool $exclusive = false, bool $autoDelete = false, ArgumentCollection $arguments = null)
     {
         $this->name = $name;
-        $this->bindings = $bindings ?: new QueueBindingCollection();
-        $this->unBindings = $unBindings ?: new QueueBindingCollection();
+        $this->bindings = $bindings ?: new BindingCollection();
+        $this->unBindings = $unBindings ?: new BindingCollection();
         $this->durable = $durable;
         $this->passive = $passive;
         $this->exclusive = $exclusive;
@@ -138,9 +140,9 @@ class QueueDefinition
     /**
      * Get bindings
      *
-     * @return QueueBindingCollection|QueueBindingDefinition[]
+     * @return BindingCollection|BindingDefinition[]
      */
-    public function getBindings(): QueueBindingCollection
+    public function getBindings(): BindingCollection
     {
         return $this->bindings;
     }
@@ -148,9 +150,9 @@ class QueueDefinition
     /**
      * Get unbindings
      *
-     * @return QueueBindingCollection
+     * @return BindingCollection|BindingDefinition[]
      */
-    public function getUnBindings(): QueueBindingCollection
+    public function getUnBindings(): BindingCollection
     {
         return $this->unBindings;
     }

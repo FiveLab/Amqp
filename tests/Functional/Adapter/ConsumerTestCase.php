@@ -13,6 +13,8 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Functional\Adapter;
 
+use FiveLab\Component\Amqp\Binding\Definition\BindingCollection;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Consumer\ConsumerConfiguration;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareCollection;
 use FiveLab\Component\Amqp\Consumer\Middleware\ProxyMessageToAnotherExchangeMiddleware;
@@ -27,8 +29,6 @@ use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
 use FiveLab\Component\Amqp\Exchange\Registry\ExchangeFactoryRegistry;
 use FiveLab\Component\Amqp\Exchange\Registry\ExchangeFactoryRegistryInterface;
 use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
-use FiveLab\Component\Amqp\Queue\Definition\QueueBindingCollection;
-use FiveLab\Component\Amqp\Queue\Definition\QueueBindingDefinition;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Tests\Functional\Consumer\Handler\MessageHandlerMock;
@@ -90,14 +90,14 @@ abstract class ConsumerTestCase extends RabbitMqTestCase
 
         $queueDefinition = new QueueDefinition(
             'some',
-            new QueueBindingCollection(new QueueBindingDefinition('test.direct', 'test'))
+            new BindingCollection(new BindingDefinition('test.direct', 'test'))
         );
 
         $this->queueFactory = $this->createQueueFactory($queueDefinition);
 
         $proxyQueueDefinition = new QueueDefinition(
             'proxy',
-            new QueueBindingCollection(new QueueBindingDefinition('proxy.direct', 'test'))
+            new BindingCollection(new BindingDefinition('proxy.direct', 'test'))
         );
 
         $this->proxyQueueFactory = $this->createQueueFactory($proxyQueueDefinition);

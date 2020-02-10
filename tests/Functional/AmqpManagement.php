@@ -248,6 +248,20 @@ class AmqpManagement
     }
 
     /**
+     * Get exchange bindings
+     *
+     * @param string $name
+     *
+     * @return array
+     */
+    public function exchangeBindings(string $name): array
+    {
+        $response = $this->client->get(\sprintf('/api/exchanges/%s/%s/bindings/destination', \urlencode($this->vhost), $name));
+
+        return \json_decode((string) $response->getBody(), true);
+    }
+
+    /**
      * Delete exchange
      *
      * @param string $name

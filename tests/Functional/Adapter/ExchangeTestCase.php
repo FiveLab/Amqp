@@ -141,7 +141,7 @@ abstract class ExchangeTestCase extends RabbitMqTestCase
      */
     private function publishMessage(Message $message): array
     {
-        $this->exchange->publish('some', $message);
+        $this->exchange->publish($message, 'some');
 
         $retrieveMessages = $this->management->queueGetMessages('test', 1);
 

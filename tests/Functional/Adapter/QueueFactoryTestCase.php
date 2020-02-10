@@ -14,13 +14,13 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Functional\Adapter;
 
 use FiveLab\Component\Amqp\Argument\ArgumentCollection;
+use FiveLab\Component\Amqp\Binding\Definition\BindingCollection;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Message\Payload;
 use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
 use FiveLab\Component\Amqp\Queue\Definition\Arguments\QueueMasterLocatorArgument;
 use FiveLab\Component\Amqp\Queue\Definition\Arguments\QueueModeArgument;
-use FiveLab\Component\Amqp\Queue\Definition\QueueBindingCollection;
-use FiveLab\Component\Amqp\Queue\Definition\QueueBindingDefinition;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Tests\Functional\RabbitMqTestCase;
@@ -173,10 +173,10 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
 
         $definition = new QueueDefinition(
             'some',
-            new QueueBindingCollection(
-                new QueueBindingDefinition('test.direct1', 'key1'),
-                new QueueBindingDefinition('test.direct2', 'key1'),
-                new QueueBindingDefinition('test.direct2', 'key2')
+            new BindingCollection(
+                new BindingDefinition('test.direct1', 'key1'),
+                new BindingDefinition('test.direct2', 'key1'),
+                new BindingDefinition('test.direct2', 'key2')
             )
         );
 
@@ -207,10 +207,10 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
         $definition = new QueueDefinition(
             'some',
             null,
-            new QueueBindingCollection(
-                new QueueBindingDefinition('test.direct1', 'key1'),
-                new QueueBindingDefinition('test.direct2', 'key1'),
-                new QueueBindingDefinition('test.direct2', 'key2')
+            new BindingCollection(
+                new BindingDefinition('test.direct1', 'key1'),
+                new BindingDefinition('test.direct2', 'key1'),
+                new BindingDefinition('test.direct2', 'key2')
             )
         );
 
@@ -266,8 +266,8 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
 
         $definition = new QueueDefinition(
             'some',
-            new QueueBindingCollection(
-                new QueueBindingDefinition('test.direct', 'test')
+            new BindingCollection(
+                new BindingDefinition('test.direct', 'test')
             )
         );
 

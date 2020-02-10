@@ -47,7 +47,7 @@ class Publisher implements PublisherInterface
     /**
      * {@inheritdoc}
      */
-    public function publish(string $routingKey, MessageInterface $message): void
+    public function publish(MessageInterface $message, string $routingKey = ''): void
     {
         $exchange = $this->exchangeFactory->create();
 
@@ -55,6 +55,6 @@ class Publisher implements PublisherInterface
             $exchange->publish($routingKey, $message);
         });
 
-        $callable($routingKey, $message);
+        $callable($message, $routingKey);
     }
 }

@@ -47,7 +47,7 @@ class AddHeaderToMessageMiddleware implements PublisherMiddlewareInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(string $routingKey, MessageInterface $message, callable $next): void
+    public function handle(MessageInterface $message, callable $next, string $routingKey = ''): void
     {
         $headers = $message->getHeaders()->all();
         $headers[$this->name] = $this->value;
@@ -59,6 +59,6 @@ class AddHeaderToMessageMiddleware implements PublisherMiddlewareInterface
             $message->getIdentifier()
         );
 
-        $next($routingKey, $messageWithHeader);
+        $next($messageWithHeader, $routingKey);
     }
 }

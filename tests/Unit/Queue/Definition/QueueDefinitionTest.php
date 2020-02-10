@@ -15,8 +15,8 @@ namespace FiveLab\Component\Amqp\Tests\Unit\Queue\Definition;
 
 use FiveLab\Component\Amqp\Argument\ArgumentCollection;
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
-use FiveLab\Component\Amqp\Queue\Definition\QueueBindingDefinition;
-use FiveLab\Component\Amqp\Queue\Definition\QueueBindingCollection;
+use FiveLab\Component\Amqp\Binding\Definition\BindingCollection;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use PHPUnit\Framework\TestCase;
 
@@ -30,7 +30,8 @@ class QueueDefinitionTest extends TestCase
         $def = new QueueDefinition('some');
 
         self::assertEquals('some', $def->getName());
-        self::assertEquals(new QueueBindingCollection(), $def->getBindings());
+        self::assertEquals(new BindingCollection(), $def->getBindings());
+        self::assertEquals(new BindingCollection(), $def->getUnBindings());
         self::assertTrue($def->isDurable());
         self::assertFalse($def->isPassive());
         self::assertFalse($def->isExclusive());
@@ -42,12 +43,12 @@ class QueueDefinitionTest extends TestCase
      */
     public function shouldSuccessCreateWithBinding(): void
     {
-        $bind1 = new QueueBindingDefinition('ex1', 'rout1');
-        $bind2 = new QueueBindingDefinition('ex2', 'rout2');
+        $bind1 = new BindingDefinition('ex1', 'rout1');
+        $bind2 = new BindingDefinition('ex2', 'rout2');
 
-        $def = new QueueDefinition('some', new QueueBindingCollection($bind1, $bind2));
+        $def = new QueueDefinition('some', new BindingCollection($bind1, $bind2));
 
-        self::assertEquals(new QueueBindingCollection($bind1, $bind2), $def->getBindings());
+        self::assertEquals(new BindingCollection($bind1, $bind2), $def->getBindings());
     }
 
     /**
@@ -55,12 +56,12 @@ class QueueDefinitionTest extends TestCase
      */
     public function shouldSuccessCreateWithUnBinding(): void
     {
-        $bind1 = new QueueBindingDefinition('ex1', 'rout1');
-        $bind2 = new QueueBindingDefinition('ex2', 'rout2');
+        $bind1 = new BindingDefinition('ex1', 'rout1');
+        $bind2 = new BindingDefinition('ex2', 'rout2');
 
-        $def = new QueueDefinition('some', new QueueBindingCollection(), new QueueBindingCollection($bind1, $bind2));
+        $def = new QueueDefinition('some', new BindingCollection(), new BindingCollection($bind1, $bind2));
 
-        self::assertEquals(new QueueBindingCollection($bind1, $bind2), $def->getUnBindings());
+        self::assertEquals(new BindingCollection($bind1, $bind2), $def->getUnBindings());
     }
 
     /**

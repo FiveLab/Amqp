@@ -11,12 +11,12 @@
 
 declare(strict_types = 1);
 
-namespace FiveLab\Component\Amqp\Queue\Definition;
+namespace FiveLab\Component\Amqp\Binding\Definition;
 
 /**
  * The definition for describe queue bindings.
  */
-class QueueBindingDefinition
+class BindingDefinition
 {
     /**
      * @var string

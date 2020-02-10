@@ -16,6 +16,8 @@ namespace FiveLab\Component\Amqp\Tests\Functional\Consumer\RoundRobin;
 use FiveLab\Component\Amqp\Adapter\Amqp\Channel\AmqpChannelFactory;
 use FiveLab\Component\Amqp\Adapter\Amqp\Connection\AmqpConnectionFactory;
 use FiveLab\Component\Amqp\Adapter\Amqp\Queue\AmqpQueueFactory;
+use FiveLab\Component\Amqp\Binding\Definition\BindingCollection;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Channel\Definition\ChannelDefinition;
 use FiveLab\Component\Amqp\Consumer\ConsumerConfiguration;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareCollection;
@@ -23,8 +25,6 @@ use FiveLab\Component\Amqp\Consumer\SingleConsumer;
 use FiveLab\Component\Amqp\Consumer\RoundRobin\RoundRobinConsumer;
 use FiveLab\Component\Amqp\Consumer\RoundRobin\RoundRobinConsumerConfiguration;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
-use FiveLab\Component\Amqp\Queue\Definition\QueueBindingCollection;
-use FiveLab\Component\Amqp\Queue\Definition\QueueBindingDefinition;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Tests\Functional\Consumer\Handler\MessageHandlerMock;
 use FiveLab\Component\Amqp\Tests\Functional\RabbitMqTestCase;
@@ -79,12 +79,12 @@ class RoundRobinConsumerTest extends RabbitMqTestCase
 
         $channelFactory = new AmqpChannelFactory($connectionFactory, new ChannelDefinition());
 
-        $this->queueFactory1 = new AmqpQueueFactory($channelFactory, new QueueDefinition('queue1', new QueueBindingCollection(
-            new QueueBindingDefinition('exchange1', 'foo1')
+        $this->queueFactory1 = new AmqpQueueFactory($channelFactory, new QueueDefinition('queue1', new BindingCollection(
+            new BindingDefinition('exchange1', 'foo1')
         )));
 
-        $this->queueFactory2 = new AmqpQueueFactory($channelFactory, new QueueDefinition('queue2', new QueueBindingCollection(
-            new QueueBindingDefinition('exchange2', 'foo2')
+        $this->queueFactory2 = new AmqpQueueFactory($channelFactory, new QueueDefinition('queue2', new BindingCollection(
+            new BindingDefinition('exchange2', 'foo2')
         )));
     }
 

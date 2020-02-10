@@ -85,6 +85,14 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
 
         $exchange->declareExchange();
 
+        foreach ($this->definition->getBindings() as $binding) {
+            $exchange->bind($binding->getExchangeName(), $binding->getRoutingKey());
+        }
+
+        foreach ($this->definition->getUnBindings() as $unbinding) {
+            $exchange->unbind($unbinding->getExchangeName(), $unbinding->getRoutingKey());
+        }
+
         $this->exchange = new AmqpExchange($channel, $exchange);
 
         return $this->exchange;

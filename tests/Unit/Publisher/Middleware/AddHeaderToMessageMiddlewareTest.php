@@ -33,7 +33,7 @@ class AddHeaderToMessageMiddlewareTest extends TestCase
         $message = new Message(new Payload('foo'));
         $executed = false;
 
-        $next = static function (string $routingKey, MessageInterface $message) use (&$executed) {
+        $next = static function (MessageInterface $message, string $routingKey) use (&$executed) {
             $executed = true;
             self::assertEquals('foo.bar', $routingKey);
             self::assertEquals(new Message(
@@ -44,7 +44,7 @@ class AddHeaderToMessageMiddlewareTest extends TestCase
             ), $message);
         };
 
-        $middleware->handle('foo.bar', $message, $next);
+        $middleware->handle($message, $next, 'foo.bar');
 
         self::assertTrue($executed, 'The next callable don\'t called.');
     }

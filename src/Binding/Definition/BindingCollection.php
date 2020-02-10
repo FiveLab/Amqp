@@ -11,24 +11,24 @@
 
 declare(strict_types = 1);
 
-namespace FiveLab\Component\Amqp\Queue\Definition;
+namespace FiveLab\Component\Amqp\Binding\Definition;
 
 /**
  * Collection for store all queue bindings.
  */
-class QueueBindingCollection implements \IteratorAggregate
+class BindingCollection implements \IteratorAggregate
 {
     /**
-     * @var array|QueueBindingDefinition[]
+     * @var array|BindingDefinition[]
      */
     private $bindings;
 
     /**
      * Constructor.
      *
-     * @param QueueBindingDefinition ...$bindings
+     * @param BindingDefinition ...$bindings
      */
-    public function __construct(QueueBindingDefinition ...$bindings)
+    public function __construct(BindingDefinition ...$bindings)
     {
         $this->bindings = $bindings;
     }
@@ -36,7 +36,7 @@ class QueueBindingCollection implements \IteratorAggregate
     /**
      * {@inheritdoc}
      *
-     * @return \ArrayIterator|QueueBindingDefinition[]
+     * @return \ArrayIterator|BindingDefinition[]
      */
     public function getIterator()
     {

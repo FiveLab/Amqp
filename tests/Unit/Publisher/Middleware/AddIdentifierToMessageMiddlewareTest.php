@@ -48,7 +48,7 @@ class AddIdentifierToMessageMiddlewareTest extends TestCase
         $executed = false;
         $next = $this->createNextCallable('some', $this->createMessage(), $executed);
 
-        $middleware->handle('some', $this->createMessage(), $next);
+        $middleware->handle($this->createMessage(), $next, 'some');
 
         self::assertTrue($executed, 'The next callable don\'t called.');
     }
@@ -67,7 +67,7 @@ class AddIdentifierToMessageMiddlewareTest extends TestCase
         $executed = false;
         $next = $this->createNextCallable('some', $this->createMessage('123'), $executed);
 
-        $middleware->handle('some', $this->createMessage(), $next);
+        $middleware->handle($this->createMessage(), $next, 'some');
 
         self::assertTrue($executed, 'The next callable don\'t called.');
     }
@@ -85,7 +85,7 @@ class AddIdentifierToMessageMiddlewareTest extends TestCase
         $executed = false;
         $next = $this->createNextCallable('some', $this->createMessage('123'), $executed);
 
-        $middleware->handle('some', $this->createMessage('123'), $next);
+        $middleware->handle($this->createMessage('123'), $next, 'some');
 
         self::assertTrue($executed, 'The next callable don\'t called.');
     }
@@ -100,7 +100,7 @@ class AddIdentifierToMessageMiddlewareTest extends TestCase
         $executed = false;
         $next = $this->createNextCallable('some', $this->createMessage(null, 'app-id'), $executed);
 
-        $middleware->handle('some', $this->createMessage(), $next);
+        $middleware->handle($this->createMessage(), $next, 'some');
 
         self::assertTrue($executed, 'The next callable don\'t called.');
     }
@@ -115,7 +115,7 @@ class AddIdentifierToMessageMiddlewareTest extends TestCase
         $executed = false;
         $next = $this->createNextCallable('some', $this->createMessage(null, '123'), $executed);
 
-        $middleware->handle('some', $this->createMessage(null, '123'), $next);
+        $middleware->handle($this->createMessage(null, '123'), $next, 'some');
 
         self::assertTrue($executed, 'The next callable don\'t called.');
     }
@@ -130,7 +130,7 @@ class AddIdentifierToMessageMiddlewareTest extends TestCase
         $executed = false;
         $next = $this->createNextCallable('some', $this->createMessage(null, null, 'user-id'), $executed);
 
-        $middleware->handle('some', $this->createMessage(), $next);
+        $middleware->handle($this->createMessage(), $next, 'some');
 
         self::assertTrue($executed, 'The next callable don\'t called.');
     }
@@ -145,7 +145,7 @@ class AddIdentifierToMessageMiddlewareTest extends TestCase
         $executed = false;
         $next = $this->createNextCallable('some', $this->createMessage(null, null, '123'), $executed);
 
-        $middleware->handle('some', $this->createMessage(null, null, '123'), $next);
+        $middleware->handle($this->createMessage(null, null, '123'), $next, 'some');
 
         self::assertTrue($executed, 'The next callable don\'t called.');
     }
@@ -161,7 +161,7 @@ class AddIdentifierToMessageMiddlewareTest extends TestCase
      */
     private function createNextCallable(string $expectedRoutingKey, Message $expectedMessage, bool &$executed): callable
     {
-        return static function (string $routingKey, Message $message) use ($expectedRoutingKey, $expectedMessage, &$executed) {
+        return static function (Message $message, string $routingKey) use ($expectedRoutingKey, $expectedMessage, &$executed) {
             $executed = true;
 
             self::assertEquals($expectedRoutingKey, $routingKey);

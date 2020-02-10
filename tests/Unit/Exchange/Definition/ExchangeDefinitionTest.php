@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Unit\Exchange\Definition;
 
+use FiveLab\Component\Amqp\Binding\Definition\BindingCollection;
 use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
 use PHPUnit\Framework\TestCase;
 
@@ -29,6 +30,8 @@ class ExchangeDefinitionTest extends TestCase
         self::assertEquals(AMQP_EX_TYPE_DIRECT, $def->getType());
         self::assertTrue($def->isDurable());
         self::assertFalse($def->isPassive());
+        self::assertEquals(new BindingCollection(), $def->getBindings());
+        self::assertEquals(new BindingCollection(), $def->getUnBindings());
     }
 
     /**

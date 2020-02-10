@@ -55,7 +55,7 @@ $exchange->publish('route-2', new Message(new Payload('message 2')));
 
 // Receive messages
 $queue->consume(function (ReceivedMessageInterface $message) {
-    print sprintf(
+    print \sprintf(
         'Receive message with tag %s from exchange %s by route %s. Payload: %s%s',
         $message->getDeliveryTag(),
         $message->getExchangeName(),
