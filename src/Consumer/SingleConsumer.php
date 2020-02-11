@@ -87,7 +87,7 @@ class SingleConsumer implements ConsumerInterface, MiddlewareAwareInterface
 
         $queue->getChannel()->setPrefetchCount($this->configuration->getPrefetchCount());
 
-        $executable = $this->middlewares->createExecutable(function (ReceivedMessageInterface $message){
+        $executable = $this->middlewares->createExecutable(function (ReceivedMessageInterface $message) {
             $this->messageHandler->handle($message);
         });
 
