@@ -30,10 +30,11 @@ class LoopConsumerConfiguration extends ConsumerConfiguration
      *
      * @param float $readTimeout
      * @param bool  $requeueOnError
+     * @param int   $prefetchCount
      */
-    public function __construct(float $readTimeout, bool $requeueOnError = true)
+    public function __construct(float $readTimeout, bool $requeueOnError = true, int $prefetchCount = 3)
     {
-        parent::__construct($requeueOnError);
+        parent::__construct($requeueOnError, $prefetchCount);
 
         $this->readTimeout = $readTimeout;
     }

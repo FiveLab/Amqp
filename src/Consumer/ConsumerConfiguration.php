@@ -24,13 +24,20 @@ class ConsumerConfiguration
     private $requeueOnError;
 
     /**
+     * @var int
+     */
+    private $prefetchCount;
+
+    /**
      * Constructor.
      *
      * @param bool $requeueOnError
+     * @param int  $prefetchCount
      */
-    public function __construct(bool $requeueOnError = true)
+    public function __construct(bool $requeueOnError = true, int $prefetchCount = 3)
     {
         $this->requeueOnError = $requeueOnError;
+        $this->prefetchCount = $prefetchCount;
     }
 
     /**
@@ -41,5 +48,15 @@ class ConsumerConfiguration
     public function isShouldRequeueOnError(): bool
     {
         return $this->requeueOnError;
+    }
+
+    /**
+     * Get prefetch count
+     *
+     * @return int|null
+     */
+    public function getPrefetchCount():  int
+    {
+        return $this->prefetchCount;
     }
 }

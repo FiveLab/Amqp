@@ -113,6 +113,8 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
             $connection->setReadTimeout($expectedReadTimeout);
         }
 
+        $channel->setPrefetchCount($this->configuration->getPrefetchCount());
+
         $executable = $this->middlewares->createExecutable(function (ReceivedMessageInterface $message) use ($queue) {
             $this->messageHandler->handle($message);
         });

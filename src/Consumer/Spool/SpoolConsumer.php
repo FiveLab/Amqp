@@ -116,7 +116,7 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
         }
 
         $originalPrefetchCount = $channel->getPrefetchCount();
-        $expectedPrefetchCount = $this->configuration->getCountMessages();
+        $expectedPrefetchCount = $this->configuration->getPrefetchCount();
 
         if ($originalPrefetchCount < $expectedPrefetchCount) {
             $channel->setPrefetchCount($expectedPrefetchCount);
@@ -159,7 +159,7 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
                     $messages->push($message);
                     $countOfProcessedMessages++;
 
-                    if ($countOfProcessedMessages >= $this->configuration->getCountMessages()) {
+                    if ($countOfProcessedMessages >= $this->configuration->getPrefetchCount()) {
                         // Flush by count messages
                         $this->flushMessages($messages);
                         $countOfProcessedMessages = 0;

@@ -85,11 +85,13 @@ class SingleConsumer implements ConsumerInterface, MiddlewareAwareInterface
     {
         $queue = $this->queueFactory->create();
 
-        $executable = $this->middlewares->createExecutable(function (ReceivedMessageInterface $message) use ($queue) {
+        $queue->getChannel()->setPrefetchCount($this->configuration->getPrefetchCount());
+
+        $executable = $this->middlewares->createExecutable(function (ReceivedMessageInterface $message){
             $this->messageHandler->handle($message);
         });
 
-        $queue->consume(function (ReceivedMessageInterface $message) use ($executable, $queue) {
+        $queue->consume(function (ReceivedMessageInterface $message) use ($executable) {
             try {
                 $executable($message);
             } catch (\Throwable $e) {
@@ -102,11 +104,11 @@ class SingleConsumer implements ConsumerInterface, MiddlewareAwareInterface
                     }
 
                     return;
-                } else {
-                    $message->nack($this->configuration->isShouldRequeueOnError());
-
-                    throw $e;
                 }
+
+                $message->nack($this->configuration->isShouldRequeueOnError());
+
+                throw $e;
             }
 
             if (!$message->isAnswered()) {

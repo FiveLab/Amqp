@@ -21,13 +21,6 @@ use FiveLab\Component\Amqp\Consumer\ConsumerConfiguration;
 class SpoolConsumerConfiguration extends ConsumerConfiguration
 {
     /**
-     * The received messages count for flush.
-     *
-     * @var int
-     */
-    private $countMessages;
-
-    /**
      * The timeout for flush messages
      *
      * @var float
@@ -51,7 +44,7 @@ class SpoolConsumerConfiguration extends ConsumerConfiguration
      */
     public function __construct(int $countMessages, float $timeout, float $readTimeout = 0.0, bool $requeueOnError = true)
     {
-        parent::__construct($requeueOnError);
+        parent::__construct($requeueOnError, $countMessages);
 
         if ($timeout <= 0) {
             throw new \InvalidArgumentException(\sprintf(
@@ -64,19 +57,8 @@ class SpoolConsumerConfiguration extends ConsumerConfiguration
             $readTimeout = $timeout;
         }
 
-        $this->countMessages = $countMessages;
         $this->timeout = $timeout;
         $this->readTimeout = $readTimeout;
-    }
-
-    /**
-     * Get count messages for flush
-     *
-     * @return int
-     */
-    public function getCountMessages(): int
-    {
-        return $this->countMessages;
     }
 
     /**
