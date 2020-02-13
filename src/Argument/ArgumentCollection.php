@@ -16,7 +16,7 @@ namespace FiveLab\Component\Amqp\Argument;
 /**
  * The collection for store all arguments.
  */
-class ArgumentCollection implements \IteratorAggregate
+class ArgumentCollection implements \IteratorAggregate, \Countable
 {
     /**
      * @var ArgumentDefinition[]
@@ -39,6 +39,14 @@ class ArgumentCollection implements \IteratorAggregate
     public function getIterator(): iterable
     {
         return new \ArrayIterator($this->arguments);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function count(): int
+    {
+        return \count($this->arguments);
     }
 
     /**

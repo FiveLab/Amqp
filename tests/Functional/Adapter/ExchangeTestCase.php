@@ -55,6 +55,24 @@ abstract class ExchangeTestCase extends RabbitMqTestCase
 
     /**
      * @test
+     *
+     * @group foo
+     */
+    public function shouldSuccessPublishViaDefaultExchange(): void
+    {
+        $this->management->createQueue('default_test');
+        $exchangeDefinition = new ExchangeDefinition('', AMQP_EX_TYPE_DIRECT);
+        $exchange = $this->createExchangeFactory($exchangeDefinition)->create();
+
+        $exchange->publish(new Message(new Payload('some')), 'default_test');
+
+        $retrieveMessages = $this->management->queueGetMessages('default_test', 1);
+
+        self::assertCount(1, $retrieveMessages, 'The default_test queue is empty. Messages not published to queue via default exchange.');
+    }
+
+    /**
+     * @test
      */
     public function shouldSuccessPublishWithDefaults(): void
     {
@@ -114,8 +132,6 @@ abstract class ExchangeTestCase extends RabbitMqTestCase
 
     /**
      * @test
-     *
-     * @group foo
      */
     public function shouldSuccessPublishWithIdentifier(): void
     {

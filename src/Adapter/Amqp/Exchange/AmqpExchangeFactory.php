@@ -83,7 +83,10 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
         $exchange->setFlags($flags);
         $exchange->setArguments($this->definition->getArguments()->toArray());
 
-        $exchange->declareExchange();
+        if ('' !== $this->definition->getName()) {
+            // We must declare only non-default exchanges.
+            $exchange->declareExchange();
+        }
 
         foreach ($this->definition->getBindings() as $binding) {
             $exchange->bind($binding->getExchangeName(), $binding->getRoutingKey());

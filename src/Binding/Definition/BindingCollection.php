@@ -16,7 +16,7 @@ namespace FiveLab\Component\Amqp\Binding\Definition;
 /**
  * Collection for store all queue bindings.
  */
-class BindingCollection implements \IteratorAggregate
+class BindingCollection implements \IteratorAggregate, \Countable
 {
     /**
      * @var array|BindingDefinition[]
@@ -41,5 +41,13 @@ class BindingCollection implements \IteratorAggregate
     public function getIterator()
     {
         return new \ArrayIterator($this->bindings);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function count(): int
+    {
+        return \count($this->bindings);
     }
 }

@@ -71,6 +71,36 @@ class ExchangeDefinition
      */
     public function __construct(string $name, string $type, bool $durable = true, bool $passive = false, ArgumentCollection $arguments = null, BindingCollection $bindings = null, BindingCollection $unbindings = null)
     {
+        if ('' === $name) {
+            // Try to create default direct exchange.
+            if ('direct' !== $type) {
+                throw new \InvalidArgumentException(\sprintf(
+                    'The default exchange allow only direct type but "%s" given.',
+                    $type
+                ));
+            }
+
+            if (!$durable) {
+                throw new \InvalidArgumentException('The default exchange not allow not durable flag.');
+            }
+
+            if ($passive) {
+                throw new \InvalidArgumentException('The default exchange not allow passive flag.');
+            }
+
+            if ($arguments && \count($arguments)) {
+                throw new \InvalidArgumentException('The default exchange not allow arguments.');
+            }
+
+            if ($bindings && \count($bindings)) {
+                throw new \InvalidArgumentException('The default exchange not allow bindings.');
+            }
+
+            if ($unbindings && \count($unbindings)) {
+                throw new \InvalidArgumentException('The default exchange not allow un-bindings.');
+            }
+        }
+
         $possibleTypes = [
             'direct',
             'topic',

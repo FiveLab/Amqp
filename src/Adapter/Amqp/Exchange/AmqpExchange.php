@@ -58,7 +58,7 @@ class AmqpExchange implements ExchangeInterface
      */
     public function getName(): string
     {
-        return $this->exchange->getName();
+        return $this->exchange->getName() ?: '';
     }
 
     /**

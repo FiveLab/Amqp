@@ -19,10 +19,6 @@ use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Exchange\Definition\Arguments\AlternateExchangeArgument;
 use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
 use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
-use FiveLab\Component\Amqp\Message\Identifier;
-use FiveLab\Component\Amqp\Message\Message;
-use FiveLab\Component\Amqp\Message\Options;
-use FiveLab\Component\Amqp\Message\Payload;
 use FiveLab\Component\Amqp\Tests\Functional\RabbitMqTestCase;
 
 abstract class ExchangeFactoryTestCase extends RabbitMqTestCase
@@ -35,6 +31,18 @@ abstract class ExchangeFactoryTestCase extends RabbitMqTestCase
      * @return ExchangeFactoryInterface
      */
     abstract protected function createExchangeFactory(ExchangeDefinition $definition): ExchangeFactoryInterface;
+
+    /**
+     * @test
+     */
+    public function shouldSuccessCreateDefaultExchange(): void
+    {
+        $definition = new ExchangeDefinition('', AMQP_EX_TYPE_DIRECT);
+        $factory = $this->createExchangeFactory($definition);
+        $exchange = $factory->create();
+
+        self::assertEquals('', $exchange->getName());
+    }
 
     /**
      * @test
