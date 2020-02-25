@@ -25,6 +25,6 @@ class SingleActiveCustomerArgument extends ArgumentDefinition
      */
     public function __construct()
     {
-        parent::__construct('x-single-active-consumer', '1');
+        parent::__construct('x-single-active-consumer', true);
     }
 }

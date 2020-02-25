@@ -26,6 +26,6 @@ class SingleActiveCustomerArgumentTest extends TestCase
         $argument = new SingleActiveCustomerArgument();
 
         self::assertEquals('x-single-active-consumer', $argument->getName());
-        self::assertEquals('1', $argument->getValue());
+        self::assertEquals(true, $argument->getValue());
     }
 }
