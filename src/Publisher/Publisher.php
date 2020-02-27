@@ -51,8 +51,8 @@ class Publisher implements PublisherInterface
     {
         $exchange = $this->exchangeFactory->create();
 
-        $callable = $this->middlewares->createExecutable(static function (string $routingKey, MessageInterface $message) use ($exchange) {
-            $exchange->publish($routingKey, $message);
+        $callable = $this->middlewares->createExecutable(static function (MessageInterface $message, string $routingKey) use ($exchange) {
+            $exchange->publish($message, $routingKey);
         });
 
         $callable($message, $routingKey);
