@@ -1,6 +1,6 @@
 FROM php:7.2-cli
 
-MAINTAINER Vitaliy Zhuk <vitaliy.zh@mserverone.com>
+MAINTAINER Vitalii Zhuk <v.zhuk@fivelab.org>
 
 RUN \
     apt-get update && \
