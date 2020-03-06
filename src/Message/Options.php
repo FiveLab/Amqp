@@ -24,13 +24,20 @@ class Options
     private $persistent;
 
     /**
+     * @var int
+     */
+    private $expiration;
+
+    /**
      * Constructor.
      *
      * @param bool $persistent
+     * @param int  $expiration
      */
-    public function __construct(bool $persistent = true)
+    public function __construct(bool $persistent = true, int $expiration = 0)
     {
         $this->persistent = $persistent;
+        $this->expiration = $expiration;
     }
 
     /**
@@ -41,5 +48,15 @@ class Options
     public function isPersistent(): bool
     {
         return $this->persistent;
+    }
+
+    /**
+     * Get expiration
+     *
+     * @return int
+     */
+    public function getExpiration(): int
+    {
+        return $this->expiration;
     }
 }

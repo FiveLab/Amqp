@@ -74,6 +74,14 @@ class AmqpExchange implements ExchangeInterface
             'delivery_mode' => $message->getOptions()->isPersistent() ? 2 : 1,
         ];
 
+        if ($message->getOptions()->getExpiration()) {
+            $options['expiration'] = $message->getOptions()->getExpiration();
+        }
+
+        if ($message->getPayload()->getContentEncoding()) {
+            $options['content_encoding'] = $message->getPayload()->getContentEncoding();
+        }
+
         if ($identifier->getId()) {
             $options['message_id'] = $identifier->getId();
         }

@@ -102,6 +102,19 @@ abstract class ExchangeTestCase extends RabbitMqTestCase
     /**
      * @test
      */
+    public function shouldSuccessPublishWithCustomContentEncoding(): void
+    {
+        $message = new Message(new Payload('foo', 'text/plain', 'gzip'));
+
+        $retrieveMessage = $this->publishMessage($message);
+
+        self::assertEquals('foo', $retrieveMessage['payload']);
+        self::assertEquals('gzip', $retrieveMessage['properties']['content_encoding']);
+    }
+
+    /**
+     * @test
+     */
     public function shouldSuccessPublishWithoutDurableMode(): void
     {
         $message = new Message(new Payload('some foo bar'), new Options(false));
@@ -109,6 +122,18 @@ abstract class ExchangeTestCase extends RabbitMqTestCase
         $retrieveMessage = $this->publishMessage($message);
 
         self::assertEquals(1, $retrieveMessage['properties']['delivery_mode']);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldSuccessPublishWithExpiration(): void
+    {
+        $message = new Message(new Payload('some foo bar'), new Options(true, 300000));
+
+        $retrieveMessage = $this->publishMessage($message);
+
+        self::assertEquals(300000, $retrieveMessage['properties']['expiration']);
     }
 
     /**

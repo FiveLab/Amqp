@@ -58,7 +58,8 @@ class AmqpReceivedMessage implements ReceivedMessageInterface
     {
         return new Payload(
             $this->envelope->getBody(),
-            $this->envelope->getContentType() ?: 'text/plain'
+            $this->envelope->getContentType() ?: 'text/plain',
+            $this->envelope->getContentEncoding() ?: null
         );
     }
 
@@ -67,7 +68,10 @@ class AmqpReceivedMessage implements ReceivedMessageInterface
      */
     public function getOptions(): Options
     {
-        return new Options($this->envelope->getDeliveryMode() === 2);
+        return new Options(
+            $this->envelope->getDeliveryMode() === 2,
+            $this->envelope->getExpiration() ? (int) $this->envelope->getExpiration() : 0
+        );
     }
 
     /**

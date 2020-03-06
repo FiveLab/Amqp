@@ -76,9 +76,13 @@ class AmqpReceivedMessageTest extends TestCase
             ->method('getContentType')
             ->willReturn('application/json');
 
+        $this->envelope->expects(self::once())
+            ->method('getContentEncoding')
+            ->willReturn('gzip');
+
         $payload = $this->receivedMessage->getPayload();
 
-        self::assertEquals(new Payload('{"a":"b"}', 'application/json'), $payload);
+        self::assertEquals(new Payload('{"a":"b"}', 'application/json', 'gzip'), $payload);
     }
 
     /**
@@ -88,21 +92,25 @@ class AmqpReceivedMessageTest extends TestCase
     {
         $options = $this->receivedMessage->getOptions();
 
-        self::assertEquals(new Options(false), $options);
+        self::assertEquals(new Options(false, 0), $options);
     }
 
     /**
      * @test
      */
-    public function shouldSuccessGetOptionsWithPersistent(): void
+    public function shouldSuccessGetOptionsWithCustomOptions(): void
     {
         $this->envelope->expects(self::once())
             ->method('getDeliveryMode')
             ->willReturn(2);
 
+        $this->envelope->expects(self::exactly(2))
+            ->method('getExpiration')
+            ->willReturn(30000);
+
         $options = $this->receivedMessage->getOptions();
 
-        self::assertEquals(new Options(true), $options);
+        self::assertEquals(new Options(true, 30000), $options);
     }
 
     /**
