@@ -66,7 +66,7 @@ class ConsoleOutputMiddleware implements ConsumerMiddlewareInterface
             $next($message);
         } catch (\Throwable $e) {
             $this->output->writeln(\sprintf(
-                '<error>Error: [%s] %s in %s:%d',
+                '<error>Error: [%s] %s in %s:%d</error>',
                 \get_class($e),
                 $e->getMessage(),
                 $e->getFile(),

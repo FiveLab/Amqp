@@ -32,7 +32,7 @@ class ConsoleOutputMiddlewareTest extends TestCase
         $output = new BufferedOutput(OutputInterface::VERBOSITY_NORMAL);
         $calledToNext = false;
 
-        $next = function (ReceivedMessageInterface $receivedMessage) use (&$calledToNext, $message) {
+        $next = static function (ReceivedMessageInterface $receivedMessage) use (&$calledToNext, $message) {
             $calledToNext = true;
             self::assertEquals($message, $receivedMessage);
         };
@@ -55,7 +55,7 @@ class ConsoleOutputMiddlewareTest extends TestCase
         $output = new BufferedOutput(OutputInterface::VERBOSITY_VERBOSE);
         $calledToNext = false;
 
-        $next = function (ReceivedMessageInterface $receivedMessage) use (&$calledToNext, $message) {
+        $next = static function (ReceivedMessageInterface $receivedMessage) use (&$calledToNext, $message) {
             $calledToNext = true;
             self::assertEquals($message, $receivedMessage);
         };
@@ -83,7 +83,7 @@ EXPECTED;
         $output = new BufferedOutput(OutputInterface::VERBOSITY_VERBOSE);
         $calledToNext = false;
 
-        $next = function (ReceivedMessageInterface $receivedMessage) use (&$calledToNext, $message) {
+        $next = static function (ReceivedMessageInterface $receivedMessage) use (&$calledToNext, $message) {
             $calledToNext = true;
             self::assertEquals($message, $receivedMessage);
 
@@ -118,7 +118,7 @@ EXPECTED;
         $output = new BufferedOutput(OutputInterface::VERBOSITY_DEBUG);
         $calledToNext = false;
 
-        $next = function (ReceivedMessageInterface $receivedMessage) use (&$calledToNext, $message) {
+        $next = static function (ReceivedMessageInterface $receivedMessage) use (&$calledToNext, $message) {
             $calledToNext = true;
             self::assertEquals($message, $receivedMessage);
         };
@@ -158,7 +158,7 @@ EXPECTED;
         $output = new BufferedOutput(OutputInterface::VERBOSITY_DEBUG);
         $calledToNext = false;
 
-        $next = function (ReceivedMessageInterface $receivedMessage) use (&$calledToNext, $message) {
+        $next = static function (ReceivedMessageInterface $receivedMessage) use (&$calledToNext, $message) {
             $calledToNext = true;
             self::assertEquals($message, $receivedMessage);
 
