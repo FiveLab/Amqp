@@ -34,6 +34,11 @@ class ThrowableMessageHandlerMock extends MessageHandlerMock implements Throwabl
     private $catchError;
 
     /**
+     * @var \Closure
+     */
+    private $catchHandler;
+
+    /**
      * {@inheritdoc}
      */
     public function handle(ReceivedMessageInterface $message): void
@@ -52,6 +57,10 @@ class ThrowableMessageHandlerMock extends MessageHandlerMock implements Throwabl
     {
         $this->catchError = $error;
         $this->catchReceivedMessage = $message;
+
+        if ($this->catchHandler) {
+            \call_user_func($this->catchHandler, $message, $error);
+        }
     }
 
     /**
@@ -62,6 +71,16 @@ class ThrowableMessageHandlerMock extends MessageHandlerMock implements Throwabl
     public function shouldThrowException(\Throwable $exception = null): void
     {
         $this->shouldThrowException = $exception;
+    }
+
+    /**
+     * Add callback for catch error
+     *
+     * @param \Closure $closure
+     */
+    public function onCatchError(\Closure $closure): void
+    {
+        $this->catchHandler = $closure;
     }
 
     /**

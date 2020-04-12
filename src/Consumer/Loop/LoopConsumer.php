@@ -155,6 +155,11 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
 
                 // Disconnect, because we can have zombie connection.
                 $connection->disconnect();
+            } catch (\Throwable $e) {
+                // Disconnect, because inner system can has buffer for sending to amqp service.
+                $connection->disconnect();
+
+                throw $e;
             }
         }
     }

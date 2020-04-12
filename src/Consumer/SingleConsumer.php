@@ -91,30 +91,36 @@ class SingleConsumer implements ConsumerInterface, MiddlewareAwareInterface
             $this->messageHandler->handle($message);
         });
 
-        $queue->consume(function (ReceivedMessageInterface $message) use ($executable) {
-            try {
-                $executable($message);
-            } catch (\Throwable $e) {
-                if ($this->messageHandler instanceof ThrowableMessageHandlerInterface) {
-                    $this->messageHandler->catchError($message, $e);
+        try {
+            $queue->consume(function (ReceivedMessageInterface $message) use ($executable) {
+                try {
+                    $executable($message);
+                } catch (\Throwable $e) {
+                    if ($this->messageHandler instanceof ThrowableMessageHandlerInterface) {
+                        $this->messageHandler->catchError($message, $e);
 
-                    if (!$message->isAnswered()) {
-                        // The error handler can manually answered to broker.
-                        $message->ack();
+                        if (!$message->isAnswered()) {
+                            // The error handler can manually answered to broker.
+                            $message->ack();
+                        }
+
+                        return;
                     }
 
-                    return;
+                    $message->nack($this->configuration->isShouldRequeueOnError());
+
+                    throw $e;
                 }
 
-                $message->nack($this->configuration->isShouldRequeueOnError());
+                if (!$message->isAnswered()) {
+                    // The message handler can manually answered to broker.
+                    $message->ack();
+                }
+            });
+        } catch (\Throwable $e) {
+            $queue->getChannel()->getConnection()->disconnect();
 
-                throw $e;
-            }
-
-            if (!$message->isAnswered()) {
-                // The message handler can manually answered to broker.
-                $message->ack();
-            }
-        });
+            throw $e;
+        }
     }
 }

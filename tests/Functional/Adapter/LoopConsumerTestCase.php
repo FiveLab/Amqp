@@ -19,9 +19,12 @@ use FiveLab\Component\Amqp\Consumer\Loop\LoopConsumer;
 use FiveLab\Component\Amqp\Consumer\Loop\LoopConsumerConfiguration;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareCollection;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
+use FiveLab\Component\Amqp\Message\MessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Tests\Functional\Consumer\Handler\MessageHandlerMock;
+use FiveLab\Component\Amqp\Tests\Functional\Consumer\Handler\ThrowableMessageHandlerMock;
 use FiveLab\Component\Amqp\Tests\Functional\RabbitMqTestCase;
 
 abstract class LoopConsumerTestCase extends RabbitMqTestCase
@@ -35,6 +38,11 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
      * @var MessageHandlerMock
      */
     private $messageHandler;
+
+    /**
+     * @var ThrowableMessageHandlerMock
+     */
+    private $throwableMessageHandler;
 
     /**
      * {@inheritdoc}
@@ -54,6 +62,7 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
 
         $this->queueFactory = $this->createQueueFactory($definition);
         $this->messageHandler = new MessageHandlerMock('test');
+        $this->throwableMessageHandler = new ThrowableMessageHandlerMock('test');
     }
 
     /**
@@ -68,7 +77,7 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
     /**
      * @test
      */
-    public function shouldSuccessConsume()
+    public function shouldSuccessConsume(): void
     {
         $this->publishMessages(50);
 
@@ -79,15 +88,129 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
             new LoopConsumerConfiguration(2)
         );
 
+        $this->runConsumer($consumer);
+
+        self::assertCount(50, $this->messageHandler->getReceivedMessages());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldSuccessAutomaticallyAckMessageOnCatchError(): void
+    {
+        $this->publishMessages(1);
+
+        $consumer = new LoopConsumer(
+            $this->queueFactory,
+            $this->throwableMessageHandler,
+            new ConsumerMiddlewareCollection(),
+            new LoopConsumerConfiguration(2)
+        );
+
+        $this->throwableMessageHandler->shouldThrowException(new \RuntimeException('some'));
+
+        $this->runConsumer($consumer);
+
+        $messages = $this->getAllMessagesFromQueue($this->queueFactory);
+        self::assertCount(0, $messages);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldSuccessManuallyAckMessageOnCatchError(): void
+    {
+        $this->publishMessages(1);
+
+        $consumer = new LoopConsumer(
+            $this->queueFactory,
+            $this->throwableMessageHandler,
+            new ConsumerMiddlewareCollection(),
+            new LoopConsumerConfiguration(2)
+        );
+
+        $this->throwableMessageHandler->shouldThrowException(new \RuntimeException('some'));
+        $this->throwableMessageHandler->onCatchError(static function (ReceivedMessageInterface $message) {
+            $message->ack();
+        });
+
+        $this->runConsumer($consumer);
+
+        $messages = $this->getAllMessagesFromQueue($this->queueFactory);
+        self::assertCount(0, $messages);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldSuccessManuallyNackMessageOnCatchError(): void
+    {
+        $this->publishMessages(1);
+
+        $consumer = new LoopConsumer(
+            $this->queueFactory,
+            $this->throwableMessageHandler,
+            new ConsumerMiddlewareCollection(),
+            new LoopConsumerConfiguration(2)
+        );
+
+        $this->throwableMessageHandler->shouldThrowException(new \RuntimeException('some'));
+        $this->throwableMessageHandler->onCatchError(static function (ReceivedMessageInterface $message) {
+            $message->nack(false);
+        });
+
+        $this->runConsumer($consumer);
+
+        $messages = $this->getAllMessagesFromQueue($this->queueFactory);
+        self::assertCount(0, $messages);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldSuccessRequeueMessageIfCatchErrorHandlerThrowException(): void
+    {
+        $this->publishMessage('some');
+
+        $consumer = new LoopConsumer(
+            $this->queueFactory,
+            $this->throwableMessageHandler,
+            new ConsumerMiddlewareCollection(),
+            new LoopConsumerConfiguration(2)
+        );
+
+        $this->throwableMessageHandler->shouldThrowException(new \RuntimeException('some'));
+        $this->throwableMessageHandler->onCatchError(static function (ReceivedMessageInterface $message, \Throwable $error) {
+            throw $error;
+        });
+
+        try {
+            $this->runConsumer($consumer);
+
+            self::fail('should throw exception');
+        } catch (\RuntimeException $e) {
+            self::assertEquals('some', $e->getMessage(), 'exception message nor equals');
+
+            $message = $this->getLastMessageFromQueue($this->queueFactory);
+            self::assertEquals('some', $message->getPayload()->getData());
+        }
+    }
+
+    /**
+     * Run consumer
+     *
+     * @param LoopConsumer $consumer
+     */
+    private function runConsumer(LoopConsumer $consumer): void
+    {
         $consumer->throwExceptionOnConsumerTimeoutExceed();
+        $consumer->getQueue()->getChannel()->getConnection()->setReadTimeout(1);
 
         try {
             $consumer->run();
         } catch (ConsumerTimeoutExceedException $e) {
-            // Normal flow.
+            // Normal flow
         }
-
-        self::assertCount(50, $this->messageHandler->getReceivedMessages());
     }
 
     /**

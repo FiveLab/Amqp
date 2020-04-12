@@ -171,7 +171,7 @@ abstract class ConsumerTestCase extends RabbitMqTestCase
     {
         $handler = new MessageHandlerMock('test');
 
-        $handler->setHandlerCallback(function (ReceivedMessageInterface $receivedMessage) {
+        $handler->setHandlerCallback(static function (ReceivedMessageInterface $receivedMessage) {
             $receivedMessage->nack(true);
         });
 
@@ -210,6 +210,38 @@ abstract class ConsumerTestCase extends RabbitMqTestCase
 
         self::assertEquals(new \Exception('some foo bar'), $handler->getCatchError());
         self::assertEquals($receivedMessages[0], $handler->getCatchReceivedMessage());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldRequeueMessageIfCatchErrorHandleThrowException(): void
+    {
+        /** @var ReceivedMessageInterface $receivedMessage */
+        $receivedMessage = null;
+
+        $handler = new ThrowableMessageHandlerMock('test');
+        $handler->shouldThrowException(new \RuntimeException('some'));
+
+        $handler->onCatchError(static function (ReceivedMessageInterface $message, \Throwable $e) use (&$receivedMessage) {
+            $receivedMessage = $message;
+
+            throw $e;
+        });
+
+        $consumer = new SingleConsumer($this->queueFactory, $handler, new ConsumerMiddlewareCollection(), new ConsumerConfiguration());
+
+        try {
+            $this->runConsumer($consumer);
+
+            self::fail('Must throw exception');
+        } catch (\RuntimeException $e) {
+            self::assertEquals('some', $e->getMessage());
+
+            $lastMessage = $this->getLastMessageFromQueue($this->queueFactory);
+
+            self::assertEquals($receivedMessage->getPayload(), $lastMessage->getPayload());
+        }
     }
 
     /**
@@ -259,8 +291,8 @@ abstract class ConsumerTestCase extends RabbitMqTestCase
      */
     public function shouldThrowExceptionIfMessageHandlerNotSupported(): void
     {
-        self::expectException(MessageHandlerNotSupportedException::class);
-        self::expectExceptionMessage('Not found supported message handler.');
+        $this->expectException(MessageHandlerNotSupportedException::class);
+        $this->expectExceptionMessage('Not found supported message handler.');
 
         $handler = new MessageHandlerMock('foo-bar');
         $chainHandler = new MessageHandlerChain($handler);
@@ -277,6 +309,8 @@ abstract class ConsumerTestCase extends RabbitMqTestCase
      */
     private function runConsumer(SingleConsumer $consumer): void
     {
+        $consumer->getQueue()->getChannel()->getConnection()->setReadTimeout(1);
+
         try {
             $consumer->run();
         } catch (ConsumerTimeoutExceedException | StopAfterNExecutesException $e) {

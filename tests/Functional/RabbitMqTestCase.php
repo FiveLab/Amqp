@@ -155,6 +155,29 @@ abstract class RabbitMqTestCase extends TestCase
     }
 
     /**
+     * Get last message from queue
+     *
+     * @param QueueFactoryInterface $queueFactory
+     *
+     * @return ReceivedMessageInterface
+     */
+    public function getLastMessageFromQueue(QueueFactoryInterface $queueFactory): ReceivedMessageInterface
+    {
+        $queue = $queueFactory->create();
+
+        $lastMessage = $queue->get();
+
+        if (!$lastMessage) {
+            throw new \RuntimeException(\sprintf(
+                'The queue "%s" is empty.',
+                $queue->getName()
+            ));
+        }
+
+        return $lastMessage;
+    }
+
+    /**
      * Assert what the queue has bindings
      *
      * @param array  $bindingsInfo
