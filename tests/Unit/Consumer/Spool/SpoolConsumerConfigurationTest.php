@@ -14,14 +14,9 @@ class SpoolConsumerConfigurationTest extends TestCase
      */
     public function shouldFailConstructionWhenTimeoutIsUnlimited(): void
     {
-        $exceptionMessage = '';
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('can\'t be less than ~0.1');
 
-        try {
-            new SpoolConsumerConfiguration(10, 0, 0.0);
-        } catch (\InvalidArgumentException $exception) {
-            $exceptionMessage = $exception->getMessage();
-        }
-
-        self::assertStringContainsString('can\'t be less than ~0.1', $exceptionMessage);
+        new SpoolConsumerConfiguration(10, 0, 0.0);
     }
 }
