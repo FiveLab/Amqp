@@ -345,6 +345,25 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
     }
 
     /**
+     * @test
+     */
+    public function shouldFailWhenBothConnectionAndSpoolReadTimeoutsAreUnlimited(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $consumer = new SpoolConsumer(
+            $this->queueFactory,
+            $this->messageHandler,
+            new ConsumerMiddlewareCollection(),
+            new SpoolConsumerConfiguration(10, 0)
+        );
+        $consumer->throwExceptionOnConsumerTimeoutExceed();
+        $this->queueFactory->create()->getChannel()->getConnection()->setReadTimeout(0);
+
+        $consumer->run();
+    }
+
+    /**
      * Publish more messages
      *
      * @param int $messages
