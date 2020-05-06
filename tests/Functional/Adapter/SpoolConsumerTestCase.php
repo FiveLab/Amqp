@@ -281,6 +281,73 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
     }
 
     /**
+     * @return array
+     */
+    public function providePrefetchAndMessageCount(): array
+    {
+        return [
+            'message amount equal to prefetch count' => [10, 10, 1],
+            'message amount multiple of prefetch count' => [5, 15, 3],
+            'message amount less than prefetch count' => [10, 7, 1],
+            'message amount more than prefetch count' => [10, 13, 2],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider providePrefetchAndMessageCount
+     *
+     * @param int $prefetchCount
+     * @param int $messageCount
+     * @param int $expectedFlushCallTimes
+     *
+     * @throws \Throwable
+     */
+    public function shouldFlushWithZeroReadTimeout(int $prefetchCount, int $messageCount, int $expectedFlushCallTimes): void
+    {
+        $this->publishMessages($messageCount);
+
+        $flushCalledTimes = 0;
+        $this->messageHandler->setFlushCallback(function () use (&$flushCalledTimes) {
+            $flushCalledTimes++;
+        });
+
+        $handleCalledTimes = 0;
+        $this->messageHandler->setHandlerCallback(function () use (&$handleCalledTimes) {
+            $handleCalledTimes++;
+        });
+
+        $consumer = new SpoolConsumer(
+            $this->queueFactory,
+            $this->messageHandler,
+            new ConsumerMiddlewareCollection(),
+            new SpoolConsumerConfiguration($prefetchCount, 1, 1, true)
+        );
+
+        $consumer->throwExceptionOnConsumerTimeoutExceed();
+
+        $this->queueFactory->create()->getChannel()->getConnection()->setReadTimeout(0);
+
+        try {
+            $consumer->run();
+        } catch (ConsumerTimeoutExceedException $e) {
+            // Normal expected flow.
+        }
+
+        self::assertEquals(
+            $messageCount,
+            $handleCalledTimes,
+            sprintf('expected %d handled messages, actually handled %d times', $messageCount, $handleCalledTimes)
+        );
+
+        self::assertEquals(
+            $expectedFlushCallTimes,
+            $flushCalledTimes,
+            sprintf('expected %d "flush" calls, actually called %d times', $expectedFlushCallTimes, $flushCalledTimes)
+        );
+    }
+
+    /**
      * Publish more messages
      *
      * @param int $messages
