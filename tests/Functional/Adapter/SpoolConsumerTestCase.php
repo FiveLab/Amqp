@@ -311,6 +311,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         $this->messageHandler->setFlushCallback(function () use (&$flushCalledTimes) {
             $flushCalledTimes++;
         });
+
         $handleCalledTimes = 0;
         $this->messageHandler->setHandlerCallback(function () use (&$handleCalledTimes) {
             $handleCalledTimes++;
@@ -322,6 +323,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
             new ConsumerMiddlewareCollection(),
             new SpoolConsumerConfiguration($prefetchCount, 1, 1, true)
         );
+
         $consumer->throwExceptionOnConsumerTimeoutExceed();
 
         $this->queueFactory->create()->getChannel()->getConnection()->setReadTimeout(0);
@@ -337,30 +339,12 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
             $handleCalledTimes,
             sprintf('expected %d handled messages, actually handled %d times', $messageCount, $handleCalledTimes)
         );
+
         self::assertEquals(
             $expectedFlushCallTimes,
             $flushCalledTimes,
             sprintf('expected %d "flush" calls, actually called %d times', $expectedFlushCallTimes, $flushCalledTimes)
         );
-    }
-
-    /**
-     * @test
-     */
-    public function shouldFailWhenBothConnectionAndSpoolReadTimeoutsAreUnlimited(): void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-
-        $consumer = new SpoolConsumer(
-            $this->queueFactory,
-            $this->messageHandler,
-            new ConsumerMiddlewareCollection(),
-            new SpoolConsumerConfiguration(10, 0)
-        );
-        $consumer->throwExceptionOnConsumerTimeoutExceed();
-        $this->queueFactory->create()->getChannel()->getConnection()->setReadTimeout(0);
-
-        $consumer->run();
     }
 
     /**
