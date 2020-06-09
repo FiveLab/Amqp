@@ -48,7 +48,7 @@ class SpoolConsumerConfiguration extends ConsumerConfiguration
 
         if ($timeout <= 0) {
             throw new \InvalidArgumentException(\sprintf(
-                'The timeout can\'t be less then ~0.1. %f given.',
+                'The timeout can\'t be less than ~0.1. %f given.',
                 $timeout
             ));
         }
