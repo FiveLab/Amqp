@@ -60,7 +60,7 @@ class AmqpReceivedMessage implements ReceivedMessageInterface
 
         if (false === $body) {
             // getBody method can return false, if length of message is zero.
-            // @see https://github.com/php-amqp/php-amqp/blob/1205d3287df0a9ec762a6594b4fa018ed9637d21/amqp_envelope.c#L101https://github.com/php-amqp/php-amqp/blob/1205d3287df0a9ec762a6594b4fa018ed9637d21/amqp_envelope.c#L101
+            // @see https://github.com/php-amqp/php-amqp/blob/1205d3287df0a9ec762a6594b4fa018ed9637d21/amqp_envelope.c#L101
             $body = '';
         }
 
