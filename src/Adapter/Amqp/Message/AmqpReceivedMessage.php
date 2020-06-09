@@ -56,8 +56,16 @@ class AmqpReceivedMessage implements ReceivedMessageInterface
      */
     public function getPayload(): Payload
     {
+        $body = $this->envelope->getBody();
+
+        if (false === $body) {
+            // getBody method can return false, if length of message is zero.
+            // @see https://github.com/php-amqp/php-amqp/blob/1205d3287df0a9ec762a6594b4fa018ed9637d21/amqp_envelope.c#L101https://github.com/php-amqp/php-amqp/blob/1205d3287df0a9ec762a6594b4fa018ed9637d21/amqp_envelope.c#L101
+            $body = '';
+        }
+
         return new Payload(
-            $this->envelope->getBody(),
+            $body,
             $this->envelope->getContentType() ?: 'text/plain',
             $this->envelope->getContentEncoding() ?: null
         );

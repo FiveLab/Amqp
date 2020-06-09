@@ -88,6 +88,20 @@ class AmqpReceivedMessageTest extends TestCase
     /**
      * @test
      */
+    public function shouldSuccessGetPayloadIfBodyIsEmpty(): void
+    {
+        $this->envelope->expects(self::once())
+            ->method('getBody')
+            ->willReturn(false);
+
+        $payload = $this->receivedMessage->getPayload();
+
+        self::assertEquals(new Payload('', 'text/plain', null), $payload);
+    }
+
+    /**
+     * @test
+     */
     public function shouldSuccessGetOptionsWithDefaults(): void
     {
         $options = $this->receivedMessage->getOptions();
