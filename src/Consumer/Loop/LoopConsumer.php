@@ -146,15 +146,15 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
                     }
                 });
             } catch (ConsumerTimeoutExceedException $e) {
+                // Disconnect, because we can have zombie connection.
+                $connection->disconnect();
+
                 // The application must force throw consumer timeout exception.
                 // Can be used manually for force stop consumer or in round robin consumer.
                 // In other cases it's normal flow.
                 if ($this->throwConsumerTimeoutExceededException) {
                     throw $e;
                 }
-
-                // Disconnect, because we can have zombie connection.
-                $connection->disconnect();
             } catch (\Throwable $e) {
                 // Disconnect, because inner system can has buffer for sending to amqp service.
                 $connection->disconnect();

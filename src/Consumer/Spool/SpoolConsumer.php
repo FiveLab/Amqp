@@ -175,6 +175,9 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
             } catch (ConsumerTimeoutExceedException $e) {
                 $this->flushMessages($messages);
 
+                // Disconnect, because we can have zombie connection.
+                $connection->disconnect();
+
                 // The application must force throw consumer timeout exception.
                 // Can be used manually for force stop consumer or in round robin consumer.
                 if ($this->throwConsumerTimeoutExceededException) {
