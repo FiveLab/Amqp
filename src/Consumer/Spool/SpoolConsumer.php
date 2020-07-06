@@ -110,7 +110,7 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
         $connectionOriginalReadTimeout = $connection->getReadTimeout();
         $spoolReadTimeout = $this->configuration->getReadTimeout();
 
-        if ($spoolReadTimeout && (0 == $connectionOriginalReadTimeout || $connectionOriginalReadTimeout > $spoolReadTimeout)) {
+        if ($spoolReadTimeout && (0 === $connectionOriginalReadTimeout || $connectionOriginalReadTimeout > $spoolReadTimeout)) {
             // Change the read timeout.
             $connection->setReadTimeout($spoolReadTimeout);
         }

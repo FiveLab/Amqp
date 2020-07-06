@@ -45,7 +45,7 @@ class ConsoleOutputMiddleware implements ConsumerMiddlewareInterface
     {
         if (OutputInterface::VERBOSITY_DEBUG === $this->output->getVerbosity()) {
             $this->fullDebugReceivedMessage($message, $next);
-        } else if (OutputInterface::VERBOSITY_VERBOSE <= $this->output->getVerbosity()) {
+        } elseif (OutputInterface::VERBOSITY_VERBOSE <= $this->output->getVerbosity()) {
             $this->verboseReceivedMessage($message, $next);
         } else {
             $next($message);

@@ -84,15 +84,15 @@ class SavepointPublisherDecorator implements SavepointPublisherInterface
                 $savepoint
             ));
         }
-        
+
         $mustDelete = false;
         $mustDeleteSavepoints = [];
-        
+
         foreach ($this->savepoints as $savepointName => $messages) {
             if ($savepointName === $savepoint) {
                 $mustDelete = true;
             }
-            
+
             if ($mustDelete) {
                 $mustDeleteSavepoints[] = $savepointName;
             }
