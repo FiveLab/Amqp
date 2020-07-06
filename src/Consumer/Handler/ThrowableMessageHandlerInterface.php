@@ -18,7 +18,7 @@ use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
 /**
  * You must implement this interface if you want to catch the error in process of message handlers.
  */
-interface ThrowableMessageHandlerInterface
+interface ThrowableMessageHandlerInterface extends MessageHandlerInterface
 {
     /**
      * Call to this method after catch the error on message handler system.

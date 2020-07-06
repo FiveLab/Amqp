@@ -35,7 +35,7 @@
     "suggest": {
         "ext-amqp": "For use amqp extension.",
         "symfony/console": "For configure console commands for run consumer.",
-        "ramsey/uuid": "For use UUID message generator"
+        "ramsey/uuid": "For use UUID message id generator"
     },
 
     "autoload": {

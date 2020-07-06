@@ -25,6 +25,6 @@ class UuidMessageIdGenerator implements MessageIdGeneratorInterface
      */
     public function generate(): string
     {
-        return Uuid::uuid1()->toString();
+        return Uuid::uuid4()->toString();
     }
 }
