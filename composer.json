@@ -52,5 +52,12 @@
 
     "config": {
         "bin-dir": "bin"
+    },
+
+    "extra": {
+        "thanks": {
+            "name": "fivelab/amqp",
+            "url": "https://github.com/FiveLab/Amqp"
+        }
     }
 }
