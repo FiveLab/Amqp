@@ -103,37 +103,31 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
      */
     public function run(): void
     {
-        $queue = $this->queueFactory->create();
-        $channel = $queue->getChannel();
-        $connection = $channel->getConnection();
-
-        $connectionOriginalReadTimeout = $connection->getReadTimeout();
+        $connectionOriginalReadTimeout = $this->queueFactory->create()->getChannel()->getConnection()->getReadTimeout();
         $spoolReadTimeout = $this->configuration->getReadTimeout();
 
-        if ($spoolReadTimeout && (0 === $connectionOriginalReadTimeout || $connectionOriginalReadTimeout > $spoolReadTimeout)) {
-            // Change the read timeout.
-            $connection->setReadTimeout($spoolReadTimeout);
-        }
+        $actualReadTimeout = ($spoolReadTimeout && (0 == $connectionOriginalReadTimeout || $connectionOriginalReadTimeout > $spoolReadTimeout))
+            ? $spoolReadTimeout
+            : $connectionOriginalReadTimeout;
 
-        $originalPrefetchCount = $channel->getPrefetchCount();
+        $originalPrefetchCount = $this->queueFactory->create()->getChannel()->getPrefetchCount();
         $expectedPrefetchCount = $this->configuration->getPrefetchCount();
 
-        if ($originalPrefetchCount < $expectedPrefetchCount) {
-            $channel->setPrefetchCount($expectedPrefetchCount);
-        }
+        $actualPrefetchCount = ($originalPrefetchCount < $expectedPrefetchCount) ? $expectedPrefetchCount: $originalPrefetchCount;
 
-        $executable = $this->middlewares->createExecutable(function (ReceivedMessageInterface $message) use ($queue) {
+        $executable = $this->middlewares->createExecutable(function (ReceivedMessageInterface $message) {
             $this->messageHandler->handle($message);
         });
 
         while (true) {
             $messages = new MutableReceivedMessageCollection();
             $endTime = \microtime(true) + $this->configuration->getTimeout();
+            $this->queueFactory->create()->getChannel()->getConnection()->setReadTimeout($actualReadTimeout);
+            $this->queueFactory->create()->getChannel()->setPrefetchCount($actualPrefetchCount);
 
             try {
                 $countOfProcessedMessages = 0;
-
-                $this->queueFactory->create()->consume(function (ReceivedMessageInterface $message) use ($queue, $executable, $messages, &$endTime, &$countOfProcessedMessages) {
+                $this->queueFactory->create()->consume(function (ReceivedMessageInterface $message) use ($executable, $messages, &$endTime, &$countOfProcessedMessages) {
                     try {
                         $executable($message);
                     } catch (\Throwable $e) {
@@ -159,7 +153,7 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
                     $messages->push($message);
                     $countOfProcessedMessages++;
 
-                    if ($countOfProcessedMessages >= $this->configuration->getPrefetchCount()) {
+                    if ($countOfProcessedMessages >= $this->queueFactory->create()->getChannel()->getPrefetchCount()) {
                         // Flush by count messages
                         $this->flushMessages($messages);
                         $countOfProcessedMessages = 0;
@@ -176,7 +170,7 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
                 $this->flushMessages($messages);
 
                 // Disconnect, because we can have zombie connection.
-                $connection->disconnect();
+                $this->queueFactory->create()->getChannel()->getConnection()->disconnect();
 
                 // The application must force throw consumer timeout exception.
                 // Can be used manually for force stop consumer or in round robin consumer.
@@ -185,7 +179,7 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
                 }
             } catch (\Throwable $e) {
                 // We must reconnect to broker because client don't return messages to queue on failed.
-                $connection->reconnect();
+                $this->queueFactory->create()->getChannel()->getConnection()->reconnect();
 
                 throw $e;
             }
