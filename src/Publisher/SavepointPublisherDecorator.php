@@ -18,8 +18,13 @@ use FiveLab\Component\Amqp\Message\MessageInterface;
 /**
  * The publisher with support savepoint functionality.
  */
-class SavepointPublisher extends Publisher implements SavepointPublisherInterface
+class SavepointPublisherDecorator implements SavepointPublisherInterface
 {
+    /**
+     * @var PublisherInterface
+     */
+    private $publisher;
+
     /**
      * @var array
      */
@@ -31,6 +36,16 @@ class SavepointPublisher extends Publisher implements SavepointPublisherInterfac
     private $activeSavepoint = '';
 
     /**
+     * Constructor.
+     *
+     * @param PublisherInterface $publisher
+     */
+    public function __construct(PublisherInterface $publisher)
+    {
+        $this->publisher = $publisher;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function publish(MessageInterface $message, string $routingKey = ''): void
@@ -38,7 +53,7 @@ class SavepointPublisher extends Publisher implements SavepointPublisherInterfac
         if ($this->activeSavepoint) {
             $this->savepoints[$this->activeSavepoint][] = [$message, $routingKey];
         } else {
-            parent::publish($message, $routingKey);
+            $this->publisher->publish($message, $routingKey);
         }
     }
 
@@ -95,7 +110,7 @@ class SavepointPublisher extends Publisher implements SavepointPublisherInterfac
     {
         foreach ($this->savepoints as $savepointName => $messages) {
             foreach ($messages as $messageInfo) {
-                parent::publish($messageInfo[0], $messageInfo[1]);
+                $this->publisher->publish($messageInfo[0], $messageInfo[1]);
             }
         }
 

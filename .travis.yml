@@ -1,3 +1,5 @@
+language: php
+
 sudo: required
 
 services:
@@ -8,7 +10,7 @@ before_script:
     - docker run -d --name event-broker-rabbitmq --network event-broker rabbitmq:3-management
     - docker build -t event-broker-amqp .
     - docker run -it -d --name event-broker-amqp --network event-broker -e "RABBITMQ_HOST=event-broker-rabbitmq" event-broker-amqp
-    - sleep 30
+    - docker exec event-broker-rabbitmq sh -c "rabbitmqctl await_startup"
 
 script:
     - docker cp . event-broker-amqp:/code

@@ -13,36 +13,22 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Unit\Publisher;
 
-use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
-use FiveLab\Component\Amqp\Exchange\ExchangeInterface;
 use FiveLab\Component\Amqp\Message\Message;
-use FiveLab\Component\Amqp\Message\MessageInterface;
 use FiveLab\Component\Amqp\Message\Payload;
-use FiveLab\Component\Amqp\Publisher\Middleware\PublisherMiddlewareCollection;
-use FiveLab\Component\Amqp\Publisher\SavepointPublisher;
+use FiveLab\Component\Amqp\Publisher\PublisherInterface;
+use FiveLab\Component\Amqp\Publisher\SavepointPublisherDecorator;
 use PHPUnit\Framework\MockObject\Matcher\Invocation;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class SavepointPublisherTest extends TestCase
 {
     /**
-     * @var ExchangeInterface|MockObject
+     * @var PublisherInterface
      */
-    private $exchange;
+    private $originalPublisher;
 
     /**
-     * @var ExchangeFactoryInterface|MockObject
-     */
-    private $exchangeFactory;
-
-    /**
-     * @var PublisherMiddlewareCollection|MockObject
-     */
-    private $middlewares;
-
-    /**
-     * @var SavepointPublisher
+     * @var SavepointPublisherDecorator
      */
     private $publisher;
 
@@ -51,15 +37,9 @@ class SavepointPublisherTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->exchange = $this->createMock(ExchangeInterface::class);
-        $this->exchangeFactory = $this->createMock(ExchangeFactoryInterface::class);
-        $this->middlewares = $this->createMock(PublisherMiddlewareCollection::class);
+        $this->originalPublisher = $this->createMock(PublisherInterface::class);
 
-        $this->exchangeFactory->expects(self::any())
-            ->method('create')
-            ->willReturn($this->exchange);
-
-        $this->publisher = new SavepointPublisher($this->exchangeFactory, $this->middlewares);
+        $this->publisher = new SavepointPublisherDecorator($this->originalPublisher);
     }
 
     /**
@@ -67,13 +47,9 @@ class SavepointPublisherTest extends TestCase
      */
     public function shouldSuccessPublishIfNoSavepoints(): void
     {
-        $executed = false;
-
-        $this->mustPublish($executed, self::once(), 'foo.bar', new Message(new Payload('some')));
+        $this->expectPublish(self::once(), 'foo.bar', new Message(new Payload('some')));
 
         $this->publisher->publish(new Message(new Payload('some')), 'foo.bar');
-
-        self::assertTrue($executed, 'The publisher don\'t execute middleware callback.');
     }
 
     /**
@@ -81,15 +57,11 @@ class SavepointPublisherTest extends TestCase
      */
     public function shouldSuccessPublishInOneSavepoint(): void
     {
-        $executed = false;
-
-        $this->mustPublish($executed, self::once(), 'foo.bar', new Message(new Payload('some')));
+        $this->expectPublish(self::once(), 'foo.bar', new Message(new Payload('some')));
 
         $this->publisher->start('savepoint_1');
         $this->publisher->publish(new Message(new Payload('some')), 'foo.bar');
         $this->publisher->flush();
-
-        self::assertTrue($executed, 'The publisher don\'t execute middleware callback.');
     }
 
     /**
@@ -97,14 +69,10 @@ class SavepointPublisherTest extends TestCase
      */
     public function shouldNotPublishBeforeFlush(): void
     {
-        $executed = false;
-
-        $this->mustPublish($executed, self::never(), 'foo.bar', new Message(new Payload('some')));
+        $this->expectPublish(self::never(), 'foo.bar', new Message(new Payload('some')));
 
         $this->publisher->start('savepoint_1');
         $this->publisher->publish(new Message(new Payload('some')), 'foo.bar');
-
-        self::assertFalse($executed, 'The publisher can\'t publish message before flush.');
     }
 
     /**
@@ -112,13 +80,9 @@ class SavepointPublisherTest extends TestCase
      */
     public function shouldSuccessPublishWithManySavepoints(): void
     {
-        $executed1 = false;
-        $executed2 = false;
-        $executed3 = false;
-
-        $this->mustPublish($executed1, self::at(0), 'foo.1', new Message(new Payload('1')));
-        $this->mustPublish($executed2, self::at(1), 'foo.2', new Message(new Payload('2')));
-        $this->mustPublish($executed3, self::at(2), 'foo.3', new Message(new Payload('3')));
+        $this->expectPublish(self::at(0), 'foo.1', new Message(new Payload('1')));
+        $this->expectPublish(self::at(1), 'foo.2', new Message(new Payload('2')));
+        $this->expectPublish(self::at(2), 'foo.3', new Message(new Payload('3')));
 
         $this->publisher->start('savepoint_1');
         $this->publisher->publish(new Message(new Payload('1')), 'foo.1');
@@ -130,10 +94,6 @@ class SavepointPublisherTest extends TestCase
         $this->publisher->publish(new Message(new Payload('3')), 'foo.3');
 
         $this->publisher->flush();
-
-        self::assertTrue($executed1, 'The publisher don\'t execute middleware callback for savepoint_1.');
-        self::assertTrue($executed2, 'The publisher don\'t execute middleware callback for savepoint_2.');
-        self::assertTrue($executed3, 'The publisher don\'t execute middleware callback for savepoint_3.');
     }
 
     /**
@@ -141,9 +101,7 @@ class SavepointPublisherTest extends TestCase
      */
     public function shouldSuccessRollbackToSavepoint(): void
     {
-        $executed1 = false;
-
-        $this->mustPublish($executed1, self::once(), 'foo.1', new Message(new Payload('1')));
+        $this->expectPublish(self::once(), 'foo.1', new Message(new Payload('1')));
 
         $this->publisher->start('savepoint_1');
         $this->publisher->publish(new Message(new Payload('1')), 'foo.1');
@@ -157,35 +115,45 @@ class SavepointPublisherTest extends TestCase
         $this->publisher->rollback('savepoint_2');
 
         $this->publisher->flush();
+    }
 
-        self::assertTrue($executed1, 'The publisher don\'t execute middleware callback for savepoint_1.');
+    /**
+     * @test
+     */
+    public function shouldThrowExceptionIfStartWithExistenceSavepoint(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The savepoint "savepoint_1" already declared.');
+
+        $this->publisher->start('savepoint_1');
+        $this->publisher->start('savepoint_2');
+        $this->publisher->start('savepoint_1');
+    }
+
+    /**
+     * @test
+     */
+    public function shouldThrowExceptionIfRollbackToNonExistenceSavepoint(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The savepoint "savepoint_2" does not exist.');
+
+        $this->publisher->start('savepoint_1');
+        $this->publisher->start('savepoint_3');
+        $this->publisher->rollback('savepoint_2');
     }
 
     /**
      * Create executable
      *
-     * @param bool         $executed
      * @param Invocation   $invocation
      * @param string|null  $expectedRouting
      * @param Message|null $expectedMessage
      */
-    private function mustPublish(bool &$executed, Invocation $invocation, string $expectedRouting = null, Message $expectedMessage = null): void
+    private function expectPublish(Invocation $invocation, string $expectedRouting, Message $expectedMessage): void
     {
-        $executable = static function (MessageInterface $message, string $routingKey = '') use (&$executed, $expectedRouting, $expectedMessage) {
-            $executed = true;
-
-            if (null !== $expectedRouting) {
-                self::assertEquals($expectedRouting, $routingKey);
-            }
-
-            if (null !== $expectedMessage) {
-                self::assertEquals($expectedMessage, $message);
-            }
-        };
-
-        $this->middlewares->expects($invocation)
-            ->method('createExecutable')
-            ->with(self::isInstanceOf(\Closure::class))
-            ->willReturn($executable);
+        $this->originalPublisher->expects($invocation)
+            ->method('publish')
+            ->with($expectedMessage, $expectedRouting);
     }
 }
