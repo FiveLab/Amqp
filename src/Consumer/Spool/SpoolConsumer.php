@@ -110,7 +110,7 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
         $connectionOriginalReadTimeout = $connection->getReadTimeout();
         $spoolReadTimeout = $this->configuration->getReadTimeout();
 
-        if ($spoolReadTimeout && (0 === $connectionOriginalReadTimeout || $connectionOriginalReadTimeout > $spoolReadTimeout)) {
+        if ($spoolReadTimeout && (0 === (int) $connectionOriginalReadTimeout || $connectionOriginalReadTimeout > $spoolReadTimeout)) {
             // Change the read timeout.
             $connection->setReadTimeout($spoolReadTimeout);
         }
@@ -129,6 +129,7 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
         while (true) {
             $messages = new MutableReceivedMessageCollection();
             $endTime = \microtime(true) + $this->configuration->getTimeout();
+            $consumerTag = \sprintf('spool.%s', \md5(\uniqid((string) \random_int(0, PHP_INT_MAX), true)));
 
             try {
                 $countOfProcessedMessages = 0;
@@ -171,12 +172,11 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
                         $this->flushMessages($messages);
                         $endTime = \microtime(true) + $this->configuration->getTimeout();
                     }
-                });
+                }, $consumerTag);
             } catch (ConsumerTimeoutExceedException $e) {
-                $this->flushMessages($messages);
+                $queue->cancelConsumer($consumerTag);
 
-                // Disconnect, because we can have zombie connection.
-                $connection->disconnect();
+                $this->flushMessages($messages);
 
                 // The application must force throw consumer timeout exception.
                 // Can be used manually for force stop consumer or in round robin consumer.
@@ -185,7 +185,7 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
                 }
             } catch (\Throwable $e) {
                 // We must reconnect to broker because client don't return messages to queue on failed.
-                $connection->reconnect();
+                $connection->disconnect();
 
                 throw $e;
             }
