@@ -83,6 +83,48 @@ class AmqpQueueTest extends TestCase
     /**
      * @test
      */
+    public function shouldSuccessConsume(): void
+    {
+        $closure = static function () {
+        };
+
+        $this->originQueue->expects(self::once())
+            ->method('consume')
+            ->with($closure);
+
+        $this->queue->consume($closure);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldSuccessConsumeWithConsumerTag(): void
+    {
+        $closure = static function () {
+        };
+
+        $this->originQueue->expects(self::once())
+            ->method('consume')
+            ->with($closure, 0, 'some.foo.bar');
+
+        $this->queue->consume($closure, 'some.foo.bar');
+    }
+
+    /**
+     * @test
+     */
+    public function shouldSuccessCancelConsumer(): void
+    {
+        $this->originQueue->expects(self::once())
+            ->method('cancel')
+            ->with('some-foo');
+
+        $this->queue->cancelConsumer('some-foo');
+    }
+
+    /**
+     * @test
+     */
     public function shouldSuccessGetMessage(): void
     {
         $envelope = $this->createMock(\AMQPEnvelope::class);

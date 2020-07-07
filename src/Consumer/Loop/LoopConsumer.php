@@ -120,6 +120,8 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
         });
 
         while (true) {
+            $consumerTag = \sprintf('loop.'.\md5(\uniqid((string)\random_int(0, PHP_INT_MAX), true)));
+
             try {
                 $this->queueFactory->create()->consume(function (ReceivedMessageInterface $message) use ($executable) {
                     try {
@@ -144,10 +146,9 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
                     if (!$message->isAnswered()) {
                         $message->ack();
                     }
-                });
+                }, $consumerTag);
             } catch (ConsumerTimeoutExceedException $e) {
-                // Disconnect, because we can have zombie connection.
-                $connection->disconnect();
+                $queue->cancelConsumer($consumerTag);
 
                 // The application must force throw consumer timeout exception.
                 // Can be used manually for force stop consumer or in round robin consumer.

@@ -66,14 +66,14 @@ class AmqpQueue implements QueueInterface
     /**
      * {@inheritdoc}
      */
-    public function consume(\Closure $handler): void
+    public function consume(\Closure $handler, string $tag = ''): void
     {
         try {
             $this->queue->consume(function (\AMQPEnvelope $envelope) use ($handler) {
                 $receivedMessage = new AmqpReceivedMessage($this->queue, $envelope);
 
                 $handler($receivedMessage);
-            });
+            }, AMQP_NOPARAM, $tag);
         } catch (\AMQPQueueException $e) {
             if (false !== \strpos(\strtolower($e->getMessage()), 'consumer timeout exceed')) {
                 throw new ConsumerTimeoutExceedException('Consumer timeout exceed.', 0, $e);
@@ -81,6 +81,14 @@ class AmqpQueue implements QueueInterface
 
             throw $e;
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function cancelConsumer(string $tag): void
+    {
+        $this->queue->cancel($tag);
     }
 
     /**
