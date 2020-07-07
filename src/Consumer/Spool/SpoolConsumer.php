@@ -174,9 +174,9 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
                     }
                 }, $consumerTag);
             } catch (ConsumerTimeoutExceedException $e) {
-                $queue->cancelConsumer($consumerTag);
-
                 $this->flushMessages($messages);
+
+                $queue->cancelConsumer($consumerTag);
 
                 // The application must force throw consumer timeout exception.
                 // Can be used manually for force stop consumer or in round robin consumer.
