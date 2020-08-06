@@ -39,8 +39,16 @@ interface QueueInterface
      * Consume the queue
      *
      * @param \Closure $handler
+     * @param string   $tag
      */
-    public function consume(\Closure $handler): void;
+    public function consume(\Closure $handler, string $tag = ''): void;
+
+    /**
+     * Cancel consumer by tag
+     *
+     * @param string $tag
+     */
+    public function cancelConsumer(string $tag): void;
 
     /**
      * Get next message from queue
