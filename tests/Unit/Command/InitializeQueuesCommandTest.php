@@ -19,6 +19,7 @@ use FiveLab\Component\Amqp\Queue\Registry\QueueFactoryRegistry;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class InitializeQueuesCommandTest extends TestCase
 {
@@ -95,6 +96,24 @@ class InitializeQueuesCommandTest extends TestCase
 
         $command = new InitializeQueuesCommand($this->registry, ['test_1', 'test_3']);
 
+        $this->output->setVerbosity(OutputInterface::VERBOSITY_NORMAL);
+        $command->run($this->input, $this->output);
+
+        self::assertEquals('', $this->output->fetch());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldSuccessExecuteWithVerbose(): void
+    {
+        $this->createFactory('test_1', true);
+        $this->createFactory('test_2', false);
+        $this->createFactory('test_3', true);
+
+        $command = new InitializeQueuesCommand($this->registry, ['test_1', 'test_3']);
+
+        $this->output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
         $command->run($this->input, $this->output);
 
         $expectedOutput = <<<OUTPUT

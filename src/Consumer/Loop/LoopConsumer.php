@@ -120,7 +120,7 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
         });
 
         while (true) {
-            $consumerTag = \sprintf('loop.'.\md5(\uniqid((string)\random_int(0, PHP_INT_MAX), true)));
+            $consumerTag = \sprintf('loop.'.\md5(\uniqid((string) \random_int(0, PHP_INT_MAX), true)));
 
             try {
                 $this->queueFactory->create()->consume(function (ReceivedMessageInterface $message) use ($executable) {
