@@ -69,10 +69,12 @@ class InitializeQueuesCommand extends Command
 
             $factory->create();
 
-            $output->writeln(\sprintf(
-                'Success initialize queue <info>%s</info>.',
-                $queue
-            ));
+            if ($output->isVerbose()) {
+                $output->writeln(\sprintf(
+                    'Success initialize queue <info>%s</info>.',
+                    $queue
+                ));
+            }
         }
 
         return 0;

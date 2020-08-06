@@ -69,10 +69,12 @@ class InitializeExchangesCommand extends Command
 
             $factory->create();
 
-            $output->writeln(\sprintf(
-                'Success initialize exchange <info>%s</info>.',
-                $exchange
-            ));
+            if ($output->isVerbose()) {
+                $output->writeln(\sprintf(
+                    'Success initialize exchange <info>%s</info>.',
+                    $exchange
+                ));
+            }
         }
 
         return 0;
