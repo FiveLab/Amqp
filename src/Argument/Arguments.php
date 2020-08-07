@@ -16,7 +16,7 @@ namespace FiveLab\Component\Amqp\Argument;
 /**
  * The collection for store all arguments.
  */
-class ArgumentCollection implements \IteratorAggregate, \Countable
+class Arguments implements \IteratorAggregate, \Countable
 {
     /**
      * @var ArgumentDefinition[]

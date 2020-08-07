@@ -18,7 +18,7 @@ use FiveLab\Component\Amqp\Exchange\ExchangeInterface;
 use FiveLab\Component\Amqp\Message\Message;
 use FiveLab\Component\Amqp\Message\MessageInterface;
 use FiveLab\Component\Amqp\Message\Payload;
-use FiveLab\Component\Amqp\Publisher\Middleware\PublisherMiddlewareCollection;
+use FiveLab\Component\Amqp\Publisher\Middleware\PublisherMiddlewares;
 use FiveLab\Component\Amqp\Publisher\Publisher;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -36,7 +36,7 @@ class PublisherTest extends TestCase
     private $exchangeFactory;
 
     /**
-     * @var PublisherMiddlewareCollection|MockObject
+     * @var PublisherMiddlewares|MockObject
      */
     private $middlewares;
 
@@ -52,7 +52,7 @@ class PublisherTest extends TestCase
     {
         $this->exchange = $this->createMock(ExchangeInterface::class);
         $this->exchangeFactory = $this->createMock(ExchangeFactoryInterface::class);
-        $this->middlewares = $this->createMock(PublisherMiddlewareCollection::class);
+        $this->middlewares = $this->createMock(PublisherMiddlewares::class);
 
         $this->exchangeFactory->expects(self::any())
             ->method('create')

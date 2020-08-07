@@ -18,7 +18,7 @@ use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
 /**
  * The collection for store middlewares for consumers.
  */
-class ConsumerMiddlewareCollection implements \IteratorAggregate
+class ConsumerMiddlewares implements \IteratorAggregate
 {
     /**
      * @var array|ConsumerMiddlewareInterface[]

@@ -18,6 +18,7 @@ use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
 
 /**
  * Middleware for stop execution after N iteration.
+ * Critical: consumer must ack to nack received message.
  */
 class StopAfterNExecutesMiddleware implements ConsumerMiddlewareInterface
 {
@@ -46,6 +47,10 @@ class StopAfterNExecutesMiddleware implements ConsumerMiddlewareInterface
      */
     public function handle(ReceivedMessageInterface $message, callable $next): void
     {
+        $next($message);
+
+        $this->executesCounter++;
+
         if ($this->executesCounter >= $this->stopAfterExecutes) {
             $this->executesCounter = 0;
 
@@ -54,9 +59,5 @@ class StopAfterNExecutesMiddleware implements ConsumerMiddlewareInterface
                 $this->stopAfterExecutes
             ));
         }
-
-        $next($message);
-
-        $this->executesCounter++;
     }
 }

@@ -16,7 +16,7 @@ namespace FiveLab\Component\Amqp\Message;
 /**
  * The collection for store all received messages.
  */
-class ReceivedMessageCollection implements \IteratorAggregate, \Countable
+class ReceivedMessages implements \IteratorAggregate, \Countable
 {
     /**
      * @var ReceivedMessageInterface[]

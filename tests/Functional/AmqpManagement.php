@@ -124,11 +124,11 @@ class AmqpManagement
     /**
      * Bind queue
      *
-     * @param string $name
+     * @param string $queueName
      * @param string $exchangeName
      * @param string $routingKey
      */
-    public function queueBind(string $name, string $exchangeName, string $routingKey): void
+    public function queueBind(string $queueName, string $exchangeName, string $routingKey): void
     {
         $data = [
             'routing_key' => $routingKey,
@@ -137,7 +137,7 @@ class AmqpManagement
         $json = \json_encode($data);
 
         $this->client->post(
-            \sprintf('/api/bindings/%s/e/%s/q/%s', \urlencode($this->vhost), \urlencode($exchangeName), \urlencode($name)),
+            \sprintf('/api/bindings/%s/e/%s/q/%s', \urlencode($this->vhost), \urlencode($exchangeName), \urlencode($queueName)),
             [
                 'body' => $json,
             ]

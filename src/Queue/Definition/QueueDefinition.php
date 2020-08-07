@@ -13,9 +13,9 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Queue\Definition;
 
-use FiveLab\Component\Amqp\Argument\ArgumentCollection;
+use FiveLab\Component\Amqp\Argument\Arguments;
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
-use FiveLab\Component\Amqp\Binding\Definition\BindingCollection;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 
 /**
@@ -67,24 +67,24 @@ class QueueDefinition
      * Constructor.
      *
      * @param string             $name
-     * @param BindingCollection  $bindings
-     * @param BindingCollection  $unBindings
+     * @param BindingDefinitions $bindings
+     * @param BindingDefinitions $unBindings
      * @param bool               $durable
      * @param bool               $passive
      * @param bool               $exclusive
      * @param bool               $autoDelete
-     * @param ArgumentCollection $arguments
+     * @param Arguments          $arguments
      */
-    public function __construct(string $name, BindingCollection $bindings = null, BindingCollection $unBindings = null, bool $durable = true, bool $passive = false, bool $exclusive = false, bool $autoDelete = false, ArgumentCollection $arguments = null)
+    public function __construct(string $name, BindingDefinitions $bindings = null, BindingDefinitions $unBindings = null, bool $durable = true, bool $passive = false, bool $exclusive = false, bool $autoDelete = false, Arguments $arguments = null)
     {
         $this->name = $name;
-        $this->bindings = $bindings ?: new BindingCollection();
-        $this->unBindings = $unBindings ?: new BindingCollection();
+        $this->bindings = $bindings ?: new BindingDefinitions();
+        $this->unBindings = $unBindings ?: new BindingDefinitions();
         $this->durable = $durable;
         $this->passive = $passive;
         $this->exclusive = $exclusive;
         $this->autoDelete = $autoDelete;
-        $this->arguments = $arguments ?: new ArgumentCollection();
+        $this->arguments = $arguments ?: new Arguments();
     }
 
     /**
@@ -140,9 +140,9 @@ class QueueDefinition
     /**
      * Get bindings
      *
-     * @return BindingCollection|BindingDefinition[]
+     * @return BindingDefinitions|BindingDefinition[]
      */
-    public function getBindings(): BindingCollection
+    public function getBindings(): BindingDefinitions
     {
         return $this->bindings;
     }
@@ -150,9 +150,9 @@ class QueueDefinition
     /**
      * Get unbindings
      *
-     * @return BindingCollection|BindingDefinition[]
+     * @return BindingDefinitions|BindingDefinition[]
      */
-    public function getUnBindings(): BindingCollection
+    public function getUnBindings(): BindingDefinitions
     {
         return $this->unBindings;
     }
@@ -160,9 +160,9 @@ class QueueDefinition
     /**
      * Get arguments
      *
-     * @return ArgumentCollection|ArgumentDefinition[]
+     * @return Arguments|ArgumentDefinition[]
      */
-    public function getArguments(): ArgumentCollection
+    public function getArguments(): Arguments
     {
         return $this->arguments;
     }

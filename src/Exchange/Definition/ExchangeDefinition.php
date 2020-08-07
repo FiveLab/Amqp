@@ -13,9 +13,9 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Exchange\Definition;
 
-use FiveLab\Component\Amqp\Argument\ArgumentCollection;
+use FiveLab\Component\Amqp\Argument\Arguments;
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
-use FiveLab\Component\Amqp\Binding\Definition\BindingCollection;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 
 /**
@@ -44,17 +44,17 @@ class ExchangeDefinition
     private $passive;
 
     /**
-     * @var ArgumentCollection
+     * @var Arguments
      */
     private $arguments;
 
     /**
-     * @var BindingCollection|BindingDefinition[]
+     * @var BindingDefinitions|BindingDefinition[]
      */
     private $bindings;
 
     /**
-     * @var BindingCollection|BindingDefinition[]
+     * @var BindingDefinitions|BindingDefinition[]
      */
     private $unbindings;
 
@@ -65,11 +65,11 @@ class ExchangeDefinition
      * @param string                  $type
      * @param bool                    $durable
      * @param bool                    $passive
-     * @param ArgumentCollection|null $arguments
-     * @param BindingCollection|null  $bindings
-     * @param BindingCollection|null  $unbindings
+     * @param Arguments|null          $arguments
+     * @param BindingDefinitions|null $bindings
+     * @param BindingDefinitions|null $unbindings
      */
-    public function __construct(string $name, string $type, bool $durable = true, bool $passive = false, ArgumentCollection $arguments = null, BindingCollection $bindings = null, BindingCollection $unbindings = null)
+    public function __construct(string $name, string $type, bool $durable = true, bool $passive = false, Arguments $arguments = null, BindingDefinitions $bindings = null, BindingDefinitions $unbindings = null)
     {
         if ('' === $name) {
             // Try to create default direct exchange.
@@ -120,9 +120,9 @@ class ExchangeDefinition
         $this->type = $type;
         $this->durable = $durable;
         $this->passive = $passive;
-        $this->arguments = $arguments ?: new ArgumentCollection();
-        $this->bindings = $bindings ?: new BindingCollection();
-        $this->unbindings = $unbindings ?: new BindingCollection();
+        $this->arguments = $arguments ?: new Arguments();
+        $this->bindings = $bindings ?: new BindingDefinitions();
+        $this->unbindings = $unbindings ?: new BindingDefinitions();
     }
 
     /**
@@ -168,9 +168,9 @@ class ExchangeDefinition
     /**
      * Get arguments
      *
-     * @return ArgumentCollection|ArgumentDefinition[]
+     * @return Arguments|ArgumentDefinition[]
      */
-    public function getArguments(): ArgumentCollection
+    public function getArguments(): Arguments
     {
         return $this->arguments;
     }
@@ -178,9 +178,9 @@ class ExchangeDefinition
     /**
      * Get bindings
      *
-     * @return BindingCollection|BindingDefinition[]
+     * @return BindingDefinitions|BindingDefinition[]
      */
-    public function getBindings(): BindingCollection
+    public function getBindings(): BindingDefinitions
     {
         return $this->bindings;
     }
@@ -188,9 +188,9 @@ class ExchangeDefinition
     /**
      * Get unbindings
      *
-     * @return BindingCollection|BindingDefinition[]
+     * @return BindingDefinitions|BindingDefinition[]
      */
-    public function getUnBindings(): BindingCollection
+    public function getUnBindings(): BindingDefinitions
     {
         return $this->unbindings;
     }

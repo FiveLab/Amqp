@@ -135,6 +135,30 @@ abstract class RabbitMqTestCase extends TestCase
     }
 
     /**
+     * Asset what the queue contain N messages
+     *
+     * @param QueueFactoryInterface $queueFactory
+     * @param int                   $countMessages
+     */
+    protected static function assertQueueContainsCountMessages(QueueFactoryInterface $queueFactory, int $countMessages): void
+    {
+        $queue = $queueFactory->create();
+
+        $messages = [];
+
+        while ($message = $queue->get()) {
+            $messages[] = $message;
+        }
+
+        self::assertCount($countMessages, $messages, \sprintf(
+            'The queue %s contain %d messages, but expected %d messages.',
+            $queue->getName(),
+            \count($messages),
+            $countMessages
+        ));
+    }
+
+    /**
      * Get all messages from queue
      *
      * @param QueueFactoryInterface $queueFactory

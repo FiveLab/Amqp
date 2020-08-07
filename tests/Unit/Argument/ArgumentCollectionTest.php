@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Unit\Argument;
 
-use FiveLab\Component\Amqp\Argument\ArgumentCollection;
+use FiveLab\Component\Amqp\Argument\Arguments;
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 use PHPUnit\Framework\TestCase;
 
@@ -27,7 +27,7 @@ class ArgumentCollectionTest extends TestCase
         $argument1 = new ArgumentDefinition('foo', 'bar');
         $argument2 = new ArgumentDefinition('bar', 'foo');
 
-        $collection = new ArgumentCollection($argument1, $argument2);
+        $collection = new Arguments($argument1, $argument2);
 
         self::assertEquals([$argument1, $argument2], \iterator_to_array($collection));
     }

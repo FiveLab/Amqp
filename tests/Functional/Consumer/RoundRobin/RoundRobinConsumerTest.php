@@ -16,11 +16,11 @@ namespace FiveLab\Component\Amqp\Tests\Functional\Consumer\RoundRobin;
 use FiveLab\Component\Amqp\Adapter\Amqp\Channel\AmqpChannelFactory;
 use FiveLab\Component\Amqp\Adapter\Amqp\Connection\AmqpConnectionFactory;
 use FiveLab\Component\Amqp\Adapter\Amqp\Queue\AmqpQueueFactory;
-use FiveLab\Component\Amqp\Binding\Definition\BindingCollection;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Channel\Definition\ChannelDefinition;
 use FiveLab\Component\Amqp\Consumer\ConsumerConfiguration;
-use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareCollection;
+use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
 use FiveLab\Component\Amqp\Consumer\SingleConsumer;
 use FiveLab\Component\Amqp\Consumer\RoundRobin\RoundRobinConsumer;
 use FiveLab\Component\Amqp\Consumer\RoundRobin\RoundRobinConsumerConfiguration;
@@ -79,11 +79,11 @@ class RoundRobinConsumerTest extends RabbitMqTestCase
 
         $channelFactory = new AmqpChannelFactory($connectionFactory, new ChannelDefinition());
 
-        $this->queueFactory1 = new AmqpQueueFactory($channelFactory, new QueueDefinition('queue1', new BindingCollection(
+        $this->queueFactory1 = new AmqpQueueFactory($channelFactory, new QueueDefinition('queue1', new BindingDefinitions(
             new BindingDefinition('exchange1', 'foo1')
         )));
 
-        $this->queueFactory2 = new AmqpQueueFactory($channelFactory, new QueueDefinition('queue2', new BindingCollection(
+        $this->queueFactory2 = new AmqpQueueFactory($channelFactory, new QueueDefinition('queue2', new BindingDefinitions(
             new BindingDefinition('exchange2', 'foo2')
         )));
     }
@@ -99,8 +99,8 @@ class RoundRobinConsumerTest extends RabbitMqTestCase
         $this->management->publishMessage('exchange2', 'foo2', 'queue2-message-1');
         $this->management->publishMessage('exchange2', 'foo2', 'queue2-message-2');
 
-        $consumer1 = new SingleConsumer($this->queueFactory1, $this->handler1, new ConsumerMiddlewareCollection(), new ConsumerConfiguration());
-        $consumer2 = new SingleConsumer($this->queueFactory2, $this->handler2, new ConsumerMiddlewareCollection(), new ConsumerConfiguration());
+        $consumer1 = new SingleConsumer($this->queueFactory1, $this->handler1, new ConsumerMiddlewares(), new ConsumerConfiguration());
+        $consumer2 = new SingleConsumer($this->queueFactory2, $this->handler2, new ConsumerMiddlewares(), new ConsumerConfiguration());
 
         $configuration = new RoundRobinConsumerConfiguration(1, 1, 5);
 

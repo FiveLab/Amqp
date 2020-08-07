@@ -16,7 +16,7 @@ namespace FiveLab\Component\Amqp\Message;
 /**
  * The collection for able to changes in received message collection.
  */
-class MutableReceivedMessageCollection extends ReceivedMessageCollection
+class MutableReceivedMessages extends ReceivedMessages
 {
     /**
      * Push message to collection
@@ -39,10 +39,10 @@ class MutableReceivedMessageCollection extends ReceivedMessageCollection
     /**
      * Create immutable collection
      *
-     * @return ReceivedMessageCollection
+     * @return ReceivedMessages
      */
-    public function immutable(): ReceivedMessageCollection
+    public function immutable(): ReceivedMessages
     {
-        return new ReceivedMessageCollection(...$this->messages);
+        return new ReceivedMessages(...$this->messages);
     }
 }

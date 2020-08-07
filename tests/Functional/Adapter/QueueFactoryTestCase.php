@@ -13,8 +13,8 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Functional\Adapter;
 
-use FiveLab\Component\Amqp\Argument\ArgumentCollection;
-use FiveLab\Component\Amqp\Binding\Definition\BindingCollection;
+use FiveLab\Component\Amqp\Argument\Arguments;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Message\Payload;
@@ -173,7 +173,7 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
 
         $definition = new QueueDefinition(
             'some',
-            new BindingCollection(
+            new BindingDefinitions(
                 new BindingDefinition('test.direct1', 'key1'),
                 new BindingDefinition('test.direct2', 'key1'),
                 new BindingDefinition('test.direct2', 'key2')
@@ -207,7 +207,7 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
         $definition = new QueueDefinition(
             'some',
             null,
-            new BindingCollection(
+            new BindingDefinitions(
                 new BindingDefinition('test.direct1', 'key1'),
                 new BindingDefinition('test.direct2', 'key1'),
                 new BindingDefinition('test.direct2', 'key2')
@@ -235,7 +235,7 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
             false,
             false,
             false,
-            new ArgumentCollection(
+            new Arguments(
                 new QueueModeArgument('default'),
                 new QueueMasterLocatorArgument('random')
             )
@@ -266,7 +266,7 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
 
         $definition = new QueueDefinition(
             'some',
-            new BindingCollection(
+            new BindingDefinitions(
                 new BindingDefinition('test.direct', 'test')
             )
         );

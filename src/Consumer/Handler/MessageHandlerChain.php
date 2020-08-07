@@ -14,7 +14,7 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Consumer\Handler;
 
 use FiveLab\Component\Amqp\Exception\MessageHandlerNotSupportedException;
-use FiveLab\Component\Amqp\Message\ReceivedMessageCollection;
+use FiveLab\Component\Amqp\Message\ReceivedMessages;
 use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
 
 /**
@@ -64,7 +64,7 @@ class MessageHandlerChain implements MessageHandlerInterface, FlushableMessageHa
     /**
      * {@inheritdoc}
      */
-    public function flush(ReceivedMessageCollection $receivedMessages): void
+    public function flush(ReceivedMessages $receivedMessages): void
     {
         foreach ($this->handlers as $handler) {
             if (!$handler instanceof FlushableMessageHandlerInterface) {
