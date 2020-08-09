@@ -18,7 +18,7 @@ use FiveLab\Component\Amqp\Exchange\ExchangeInterface;
 use FiveLab\Component\Amqp\Message\Message;
 use FiveLab\Component\Amqp\Message\MessageInterface;
 use FiveLab\Component\Amqp\Message\Payload;
-use FiveLab\Component\Amqp\Publisher\Middleware\PublisherMiddlewareCollection;
+use FiveLab\Component\Amqp\Publisher\Middleware\PublisherMiddlewares;
 use FiveLab\Component\Amqp\Publisher\Publisher;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -36,7 +36,7 @@ class PublisherTest extends TestCase
     private $exchangeFactory;
 
     /**
-     * @var PublisherMiddlewareCollection|MockObject
+     * @var PublisherMiddlewares
      */
     private $middlewares;
 
@@ -52,7 +52,7 @@ class PublisherTest extends TestCase
     {
         $this->exchange = $this->createMock(ExchangeInterface::class);
         $this->exchangeFactory = $this->createMock(ExchangeFactoryInterface::class);
-        $this->middlewares = $this->createMock(PublisherMiddlewareCollection::class);
+        $this->middlewares = new PublisherMiddlewares();
 
         $this->exchangeFactory->expects(self::any())
             ->method('create')
@@ -67,22 +67,11 @@ class PublisherTest extends TestCase
     public function shouldSuccessPublish(): void
     {
         $message = new Message(new Payload('some'));
-        $executed = false;
 
-        $executable = static function (MessageInterface $message, string $routingKey = '') use (&$executed) {
-            $executed = true;
-
-            self::assertEquals('foo.bar', $routingKey);
-            self::assertEquals(new Message(new Payload('some')), $message);
-        };
-
-        $this->middlewares->expects(self::once())
-            ->method('createExecutable')
-            ->with(self::isInstanceOf(\Closure::class))
-            ->willReturn($executable);
+        $this->exchange->expects(self::once())
+            ->method('publish')
+            ->with($message, 'foo.bar');
 
         $this->publisher->publish($message, 'foo.bar');
-
-        self::assertTrue($executed, 'The publisher don\'t execute middleware callback.');
     }
 }

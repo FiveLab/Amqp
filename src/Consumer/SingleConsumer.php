@@ -15,8 +15,9 @@ namespace FiveLab\Component\Amqp\Consumer;
 
 use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlerInterface;
 use FiveLab\Component\Amqp\Consumer\Handler\ThrowableMessageHandlerInterface;
-use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareCollection;
+use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareInterface;
+use FiveLab\Component\Amqp\Exception\StopAfterNExecutesException;
 use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
@@ -37,7 +38,7 @@ class SingleConsumer implements ConsumerInterface, MiddlewareAwareInterface
     private $messageHandler;
 
     /**
-     * @var ConsumerMiddlewareCollection
+     * @var ConsumerMiddlewares
      */
     private $middlewares;
 
@@ -49,12 +50,12 @@ class SingleConsumer implements ConsumerInterface, MiddlewareAwareInterface
     /**
      * Constructor.
      *
-     * @param QueueFactoryInterface        $queueFactory
-     * @param MessageHandlerInterface      $messageHandler
-     * @param ConsumerMiddlewareCollection $middlewares
-     * @param ConsumerConfiguration        $configuration
+     * @param QueueFactoryInterface   $queueFactory
+     * @param MessageHandlerInterface $messageHandler
+     * @param ConsumerMiddlewares     $middlewares
+     * @param ConsumerConfiguration   $configuration
      */
-    public function __construct(QueueFactoryInterface $queueFactory, MessageHandlerInterface $messageHandler, ConsumerMiddlewareCollection $middlewares, ConsumerConfiguration $configuration)
+    public function __construct(QueueFactoryInterface $queueFactory, MessageHandlerInterface $messageHandler, ConsumerMiddlewares $middlewares, ConsumerConfiguration $configuration)
     {
         $this->queueFactory = $queueFactory;
         $this->messageHandler = $messageHandler;
@@ -95,6 +96,13 @@ class SingleConsumer implements ConsumerInterface, MiddlewareAwareInterface
             $queue->consume(function (ReceivedMessageInterface $message) use ($executable) {
                 try {
                     $executable($message);
+                } catch (StopAfterNExecutesException $error) {
+                    // We must stop after N executes. In this case we ack message and exit from loop.
+                    if (!$message->isAnswered()) {
+                        $message->ack();
+                    }
+
+                    throw $error;
                 } catch (\Throwable $e) {
                     if ($this->messageHandler instanceof ThrowableMessageHandlerInterface) {
                         $this->messageHandler->catchError($message, $e);
@@ -116,11 +124,14 @@ class SingleConsumer implements ConsumerInterface, MiddlewareAwareInterface
                     // The message handler can manually answered to broker.
                     $message->ack();
                 }
-            });
-        } catch (\Throwable $e) {
+            }, $this->configuration->getTagGenerator()->generate());
+        } catch (StopAfterNExecutesException $error) {
+            // Normal flow. Exit from loop.
+            return;
+        } catch (\Throwable $error) {
             $queue->getChannel()->getConnection()->disconnect();
 
-            throw $e;
+            throw $error;
         }
     }
 }

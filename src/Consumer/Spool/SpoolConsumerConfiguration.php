@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Consumer\Spool;
 
 use FiveLab\Component\Amqp\Consumer\ConsumerConfiguration;
+use FiveLab\Component\Amqp\Consumer\Tag\ConsumerTagGeneratorInterface;
 
 /**
  * The configuration for spool consumer.
@@ -37,14 +38,15 @@ class SpoolConsumerConfiguration extends ConsumerConfiguration
     /**
      * Constructor.
      *
-     * @param int   $countMessages
-     * @param float $timeout
-     * @param float $readTimeout
-     * @param bool  $requeueOnError
+     * @param int                           $countMessages
+     * @param float                         $timeout
+     * @param float                         $readTimeout
+     * @param bool                          $requeueOnError
+     * @param ConsumerTagGeneratorInterface $tagGenerator
      */
-    public function __construct(int $countMessages, float $timeout, float $readTimeout = 0.0, bool $requeueOnError = true)
+    public function __construct(int $countMessages, float $timeout, float $readTimeout = 0.0, bool $requeueOnError = true, ConsumerTagGeneratorInterface $tagGenerator = null)
     {
-        parent::__construct($requeueOnError, $countMessages);
+        parent::__construct($requeueOnError, $countMessages, $tagGenerator);
 
         if ($timeout <= 0) {
             throw new \InvalidArgumentException(\sprintf(

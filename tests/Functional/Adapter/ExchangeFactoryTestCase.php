@@ -13,8 +13,8 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Functional\Adapter;
 
-use FiveLab\Component\Amqp\Argument\ArgumentCollection;
-use FiveLab\Component\Amqp\Binding\Definition\BindingCollection;
+use FiveLab\Component\Amqp\Argument\ArgumentDefinitions;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Exchange\Definition\Arguments\AlternateExchangeArgument;
 use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
@@ -118,7 +118,7 @@ abstract class ExchangeFactoryTestCase extends RabbitMqTestCase
             AMQP_EX_TYPE_DIRECT,
             true,
             false,
-            new ArgumentCollection(
+            new ArgumentDefinitions(
                 new AlternateExchangeArgument('foo-bar')
             )
         );
@@ -147,7 +147,7 @@ abstract class ExchangeFactoryTestCase extends RabbitMqTestCase
             true,
             false,
             null,
-            new BindingCollection(new BindingDefinition('foo.bar', 'some'))
+            new BindingDefinitions(new BindingDefinition('foo.bar', 'some'))
         );
 
         $factory = $this->createExchangeFactory($definition);

@@ -13,9 +13,9 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Unit\Queue\Definition;
 
-use FiveLab\Component\Amqp\Argument\ArgumentCollection;
+use FiveLab\Component\Amqp\Argument\ArgumentDefinitions;
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
-use FiveLab\Component\Amqp\Binding\Definition\BindingCollection;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use PHPUnit\Framework\TestCase;
@@ -30,8 +30,8 @@ class QueueDefinitionTest extends TestCase
         $def = new QueueDefinition('some');
 
         self::assertEquals('some', $def->getName());
-        self::assertEquals(new BindingCollection(), $def->getBindings());
-        self::assertEquals(new BindingCollection(), $def->getUnBindings());
+        self::assertEquals(new BindingDefinitions(), $def->getBindings());
+        self::assertEquals(new BindingDefinitions(), $def->getUnBindings());
         self::assertTrue($def->isDurable());
         self::assertFalse($def->isPassive());
         self::assertFalse($def->isExclusive());
@@ -46,9 +46,9 @@ class QueueDefinitionTest extends TestCase
         $bind1 = new BindingDefinition('ex1', 'rout1');
         $bind2 = new BindingDefinition('ex2', 'rout2');
 
-        $def = new QueueDefinition('some', new BindingCollection($bind1, $bind2));
+        $def = new QueueDefinition('some', new BindingDefinitions($bind1, $bind2));
 
-        self::assertEquals(new BindingCollection($bind1, $bind2), $def->getBindings());
+        self::assertEquals(new BindingDefinitions($bind1, $bind2), $def->getBindings());
     }
 
     /**
@@ -59,9 +59,9 @@ class QueueDefinitionTest extends TestCase
         $bind1 = new BindingDefinition('ex1', 'rout1');
         $bind2 = new BindingDefinition('ex2', 'rout2');
 
-        $def = new QueueDefinition('some', new BindingCollection(), new BindingCollection($bind1, $bind2));
+        $def = new QueueDefinition('some', new BindingDefinitions(), new BindingDefinitions($bind1, $bind2));
 
-        self::assertEquals(new BindingCollection($bind1, $bind2), $def->getUnBindings());
+        self::assertEquals(new BindingDefinitions($bind1, $bind2), $def->getUnBindings());
     }
 
     /**
@@ -109,10 +109,10 @@ class QueueDefinitionTest extends TestCase
      */
     public function shouldSuccessCreateWithArguments(): void
     {
-        $def = new QueueDefinition('some', null, null, false, false, false, false, new ArgumentCollection(
+        $def = new QueueDefinition('some', null, null, false, false, false, false, new ArgumentDefinitions(
             new ArgumentDefinition('some', 'foo-bar')
         ));
 
-        self::assertEquals(new ArgumentCollection(new ArgumentDefinition('some', 'foo-bar')), $def->getArguments());
+        self::assertEquals(new ArgumentDefinitions(new ArgumentDefinition('some', 'foo-bar')), $def->getArguments());
     }
 }

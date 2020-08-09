@@ -15,8 +15,8 @@ use FiveLab\Component\Amqp\Adapter\Amqp\Exchange\AmqpExchangeFactory;
 use FiveLab\Component\Amqp\Adapter\Amqp\Queue\AmqpQueueFactory;
 use FiveLab\Component\Amqp\Channel\Definition\ChannelDefinition;
 use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
-use FiveLab\Component\Amqp\Queue\Definition\QueueBindingCollection;
-use FiveLab\Component\Amqp\Queue\Definition\QueueBindingDefinition;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 
 $connectionFactory = new AmqpConnectionFactory([
@@ -35,9 +35,9 @@ $exchangeFactory = new AmqpExchangeFactory($channelFactory, $exchangeDefinition)
 $exchange = $exchangeFactory->create();
 
 // Create queue
-$queueDefinition = new QueueDefinition('new-queue', new QueueBindingCollection(
-    new QueueBindingDefinition('new-exchange', 'route-1'),
-    new QueueBindingDefinition('new-exchange', 'route-2')
+$queueDefinition = new QueueDefinition('new-queue', new BindingDefinitions(
+    new BindingDefinition('new-exchange', 'route-1'),
+    new BindingDefinition('new-exchange', 'route-2')
 ));
 
 $queueFactory = new AmqpQueueFactory($channelFactory, $queueDefinition);
@@ -48,6 +48,10 @@ After this, you can publish messages to receive messages.
 
 ```php
 <?php
+
+use FiveLab\Component\Amqp\Message\Message;
+use FiveLab\Component\Amqp\Message\Payload;
+use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
 
 // Publish message
 $exchange->publish('route-1', new Message(new Payload('message 1')));
@@ -108,13 +112,13 @@ And you can create and run consumer:
 <?php
 
 use FiveLab\Component\Amqp\Consumer\SingleConsumer;
-use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareCollection;
+use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
 use FiveLab\Component\Amqp\Consumer\ConsumerConfiguration;
 
 $consumer = new SingleConsumer(
     $queueFactory,
     new MyMessageHandler(),
-    new ConsumerMiddlewareCollection(),
+    new ConsumerMiddlewares(),
     new ConsumerConfiguration()
 );
 

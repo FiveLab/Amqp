@@ -24,9 +24,9 @@ use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Tests\Functional\Adapter\Amqp\Channel\StubAmqpChannelFactory;
-use FiveLab\Component\Amqp\Tests\Functional\Adapter\ConsumerTestCase;
+use FiveLab\Component\Amqp\Tests\Functional\Adapter\SingleConsumerTestCase;
 
-class AmqpSingleConsumerTest extends ConsumerTestCase
+class AmqpSingleSingleConsumerTest extends SingleConsumerTestCase
 {
     /**
      * {@inheritdoc}
@@ -39,7 +39,7 @@ class AmqpSingleConsumerTest extends ConsumerTestCase
             'vhost'        => $this->getRabbitMqVhost(),
             'login'        => $this->getRabbitMqLogin(),
             'password'     => $this->getRabbitMqPassword(),
-            'read_timeout' => 2,
+            'read_timeout' => 1,
         ]);
 
         $channelFactory = new AmqpChannelFactory($connectionFactory, new ChannelDefinition());
@@ -58,7 +58,7 @@ class AmqpSingleConsumerTest extends ConsumerTestCase
             'vhost'        => $this->getRabbitMqVhost(),
             'login'        => $this->getRabbitMqLogin(),
             'password'     => $this->getRabbitMqPassword(),
-            'read_timeout' => 2,
+            'read_timeout' => 1,
         ]);
 
         $channelFactory = new AmqpChannelFactory($connectionFactory, new ChannelDefinition());

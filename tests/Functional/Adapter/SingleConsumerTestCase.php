@@ -13,14 +13,14 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Functional\Adapter;
 
-use FiveLab\Component\Amqp\Binding\Definition\BindingCollection;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Consumer\ConsumerConfiguration;
-use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareCollection;
+use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
 use FiveLab\Component\Amqp\Consumer\Middleware\ProxyMessageToAnotherExchangeMiddleware;
 use FiveLab\Component\Amqp\Consumer\Middleware\StopAfterNExecutesMiddleware;
 use FiveLab\Component\Amqp\Consumer\SingleConsumer;
-use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlerChain;
+use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlers;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Exception\MessageHandlerNotSupportedException;
 use FiveLab\Component\Amqp\Exception\StopAfterNExecutesException;
@@ -36,7 +36,7 @@ use FiveLab\Component\Amqp\Tests\Functional\Consumer\Handler\ThrowableMessageHan
 use FiveLab\Component\Amqp\Tests\Functional\Consumer\Middleware\MiddlewareMock;
 use FiveLab\Component\Amqp\Tests\Functional\RabbitMqTestCase;
 
-abstract class ConsumerTestCase extends RabbitMqTestCase
+abstract class SingleConsumerTestCase extends RabbitMqTestCase
 {
     /**
      * @var QueueFactoryInterface
@@ -90,14 +90,14 @@ abstract class ConsumerTestCase extends RabbitMqTestCase
 
         $queueDefinition = new QueueDefinition(
             'some',
-            new BindingCollection(new BindingDefinition('test.direct', 'test'))
+            new BindingDefinitions(new BindingDefinition('test.direct', 'test'))
         );
 
         $this->queueFactory = $this->createQueueFactory($queueDefinition);
 
         $proxyQueueDefinition = new QueueDefinition(
             'proxy',
-            new BindingCollection(new BindingDefinition('proxy.direct', 'test'))
+            new BindingDefinitions(new BindingDefinition('proxy.direct', 'test'))
         );
 
         $this->proxyQueueFactory = $this->createQueueFactory($proxyQueueDefinition);
@@ -115,7 +115,7 @@ abstract class ConsumerTestCase extends RabbitMqTestCase
     public function shouldSuccessConsume(): void
     {
         $handler = new MessageHandlerMock('test');
-        $consumer = new SingleConsumer($this->queueFactory, $handler, new ConsumerMiddlewareCollection(), new ConsumerConfiguration());
+        $consumer = new SingleConsumer($this->queueFactory, $handler, new ConsumerMiddlewares(), new ConsumerConfiguration());
         $this->runConsumer($consumer);
 
         $receivedMessages = $handler->getReceivedMessages();
@@ -135,7 +135,7 @@ abstract class ConsumerTestCase extends RabbitMqTestCase
             $receivedMessage->ack();
         });
 
-        $consumer = new SingleConsumer($this->queueFactory, $handler, new ConsumerMiddlewareCollection(), new ConsumerConfiguration());
+        $consumer = new SingleConsumer($this->queueFactory, $handler, new ConsumerMiddlewares(), new ConsumerConfiguration());
         $this->runConsumer($consumer);
 
         $receivedMessages = $handler->getReceivedMessages();
@@ -155,7 +155,7 @@ abstract class ConsumerTestCase extends RabbitMqTestCase
             $receivedMessage->nack(false);
         });
 
-        $consumer = new SingleConsumer($this->queueFactory, $handler, new ConsumerMiddlewareCollection(), new ConsumerConfiguration());
+        $consumer = new SingleConsumer($this->queueFactory, $handler, new ConsumerMiddlewares(), new ConsumerConfiguration());
         $this->runConsumer($consumer);
 
         $receivedMessages = $handler->getReceivedMessages();
@@ -175,7 +175,7 @@ abstract class ConsumerTestCase extends RabbitMqTestCase
             $receivedMessage->nack(true);
         });
 
-        $consumer = new SingleConsumer($this->queueFactory, $handler, new ConsumerMiddlewareCollection(new StopAfterNExecutesMiddleware(2)), new ConsumerConfiguration());
+        $consumer = new SingleConsumer($this->queueFactory, $handler, new ConsumerMiddlewares(new StopAfterNExecutesMiddleware(2)), new ConsumerConfiguration());
         $this->runConsumer($consumer);
 
         $receivedMessages = $handler->getReceivedMessages();
@@ -198,7 +198,7 @@ abstract class ConsumerTestCase extends RabbitMqTestCase
         $handler = new ThrowableMessageHandlerMock('test');
         $handler->shouldThrowException(new \Exception('some foo bar'));
 
-        $consumer = new SingleConsumer($this->queueFactory, $handler, new ConsumerMiddlewareCollection(), new ConsumerConfiguration());
+        $consumer = new SingleConsumer($this->queueFactory, $handler, new ConsumerMiddlewares(), new ConsumerConfiguration());
         $this->runConsumer($consumer);
 
         $receivedMessages = $handler->getReceivedMessages();
@@ -229,7 +229,7 @@ abstract class ConsumerTestCase extends RabbitMqTestCase
             throw $e;
         });
 
-        $consumer = new SingleConsumer($this->queueFactory, $handler, new ConsumerMiddlewareCollection(), new ConsumerConfiguration());
+        $consumer = new SingleConsumer($this->queueFactory, $handler, new ConsumerMiddlewares(), new ConsumerConfiguration());
 
         try {
             $this->runConsumer($consumer);
@@ -252,7 +252,7 @@ abstract class ConsumerTestCase extends RabbitMqTestCase
         $handler = new MessageHandlerMock('test');
         $middleware = new MiddlewareMock();
 
-        $consumer = new SingleConsumer($this->queueFactory, $handler, new ConsumerMiddlewareCollection($middleware), new ConsumerConfiguration());
+        $consumer = new SingleConsumer($this->queueFactory, $handler, new ConsumerMiddlewares($middleware), new ConsumerConfiguration());
         $this->runConsumer($consumer);
 
         $receivedMessagesOnHandler = $handler->getReceivedMessages();
@@ -272,7 +272,7 @@ abstract class ConsumerTestCase extends RabbitMqTestCase
         $handler = new MessageHandlerMock('test');
         $middleware = new ProxyMessageToAnotherExchangeMiddleware($this->exchangeRegistry, 'proxy.direct');
 
-        $consumer = new SingleConsumer($this->queueFactory, $handler, new ConsumerMiddlewareCollection($middleware), new ConsumerConfiguration());
+        $consumer = new SingleConsumer($this->queueFactory, $handler, new ConsumerMiddlewares($middleware), new ConsumerConfiguration());
         $this->runConsumer($consumer);
 
         $messages = $this->getAllMessagesFromQueue($this->proxyQueueFactory);
@@ -295,9 +295,9 @@ abstract class ConsumerTestCase extends RabbitMqTestCase
         $this->expectExceptionMessage('Not found supported message handler.');
 
         $handler = new MessageHandlerMock('foo-bar');
-        $chainHandler = new MessageHandlerChain($handler);
+        $chainHandler = new MessageHandlers($handler);
 
-        $consumer = new SingleConsumer($this->queueFactory, $chainHandler, new ConsumerMiddlewareCollection(), new ConsumerConfiguration());
+        $consumer = new SingleConsumer($this->queueFactory, $chainHandler, new ConsumerMiddlewares(), new ConsumerConfiguration());
 
         $consumer->run();
     }
@@ -313,7 +313,7 @@ abstract class ConsumerTestCase extends RabbitMqTestCase
 
         try {
             $consumer->run();
-        } catch (ConsumerTimeoutExceedException | StopAfterNExecutesException $e) {
+        } catch (ConsumerTimeoutExceedException $e) {
             // Timeout or max executes. Normal flow.
         }
     }

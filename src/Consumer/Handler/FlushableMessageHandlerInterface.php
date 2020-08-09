@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Consumer\Handler;
 
-use FiveLab\Component\Amqp\Message\ReceivedMessageCollection;
+use FiveLab\Component\Amqp\Message\ReceivedMessages;
 
 /**
  * All message handlers for flushed consumers should implement this interface.
@@ -23,7 +23,7 @@ interface FlushableMessageHandlerInterface extends MessageHandlerInterface
     /**
      * Flush all received messages.
      *
-     * @param ReceivedMessageCollection $receivedMessages
+     * @param ReceivedMessages $receivedMessages
      */
-    public function flush(ReceivedMessageCollection $receivedMessages): void;
+    public function flush(ReceivedMessages $receivedMessages): void;
 }

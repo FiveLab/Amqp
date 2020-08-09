@@ -20,7 +20,7 @@ use FiveLab\Component\Amqp\Channel\Definition\ChannelDefinition;
 use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
 use FiveLab\Component\Amqp\Message\Message;
 use FiveLab\Component\Amqp\Message\Payload;
-use FiveLab\Component\Amqp\Publisher\Middleware\PublisherMiddlewareCollection;
+use FiveLab\Component\Amqp\Publisher\Middleware\PublisherMiddlewares;
 use FiveLab\Component\Amqp\Publisher\Publisher;
 use FiveLab\Component\Amqp\Tests\Functional\RabbitMqTestCase;
 
@@ -54,7 +54,7 @@ class PublisherTest extends RabbitMqTestCase
 
         $exchangeFactory->create();
 
-        $this->publisher = new Publisher($exchangeFactory, new PublisherMiddlewareCollection());
+        $this->publisher = new Publisher($exchangeFactory, new PublisherMiddlewares());
 
         $this->management->createQueue('test');
         $this->management->queueBind('test', 'test', 'test-routing');

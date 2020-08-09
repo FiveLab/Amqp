@@ -11,35 +11,44 @@
 
 declare(strict_types = 1);
 
-namespace FiveLab\Component\Amqp\Publisher\Middleware;
+namespace FiveLab\Component\Amqp\Consumer\Middleware;
 
-use FiveLab\Component\Amqp\Message\MessageInterface;
 use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
 
 /**
  * The collection for store middlewares for consumers.
  */
-class PublisherMiddlewareCollection implements \IteratorAggregate
+class ConsumerMiddlewares implements \IteratorAggregate
 {
     /**
-     * @var array|PublisherMiddlewareInterface[]
+     * @var array|ConsumerMiddlewareInterface[]
      */
     private $middlewares = [];
 
     /**
      * Constructor.
      *
-     * @param PublisherMiddlewareInterface ...$middlewares
+     * @param ConsumerMiddlewareInterface ...$middlewares
      */
-    public function __construct(PublisherMiddlewareInterface ...$middlewares)
+    public function __construct(ConsumerMiddlewareInterface ...$middlewares)
     {
         $this->middlewares = $middlewares;
     }
 
     /**
+     * Push middleware
+     *
+     * @param ConsumerMiddlewareInterface $middleware
+     */
+    public function push(ConsumerMiddlewareInterface $middleware): void
+    {
+        \array_push($this->middlewares, $middleware);
+    }
+
+    /**
      * {@inheritdoc}
      *
-     * @return \ArrayIterator|PublisherMiddlewareInterface[]
+     * @return \ArrayIterator|ConsumerMiddlewareInterface[]
      */
     public function getIterator()
     {
@@ -58,8 +67,8 @@ class PublisherMiddlewareCollection implements \IteratorAggregate
         $middlewares = $this->middlewares;
 
         while ($middleware = \array_pop($middlewares)) {
-            $lastExecutable = static function (MessageInterface $message, string $routingKey) use ($middleware, $lastExecutable) {
-                return $middleware->handle($message, $lastExecutable, $routingKey);
+            $lastExecutable = function (ReceivedMessageInterface $message) use ($middleware, $lastExecutable) {
+                return $middleware->handle($message, $lastExecutable);
             };
         }
 

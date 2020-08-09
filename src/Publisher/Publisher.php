@@ -15,7 +15,7 @@ namespace FiveLab\Component\Amqp\Publisher;
 
 use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
 use FiveLab\Component\Amqp\Message\MessageInterface;
-use FiveLab\Component\Amqp\Publisher\Middleware\PublisherMiddlewareCollection;
+use FiveLab\Component\Amqp\Publisher\Middleware\PublisherMiddlewares;
 
 /**
  * The default publisher
@@ -28,17 +28,17 @@ class Publisher implements PublisherInterface
     private $exchangeFactory;
 
     /**
-     * @var PublisherMiddlewareCollection
+     * @var PublisherMiddlewares
      */
     private $middlewares;
 
     /**
      * Constructor.
      *
-     * @param ExchangeFactoryInterface      $exchangeFactory
-     * @param PublisherMiddlewareCollection $middlewares
+     * @param ExchangeFactoryInterface $exchangeFactory
+     * @param PublisherMiddlewares     $middlewares
      */
-    public function __construct(ExchangeFactoryInterface $exchangeFactory, PublisherMiddlewareCollection $middlewares)
+    public function __construct(ExchangeFactoryInterface $exchangeFactory, PublisherMiddlewares $middlewares)
     {
         $this->exchangeFactory = $exchangeFactory;
         $this->middlewares = $middlewares;

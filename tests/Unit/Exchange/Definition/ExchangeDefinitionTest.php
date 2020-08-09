@@ -13,9 +13,9 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Unit\Exchange\Definition;
 
-use FiveLab\Component\Amqp\Argument\ArgumentCollection;
+use FiveLab\Component\Amqp\Argument\ArgumentDefinitions;
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
-use FiveLab\Component\Amqp\Binding\Definition\BindingCollection;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
 use PHPUnit\Framework\TestCase;
@@ -33,8 +33,8 @@ class ExchangeDefinitionTest extends TestCase
         self::assertEquals(AMQP_EX_TYPE_DIRECT, $def->getType());
         self::assertTrue($def->isDurable());
         self::assertFalse($def->isPassive());
-        self::assertEquals(new BindingCollection(), $def->getBindings());
-        self::assertEquals(new BindingCollection(), $def->getUnBindings());
+        self::assertEquals(new BindingDefinitions(), $def->getBindings());
+        self::assertEquals(new BindingDefinitions(), $def->getUnBindings());
     }
 
     /**
@@ -92,33 +92,33 @@ class ExchangeDefinitionTest extends TestCase
             AMQP_EX_TYPE_DIRECT,
             true,
             false,
-            new ArgumentCollection(),
-            new BindingCollection(),
-            new BindingCollection()
+            new ArgumentDefinitions(),
+            new BindingDefinitions(),
+            new BindingDefinitions()
         );
 
         self::assertEquals('', $def->getName());
         self::assertTrue($def->isDurable());
         self::assertFalse($def->isPassive());
-        self::assertEquals(new ArgumentCollection(), $def->getArguments());
-        self::assertEquals(new BindingCollection(), $def->getBindings());
-        self::assertEquals(new BindingCollection(), $def->getUnBindings());
+        self::assertEquals(new ArgumentDefinitions(), $def->getArguments());
+        self::assertEquals(new BindingDefinitions(), $def->getBindings());
+        self::assertEquals(new BindingDefinitions(), $def->getUnBindings());
     }
 
     /**
      * @test
      *
-     * @param \Throwable              $expectedException
-     * @param string                  $type
-     * @param bool                    $durable
-     * @param bool                    $passive
-     * @param ArgumentCollection|null $arguments
-     * @param BindingCollection|null  $bindings
-     * @param BindingCollection|null  $unbindings
+     * @param \Throwable               $expectedException
+     * @param string                   $type
+     * @param bool                     $durable
+     * @param bool                     $passive
+     * @param ArgumentDefinitions|null $arguments
+     * @param BindingDefinitions|null  $bindings
+     * @param BindingDefinitions|null  $unbindings
      *
      * @dataProvider provideInvalidParametersForDefaultExchange
      */
-    public function shouldFailCreateDefaultExchange(\Throwable $expectedException, string $type, bool $durable, bool $passive, ArgumentCollection $arguments = null, BindingCollection $bindings = null, BindingCollection $unbindings = null): void
+    public function shouldFailCreateDefaultExchange(\Throwable $expectedException, string $type, bool $durable, bool $passive, ArgumentDefinitions $arguments = null, BindingDefinitions $bindings = null, BindingDefinitions $unbindings = null): void
     {
         $this->expectException(\get_class($expectedException));
         $this->expectExceptionMessage($expectedException->getMessage());
@@ -179,7 +179,7 @@ class ExchangeDefinitionTest extends TestCase
                 'direct',
                 true,
                 false,
-                new ArgumentCollection(new ArgumentDefinition('x-some', 'foo')),
+                new ArgumentDefinitions(new ArgumentDefinition('x-some', 'foo')),
             ],
 
             'with bindings' => [
@@ -188,7 +188,7 @@ class ExchangeDefinitionTest extends TestCase
                 true,
                 false,
                 null,
-                new BindingCollection(new BindingDefinition('some', 'foo')),
+                new BindingDefinitions(new BindingDefinition('some', 'foo')),
             ],
 
             'with unbindings' => [
@@ -198,7 +198,7 @@ class ExchangeDefinitionTest extends TestCase
                 false,
                 null,
                 null,
-                new BindingCollection(new BindingDefinition('some', 'foo')),
+                new BindingDefinitions(new BindingDefinition('some', 'foo')),
             ],
         ];
     }

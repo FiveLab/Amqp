@@ -15,7 +15,7 @@ namespace FiveLab\Component\Amqp\Tests\Functional\Consumer\Handler;
 
 use FiveLab\Component\Amqp\Consumer\Handler\FlushableMessageHandlerInterface;
 use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlerInterface;
-use FiveLab\Component\Amqp\Message\ReceivedMessageCollection;
+use FiveLab\Component\Amqp\Message\ReceivedMessages;
 use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
 
 class MessageHandlerMock implements MessageHandlerInterface, FlushableMessageHandlerInterface
@@ -70,17 +70,17 @@ class MessageHandlerMock implements MessageHandlerInterface, FlushableMessageHan
      */
     public function handle(ReceivedMessageInterface $message): void
     {
+        $this->receivedMessages[] = $message;
+
         if ($this->handleCallback) {
             \call_user_func($this->handleCallback, $message);
         }
-
-        $this->receivedMessages[] = $message;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function flush(ReceivedMessageCollection $receivedMessages): void
+    public function flush(ReceivedMessages $receivedMessages): void
     {
         $this->flushedMessages[] = \iterator_to_array($receivedMessages);
 

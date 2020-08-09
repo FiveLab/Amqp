@@ -13,13 +13,15 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Consumer\Loop;
 
+use FiveLab\Component\Amqp\Channel\ChannelInterface;
 use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
 use FiveLab\Component\Amqp\Consumer\Handler\FlushableMessageHandlerInterface;
 use FiveLab\Component\Amqp\Consumer\Handler\ThrowableMessageHandlerInterface;
-use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareCollection;
+use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareInterface;
 use FiveLab\Component\Amqp\Consumer\MiddlewareAwareInterface;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
+use FiveLab\Component\Amqp\Exception\StopAfterNExecutesException;
 use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
@@ -40,7 +42,7 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
     private $messageHandler;
 
     /**
-     * @var ConsumerMiddlewareCollection
+     * @var ConsumerMiddlewares
      */
     private $middlewares;
 
@@ -61,10 +63,10 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
      *
      * @param QueueFactoryInterface            $queueFactory
      * @param FlushableMessageHandlerInterface $messageHandler
-     * @param ConsumerMiddlewareCollection     $middlewares
+     * @param ConsumerMiddlewares              $middlewares
      * @param LoopConsumerConfiguration        $configuration
      */
-    public function __construct(QueueFactoryInterface $queueFactory, FlushableMessageHandlerInterface $messageHandler, ConsumerMiddlewareCollection $middlewares, LoopConsumerConfiguration $configuration)
+    public function __construct(QueueFactoryInterface $queueFactory, FlushableMessageHandlerInterface $messageHandler, ConsumerMiddlewares $middlewares, LoopConsumerConfiguration $configuration)
     {
         $this->queueFactory = $queueFactory;
         $this->messageHandler = $messageHandler;
@@ -101,8 +103,86 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
      */
     public function run(): void
     {
-        $queue = $this->queueFactory->create();
-        $channel = $queue->getChannel();
+        $executable = $this->middlewares->createExecutable(function (ReceivedMessageInterface $message) {
+            $this->messageHandler->handle($message);
+        });
+
+        while (true) {
+            $channel = $this->queueFactory->create()->getChannel();
+
+            $this->configureBeforeConsume($channel);
+
+            try {
+                $this->queueFactory->create()->consume(function (ReceivedMessageInterface $message) use ($executable) {
+                    try {
+                        $executable($message);
+                    } catch (ConsumerTimeoutExceedException $error) {
+                        // Attention: the executable can't throw consumer timeout exception. But in test we throw
+                        // this exception for transfer control to next catch and test success while iteration.
+                        $message->ack();
+
+                        throw $error;
+                    } catch (StopAfterNExecutesException $error) {
+                        // We must stop after N executes. In this case we success process message.
+                        if (!$message->isAnswered()) {
+                            $message->ack();
+                        }
+
+                        throw $error;
+                    } catch (\Throwable $e) {
+                        if ($this->messageHandler instanceof ThrowableMessageHandlerInterface) {
+                            $this->messageHandler->catchError($message, $e);
+
+                            if (!$message->isAnswered()) {
+                                // The error handler can manually answered to broker.
+                                $message->ack();
+                            }
+
+                            return;
+                        }
+
+                        $message->nack($this->configuration->isShouldRequeueOnError());
+
+                        throw $e;
+                    }
+
+                    if (!$message->isAnswered()) {
+                        $message->ack();
+                    }
+                }, $this->configuration->getTagGenerator()->generate());
+            } catch (ConsumerTimeoutExceedException $e) {
+                // Note: we can't cancel consumer, because rabbitmq can send next message to client
+                // and client attach to existence consumer. As result we can receive error: orphaned envelope.
+                // We full disconnect and try reconnect
+                $channel->getConnection()->disconnect();
+
+                // The application must force throw consumer timeout exception.
+                // Can be used manually for force stop consumer or in round robin consumer.
+                // In other cases it's normal flow.
+                if ($this->throwConsumerTimeoutExceededException) {
+                    throw $e;
+                }
+            } catch (StopAfterNExecutesException $error) {
+                // Disconnect, because inner system can has buffer for sending to amqp service.
+                $channel->getConnection()->disconnect();
+
+                return;
+            } catch (\Throwable $e) {
+                // Disconnect, because inner system can has buffer for sending to amqp service.
+                $channel->getConnection()->disconnect();
+
+                throw $e;
+            }
+        }
+    }
+
+    /**
+     * Configure channel and connection before consume
+     *
+     * @param ChannelInterface $channel
+     */
+    private function configureBeforeConsume(ChannelInterface $channel): void
+    {
         $connection = $channel->getConnection();
 
         $originalReadTimeout = $connection->getReadTimeout();
@@ -114,54 +194,5 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
         }
 
         $channel->setPrefetchCount($this->configuration->getPrefetchCount());
-
-        $executable = $this->middlewares->createExecutable(function (ReceivedMessageInterface $message) use ($queue) {
-            $this->messageHandler->handle($message);
-        });
-
-        while (true) {
-            $consumerTag = \sprintf('loop.'.\md5(\uniqid((string) \random_int(0, PHP_INT_MAX), true)));
-
-            try {
-                $this->queueFactory->create()->consume(function (ReceivedMessageInterface $message) use ($executable) {
-                    try {
-                        $executable($message);
-                    } catch (\Throwable $e) {
-                        if ($this->messageHandler instanceof ThrowableMessageHandlerInterface) {
-                            $this->messageHandler->catchError($message, $e);
-
-                            if (!$message->isAnswered()) {
-                                // The error handler can manually answered to broker.
-                                $message->ack();
-                            }
-
-                            return;
-                        } else {
-                            $message->nack($this->configuration->isShouldRequeueOnError());
-
-                            throw $e;
-                        }
-                    }
-
-                    if (!$message->isAnswered()) {
-                        $message->ack();
-                    }
-                }, $consumerTag);
-            } catch (ConsumerTimeoutExceedException $e) {
-                $queue->cancelConsumer($consumerTag);
-
-                // The application must force throw consumer timeout exception.
-                // Can be used manually for force stop consumer or in round robin consumer.
-                // In other cases it's normal flow.
-                if ($this->throwConsumerTimeoutExceededException) {
-                    throw $e;
-                }
-            } catch (\Throwable $e) {
-                // Disconnect, because inner system can has buffer for sending to amqp service.
-                $connection->disconnect();
-
-                throw $e;
-            }
-        }
     }
 }

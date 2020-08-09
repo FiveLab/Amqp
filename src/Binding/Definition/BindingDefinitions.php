@@ -16,7 +16,7 @@ namespace FiveLab\Component\Amqp\Binding\Definition;
 /**
  * Collection for store all queue bindings.
  */
-class BindingCollection implements \IteratorAggregate, \Countable
+class BindingDefinitions implements \IteratorAggregate, \Countable
 {
     /**
      * @var array|BindingDefinition[]
