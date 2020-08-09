@@ -20,7 +20,7 @@ use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
 /**
  * The chain of message handlers.
  */
-class MessageHandlerChain implements MessageHandlerInterface, FlushableMessageHandlerInterface, ThrowableMessageHandlerInterface
+class MessageHandlers implements MessageHandlerInterface, FlushableMessageHandlerInterface, ThrowableMessageHandlerInterface
 {
     /**
      * @var array|MessageHandlerInterface[]

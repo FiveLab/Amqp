@@ -56,9 +56,9 @@ class RunRoundRobinConsumerCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
-        $this->consumer->setChangeConsumerHandler(function (ConsumerInterface $consumer) use ($output) {
+        $this->consumer->setChangeConsumerHandler(static function (ConsumerInterface $consumer) use ($output) {
             if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
                 $output->writeln(\sprintf(
                     'Select next consumer with queue <comment>%s</comment>.',

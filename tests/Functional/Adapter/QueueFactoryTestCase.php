@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Functional\Adapter;
 
-use FiveLab\Component\Amqp\Argument\Arguments;
+use FiveLab\Component\Amqp\Argument\ArgumentDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
@@ -235,7 +235,7 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
             false,
             false,
             false,
-            new Arguments(
+            new ArgumentDefinitions(
                 new QueueModeArgument('default'),
                 new QueueMasterLocatorArgument('random')
             )

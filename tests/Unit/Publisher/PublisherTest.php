@@ -36,7 +36,7 @@ class PublisherTest extends TestCase
     private $exchangeFactory;
 
     /**
-     * @var PublisherMiddlewares|MockObject
+     * @var PublisherMiddlewares
      */
     private $middlewares;
 
@@ -52,7 +52,7 @@ class PublisherTest extends TestCase
     {
         $this->exchange = $this->createMock(ExchangeInterface::class);
         $this->exchangeFactory = $this->createMock(ExchangeFactoryInterface::class);
-        $this->middlewares = $this->createMock(PublisherMiddlewares::class);
+        $this->middlewares = new PublisherMiddlewares();
 
         $this->exchangeFactory->expects(self::any())
             ->method('create')
@@ -67,22 +67,11 @@ class PublisherTest extends TestCase
     public function shouldSuccessPublish(): void
     {
         $message = new Message(new Payload('some'));
-        $executed = false;
 
-        $executable = static function (MessageInterface $message, string $routingKey = '') use (&$executed) {
-            $executed = true;
-
-            self::assertEquals('foo.bar', $routingKey);
-            self::assertEquals(new Message(new Payload('some')), $message);
-        };
-
-        $this->middlewares->expects(self::once())
-            ->method('createExecutable')
-            ->with(self::isInstanceOf(\Closure::class))
-            ->willReturn($executable);
+        $this->exchange->expects(self::once())
+            ->method('publish')
+            ->with($message, 'foo.bar');
 
         $this->publisher->publish($message, 'foo.bar');
-
-        self::assertTrue($executed, 'The publisher don\'t execute middleware callback.');
     }
 }

@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Functional\Adapter;
 
-use FiveLab\Component\Amqp\Argument\Arguments;
+use FiveLab\Component\Amqp\Argument\ArgumentDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Exchange\Definition\Arguments\AlternateExchangeArgument;
@@ -118,7 +118,7 @@ abstract class ExchangeFactoryTestCase extends RabbitMqTestCase
             AMQP_EX_TYPE_DIRECT,
             true,
             false,
-            new Arguments(
+            new ArgumentDefinitions(
                 new AlternateExchangeArgument('foo-bar')
             )
         );

@@ -270,11 +270,11 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         } catch (\InvalidArgumentException $e) {
             $nonProcessMessages = \array_map(static function (ReceivedMessageInterface $receivedMessage) {
                 return $receivedMessage->getPayload()->getData();
-            },  $this->getAllMessagesFromQueue($this->queueFactory));
+            }, $this->getAllMessagesFromQueue($this->queueFactory));
 
             self::assertEquals([
                 'message #4',
-                'message #5'
+                'message #5',
             ], $nonProcessMessages);
 
             throw $e;
@@ -360,7 +360,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
             self::assertEquals([
                 'message #1',
                 'message #2',
-                'message #3'
+                'message #3',
             ], $receivedMessages);
 
             $flushedMessages = \array_map(static function (ReceivedMessageInterface $message) {
@@ -370,7 +370,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
             self::assertEquals([
                 'message #1',
                 'message #2',
-                'message #3'
+                'message #3',
             ], $flushedMessages);
 
             self::assertQueueEmpty($this->queueFactory);

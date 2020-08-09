@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Unit\Queue\Definition;
 
-use FiveLab\Component\Amqp\Argument\Arguments;
+use FiveLab\Component\Amqp\Argument\ArgumentDefinitions;
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
@@ -109,10 +109,10 @@ class QueueDefinitionTest extends TestCase
      */
     public function shouldSuccessCreateWithArguments(): void
     {
-        $def = new QueueDefinition('some', null, null, false, false, false, false, new Arguments(
+        $def = new QueueDefinition('some', null, null, false, false, false, false, new ArgumentDefinitions(
             new ArgumentDefinition('some', 'foo-bar')
         ));
 
-        self::assertEquals(new Arguments(new ArgumentDefinition('some', 'foo-bar')), $def->getArguments());
+        self::assertEquals(new ArgumentDefinitions(new ArgumentDefinition('some', 'foo-bar')), $def->getArguments());
     }
 }

@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Queue\Definition;
 
-use FiveLab\Component\Amqp\Argument\Arguments;
+use FiveLab\Component\Amqp\Argument\ArgumentDefinitions;
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
@@ -66,16 +66,16 @@ class QueueDefinition
     /**
      * Constructor.
      *
-     * @param string             $name
-     * @param BindingDefinitions $bindings
-     * @param BindingDefinitions $unBindings
-     * @param bool               $durable
-     * @param bool               $passive
-     * @param bool               $exclusive
-     * @param bool               $autoDelete
-     * @param Arguments          $arguments
+     * @param string              $name
+     * @param BindingDefinitions  $bindings
+     * @param BindingDefinitions  $unBindings
+     * @param bool                $durable
+     * @param bool                $passive
+     * @param bool                $exclusive
+     * @param bool                $autoDelete
+     * @param ArgumentDefinitions $arguments
      */
-    public function __construct(string $name, BindingDefinitions $bindings = null, BindingDefinitions $unBindings = null, bool $durable = true, bool $passive = false, bool $exclusive = false, bool $autoDelete = false, Arguments $arguments = null)
+    public function __construct(string $name, BindingDefinitions $bindings = null, BindingDefinitions $unBindings = null, bool $durable = true, bool $passive = false, bool $exclusive = false, bool $autoDelete = false, ArgumentDefinitions $arguments = null)
     {
         $this->name = $name;
         $this->bindings = $bindings ?: new BindingDefinitions();
@@ -84,7 +84,7 @@ class QueueDefinition
         $this->passive = $passive;
         $this->exclusive = $exclusive;
         $this->autoDelete = $autoDelete;
-        $this->arguments = $arguments ?: new Arguments();
+        $this->arguments = $arguments ?: new ArgumentDefinitions();
     }
 
     /**
@@ -160,9 +160,9 @@ class QueueDefinition
     /**
      * Get arguments
      *
-     * @return Arguments|ArgumentDefinition[]
+     * @return ArgumentDefinitions|ArgumentDefinition[]
      */
-    public function getArguments(): Arguments
+    public function getArguments(): ArgumentDefinitions
     {
         return $this->arguments;
     }

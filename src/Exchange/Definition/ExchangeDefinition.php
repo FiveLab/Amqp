@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Exchange\Definition;
 
-use FiveLab\Component\Amqp\Argument\Arguments;
+use FiveLab\Component\Amqp\Argument\ArgumentDefinitions;
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
@@ -44,7 +44,7 @@ class ExchangeDefinition
     private $passive;
 
     /**
-     * @var Arguments
+     * @var ArgumentDefinitions
      */
     private $arguments;
 
@@ -61,15 +61,15 @@ class ExchangeDefinition
     /**
      * Constructor.
      *
-     * @param string                  $name
-     * @param string                  $type
-     * @param bool                    $durable
-     * @param bool                    $passive
-     * @param Arguments|null          $arguments
-     * @param BindingDefinitions|null $bindings
-     * @param BindingDefinitions|null $unbindings
+     * @param string                   $name
+     * @param string                   $type
+     * @param bool                     $durable
+     * @param bool                     $passive
+     * @param ArgumentDefinitions|null $arguments
+     * @param BindingDefinitions|null  $bindings
+     * @param BindingDefinitions|null  $unbindings
      */
-    public function __construct(string $name, string $type, bool $durable = true, bool $passive = false, Arguments $arguments = null, BindingDefinitions $bindings = null, BindingDefinitions $unbindings = null)
+    public function __construct(string $name, string $type, bool $durable = true, bool $passive = false, ArgumentDefinitions $arguments = null, BindingDefinitions $bindings = null, BindingDefinitions $unbindings = null)
     {
         if ('' === $name) {
             // Try to create default direct exchange.
@@ -120,7 +120,7 @@ class ExchangeDefinition
         $this->type = $type;
         $this->durable = $durable;
         $this->passive = $passive;
-        $this->arguments = $arguments ?: new Arguments();
+        $this->arguments = $arguments ?: new ArgumentDefinitions();
         $this->bindings = $bindings ?: new BindingDefinitions();
         $this->unbindings = $unbindings ?: new BindingDefinitions();
     }
@@ -168,9 +168,9 @@ class ExchangeDefinition
     /**
      * Get arguments
      *
-     * @return Arguments|ArgumentDefinition[]
+     * @return ArgumentDefinitions|ArgumentDefinition[]
      */
-    public function getArguments(): Arguments
+    public function getArguments(): ArgumentDefinitions
     {
         return $this->arguments;
     }

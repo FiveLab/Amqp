@@ -20,7 +20,7 @@ use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
 use FiveLab\Component\Amqp\Consumer\Middleware\ProxyMessageToAnotherExchangeMiddleware;
 use FiveLab\Component\Amqp\Consumer\Middleware\StopAfterNExecutesMiddleware;
 use FiveLab\Component\Amqp\Consumer\SingleConsumer;
-use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlerChain;
+use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlers;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Exception\MessageHandlerNotSupportedException;
 use FiveLab\Component\Amqp\Exception\StopAfterNExecutesException;
@@ -295,7 +295,7 @@ abstract class SingleConsumerTestCase extends RabbitMqTestCase
         $this->expectExceptionMessage('Not found supported message handler.');
 
         $handler = new MessageHandlerMock('foo-bar');
-        $chainHandler = new MessageHandlerChain($handler);
+        $chainHandler = new MessageHandlers($handler);
 
         $consumer = new SingleConsumer($this->queueFactory, $chainHandler, new ConsumerMiddlewares(), new ConsumerConfiguration());
 

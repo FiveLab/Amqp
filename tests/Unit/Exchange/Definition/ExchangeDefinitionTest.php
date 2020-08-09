@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Unit\Exchange\Definition;
 
-use FiveLab\Component\Amqp\Argument\Arguments;
+use FiveLab\Component\Amqp\Argument\ArgumentDefinitions;
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
@@ -92,7 +92,7 @@ class ExchangeDefinitionTest extends TestCase
             AMQP_EX_TYPE_DIRECT,
             true,
             false,
-            new Arguments(),
+            new ArgumentDefinitions(),
             new BindingDefinitions(),
             new BindingDefinitions()
         );
@@ -100,7 +100,7 @@ class ExchangeDefinitionTest extends TestCase
         self::assertEquals('', $def->getName());
         self::assertTrue($def->isDurable());
         self::assertFalse($def->isPassive());
-        self::assertEquals(new Arguments(), $def->getArguments());
+        self::assertEquals(new ArgumentDefinitions(), $def->getArguments());
         self::assertEquals(new BindingDefinitions(), $def->getBindings());
         self::assertEquals(new BindingDefinitions(), $def->getUnBindings());
     }
@@ -108,17 +108,17 @@ class ExchangeDefinitionTest extends TestCase
     /**
      * @test
      *
-     * @param \Throwable              $expectedException
-     * @param string                  $type
-     * @param bool                    $durable
-     * @param bool                    $passive
-     * @param Arguments|null          $arguments
-     * @param BindingDefinitions|null $bindings
-     * @param BindingDefinitions|null $unbindings
+     * @param \Throwable               $expectedException
+     * @param string                   $type
+     * @param bool                     $durable
+     * @param bool                     $passive
+     * @param ArgumentDefinitions|null $arguments
+     * @param BindingDefinitions|null  $bindings
+     * @param BindingDefinitions|null  $unbindings
      *
      * @dataProvider provideInvalidParametersForDefaultExchange
      */
-    public function shouldFailCreateDefaultExchange(\Throwable $expectedException, string $type, bool $durable, bool $passive, Arguments $arguments = null, BindingDefinitions $bindings = null, BindingDefinitions $unbindings = null): void
+    public function shouldFailCreateDefaultExchange(\Throwable $expectedException, string $type, bool $durable, bool $passive, ArgumentDefinitions $arguments = null, BindingDefinitions $bindings = null, BindingDefinitions $unbindings = null): void
     {
         $this->expectException(\get_class($expectedException));
         $this->expectExceptionMessage($expectedException->getMessage());
@@ -179,7 +179,7 @@ class ExchangeDefinitionTest extends TestCase
                 'direct',
                 true,
                 false,
-                new Arguments(new ArgumentDefinition('x-some', 'foo')),
+                new ArgumentDefinitions(new ArgumentDefinition('x-some', 'foo')),
             ],
 
             'with bindings' => [

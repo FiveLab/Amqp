@@ -99,26 +99,6 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
     }
 
     /**
-     * Configure channel and connection before consume
-     *
-     * @param ChannelInterface $channel
-     */
-    private function configureBeforeConsume(ChannelInterface $channel): void
-    {
-        $connection = $channel->getConnection();
-
-        $originalReadTimeout = $connection->getReadTimeout();
-        $expectedReadTimeout = $this->configuration->getReadTimeout();
-
-        if (!$originalReadTimeout || $originalReadTimeout > $expectedReadTimeout) {
-            // Change the read timeout.
-            $connection->setReadTimeout($expectedReadTimeout);
-        }
-
-        $channel->setPrefetchCount($this->configuration->getPrefetchCount());
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function run(): void
@@ -194,5 +174,25 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
                 throw $e;
             }
         }
+    }
+
+    /**
+     * Configure channel and connection before consume
+     *
+     * @param ChannelInterface $channel
+     */
+    private function configureBeforeConsume(ChannelInterface $channel): void
+    {
+        $connection = $channel->getConnection();
+
+        $originalReadTimeout = $connection->getReadTimeout();
+        $expectedReadTimeout = $this->configuration->getReadTimeout();
+
+        if (!$originalReadTimeout || $originalReadTimeout > $expectedReadTimeout) {
+            // Change the read timeout.
+            $connection->setReadTimeout($expectedReadTimeout);
+        }
+
+        $channel->setPrefetchCount($this->configuration->getPrefetchCount());
     }
 }

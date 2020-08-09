@@ -41,7 +41,7 @@ class PublisherMiddlewares implements \IteratorAggregate
      *
      * @return \ArrayIterator|PublisherMiddlewareInterface[]
      */
-    public function getIterator()
+    public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator($this->middlewares);
     }

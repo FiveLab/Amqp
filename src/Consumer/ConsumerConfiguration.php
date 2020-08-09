@@ -39,8 +39,9 @@ class ConsumerConfiguration
     /**
      * Constructor.
      *
-     * @param bool $requeueOnError
-     * @param int  $prefetchCount
+     * @param bool                               $requeueOnError
+     * @param int                                $prefetchCount
+     * @param ConsumerTagGeneratorInterface|null $tagGenerator
      */
     public function __construct(bool $requeueOnError = true, int $prefetchCount = 3, ConsumerTagGeneratorInterface $tagGenerator = null)
     {
