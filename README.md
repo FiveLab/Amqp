@@ -1,7 +1,7 @@
 Event Broker: AMQP
 ==================
 
-[![Build Status](https://github.com/FiveLab/Amqp/workflows/Testing/badge.svg?branch=master)](https://travis-ci.org/FiveLab/Amqp)
+[![Build Status](https://github.com/FiveLab/Amqp/workflows/Testing/badge.svg?branch=master)](https://github.com/FiveLab/Amqp/actions)
 
 This library for receive events from RabbitMQ and publish messages to AMQP.
 
