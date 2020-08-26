@@ -15,9 +15,10 @@ jobs:
 
         services:
             rabbitmq:
-                image: rabbitmq:3.8.3
+                image: rabbitmq:3-management
                 ports:
                     - 5672:5672
+                    - 15672:15672
 
         steps:
             -   name: Checkout
