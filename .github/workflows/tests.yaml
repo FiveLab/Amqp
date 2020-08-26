@@ -30,9 +30,12 @@ jobs:
                     extensions: "json,amqp"
                     ini-values: "memory_limit=-1"
                     php-version: "${{ matrix.php }}"
+                    tools: "composer"
 
             -   name: Run tests on stable packages
-                run: ./bin/phpunit
+                run: |
+                    composer install --prefer-dist
+                    ./bin/phpunit
                 env:
                     RABBITMQ_HOST: localhost
 
