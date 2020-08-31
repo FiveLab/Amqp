@@ -58,4 +58,22 @@ class HeadersTest extends TestCase
 
         $headers->get('bar');
     }
+
+    /**
+     * @test
+     */
+    public function shouldReturnArrayHeader(): void
+    {
+        $xDeathHeaderValue = [
+            [
+                'count' => 1,
+            ],
+        ];
+
+        $headers = new Headers([
+            'x-death' => $xDeathHeaderValue,
+        ]);
+
+        self::assertEquals($xDeathHeaderValue, $headers->get('x-death'));
+    }
 }
