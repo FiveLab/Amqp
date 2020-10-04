@@ -51,7 +51,7 @@ $ docker run -d \
     --name event-broker-amqp-rabbitmq \
     rabbitmq:management
 $ docker build -t event-broker-amqp .
-$ docker run -it \
+$ docker run -it --rm \
     --name event-broker-amqp \
     -v $(pwd):/code \
     --network event-broker-amqp \
@@ -65,7 +65,7 @@ $ docker run -it \
 After success run and attach to container you must install vendors:
 
 ```bash
-$ composer install
+$ composer update
 ```
 
 Before create the PR or merge into develop, please run next commands for validate code:
