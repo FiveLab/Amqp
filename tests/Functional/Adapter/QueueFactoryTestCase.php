@@ -277,7 +277,7 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
         $consumed = false;
 
         try {
-            $queue->consume(function (ReceivedMessageInterface $receivedMessage) use (&$consumed) {
+            $queue->consume(static function (ReceivedMessageInterface $receivedMessage) use (&$consumed) {
                 $consumed = true;
 
                 self::assertEquals(new Payload('some foo bar'), $receivedMessage->getPayload());
@@ -290,5 +290,33 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
         }
 
         self::assertTrue($consumed, 'The queue not receive message.');
+    }
+
+    /**
+     * @test
+     */
+    public function shouldSuccessGetCountMessages(): void
+    {
+        $this->management->createExchange(AMQP_EX_TYPE_DIRECT, 'test.direct');
+        $this->management->createQueue('some');
+        $this->management->queueBind('some', 'test.direct', 'test');
+
+        for ($i = 0; $i < 12; $i++) {
+            $this->management->publishMessage('test.direct', 'test', 'some foo bar '.$i);
+        }
+
+        $definition = new QueueDefinition(
+            'some',
+            new BindingDefinitions(
+                new BindingDefinition('test.direct', 'test')
+            )
+        );
+
+        $factory = $this->createQueueFactory($definition);
+        $queue = $factory->create();
+
+        $countMessages = $queue->countMessages();
+
+        self::assertEquals(12, $countMessages);
     }
 }

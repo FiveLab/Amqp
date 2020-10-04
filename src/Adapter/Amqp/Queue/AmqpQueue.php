@@ -112,4 +112,12 @@ class AmqpQueue implements QueueInterface
     {
         $this->queue->purge();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function countMessages(): int
+    {
+        return $this->queue->declareQueue();
+    }
 }
