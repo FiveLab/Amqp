@@ -126,4 +126,4 @@ $consumer->run();
 ```
 
 If you want to process any messages in one queue, you can use `FiveLab\Component\Amqp\Consumer\Handler\MessageHandlerChain`.
-It allow to receive any message from queue and check if the message handler support to process this message.
+It allows to receive any message from queue and check if the message handler support to process this message.
