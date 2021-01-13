@@ -13,6 +13,9 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Message;
 
+/**
+ * Implement delay message. It add common headers for next control in handlers.
+ */
 class DelayMessage implements MessageInterface
 {
     public const HEADER_PUBLISHER_KEY = 'x-delay-publisher';
