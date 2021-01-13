@@ -19,7 +19,7 @@ use FiveLab\Component\Amqp\Message\MessageInterface;
 /**
  * Publisher for publish messages to delay system
  */
-class DelayPublisher implements PublisherInterface
+class DelayPublisher implements DelayPublisherInterface
 {
     /**
      * @var PublisherInterface
