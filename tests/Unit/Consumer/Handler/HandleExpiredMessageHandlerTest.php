@@ -32,6 +32,11 @@ class HandleExpiredMessageHandlerTest extends TestCase
     private $publisherRegistry;
 
     /**
+     * @var PublisherInterface
+     */
+    private $delayPublisher;
+
+    /**
      * @var HandleExpiredMessageHandler
      */
     private $handler;
@@ -42,7 +47,8 @@ class HandleExpiredMessageHandlerTest extends TestCase
     protected function setUp(): void
     {
         $this->publisherRegistry = $this->createMock(PublisherRegistryInterface::class);
-        $this->handler = new HandleExpiredMessageHandler($this->publisherRegistry, 'delay', 'landfill');
+        $this->delayPublisher = $this->createMock(PublisherInterface::class);
+        $this->handler = new HandleExpiredMessageHandler($this->publisherRegistry, $this->delayPublisher, 'landfill');
     }
 
     /**
@@ -106,13 +112,16 @@ class HandleExpiredMessageHandlerTest extends TestCase
             ->with('processing')
             ->willReturn($publisher);
 
+        $this->delayPublisher->expects(self::never())
+            ->method('publish');
+
         $this->handler->handle($message);
     }
 
     /**
      * @test
      */
-    public function shuldSuccessRetryPublishToDelay(): void
+    public function shouldSuccessRetryPublishToDelay(): void
     {
         $message = $this->createMock(ReceivedMessageInterface::class);
 
@@ -133,9 +142,8 @@ class HandleExpiredMessageHandlerTest extends TestCase
             ->method('getIdentifier')
             ->willReturn(new Identifier('qq'));
 
-        $publisher = $this->createMock(PublisherInterface::class);
 
-        $publisher->expects(self::once())
+        $this->delayPublisher->expects(self::once())
             ->method('publish')
             ->with(new Message(
                 new Payload('foo bar'),
@@ -148,11 +156,6 @@ class HandleExpiredMessageHandlerTest extends TestCase
                 ]),
                 new Identifier('qq')
             ), 'landfill');
-
-        $this->publisherRegistry->expects(self::once())
-            ->method('get')
-            ->with('delay')
-            ->willReturn($publisher);
 
         $this->handler->handle($message);
     }

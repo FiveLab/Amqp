@@ -17,6 +17,7 @@ use FiveLab\Component\Amqp\Message\DelayMessage;
 use FiveLab\Component\Amqp\Message\Headers;
 use FiveLab\Component\Amqp\Message\Message;
 use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Publisher\PublisherInterface;
 use FiveLab\Component\Amqp\Publisher\Registry\PublisherRegistryInterface;
 
 /**
@@ -30,9 +31,9 @@ class HandleExpiredMessageHandler implements ThrowableMessageHandlerInterface
     private $publisherRegistry;
 
     /**
-     * @var string
+     * @var PublisherInterface
      */
-    private $delayPublisherKey;
+    private $delayPublisher;
 
     /**
      * @var string
@@ -43,13 +44,13 @@ class HandleExpiredMessageHandler implements ThrowableMessageHandlerInterface
      * Constructor.
      *
      * @param PublisherRegistryInterface $publisherRegistry
-     * @param string                     $delayPublisherKey
+     * @param PublisherInterface         $delayPublisher
      * @param string                     $landfillRoutingKey
      */
-    public function __construct(PublisherRegistryInterface $publisherRegistry, string $delayPublisherKey, string $landfillRoutingKey)
+    public function __construct(PublisherRegistryInterface $publisherRegistry, PublisherInterface $delayPublisher, string $landfillRoutingKey)
     {
         $this->publisherRegistry = $publisherRegistry;
-        $this->delayPublisherKey = $delayPublisherKey;
+        $this->delayPublisher = $delayPublisher;
         $this->landfillRoutingKey = $landfillRoutingKey;
     }
 
@@ -69,23 +70,21 @@ class HandleExpiredMessageHandler implements ThrowableMessageHandlerInterface
         $payload = $message->getPayload();
         $headers = $message->getHeaders();
 
+        $publisherKey = $headers->get(DelayMessage::HEADER_PUBLISHER_KEY);
+        $routingKey = $headers->get(DelayMessage::HEADER_ROUTING_KEY);
         $counter = $headers->has(DelayMessage::HEADER_COUNTER) ? $headers->get(DelayMessage::HEADER_COUNTER) : 1;
         $counter--;
 
         $listHeaders = $headers->all();
 
-        if ($counter && $counter > 0) {
+        if ($counter > 0) {
             // Retry send message to landfill
             $listHeaders[DelayMessage::HEADER_COUNTER] = $counter;
-            $routing = $this->landfillRoutingKey;
-            $publisherKey = $this->delayPublisherKey;
 
             $sendMessage = new Message($payload, null, new Headers($listHeaders), $message->getIdentifier());
+            $this->delayPublisher->publish($sendMessage, $this->landfillRoutingKey);
         } else {
             // Publish message to target
-            $publisherKey = $headers->get(DelayMessage::HEADER_PUBLISHER_KEY);
-            $routing = $headers->get(DelayMessage::HEADER_ROUTING_KEY);
-
             unset(
                 $listHeaders[DelayMessage::HEADER_PUBLISHER_KEY],
                 $listHeaders[DelayMessage::HEADER_ROUTING_KEY],
@@ -93,10 +92,10 @@ class HandleExpiredMessageHandler implements ThrowableMessageHandlerInterface
             );
 
             $sendMessage = new Message($payload, null, new Headers($listHeaders), $message->getIdentifier());
-        }
+            $publisher = $this->publisherRegistry->get($publisherKey);
 
-        $publisher = $this->publisherRegistry->get($publisherKey);
-        $publisher->publish($sendMessage, $routing);
+            $publisher->publish($sendMessage, $routingKey);
+        }
     }
 
     /**
