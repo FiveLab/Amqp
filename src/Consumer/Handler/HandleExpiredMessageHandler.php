@@ -104,5 +104,6 @@ class HandleExpiredMessageHandler implements ThrowableMessageHandlerInterface
     public function catchError(ReceivedMessageInterface $message, \Throwable $error): void
     {
         // @todo: publish message to fallback
+        throw $error;
     }
 }
