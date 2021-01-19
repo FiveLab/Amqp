@@ -64,8 +64,14 @@ class HandleExpiredMessageHandlerTest extends TestCase
         $message = $this->createMock(ReceivedMessageInterface::class);
 
         $message->expects(self::once())
-            ->method('getRoutingKey')
-            ->willReturn($routing);
+            ->method('getHeaders')
+            ->willReturn(new Headers([
+                'x-death' => [
+                    [
+                        'routing-keys' => [$routing],
+                    ],
+                ],
+            ]));
 
         $result = $this->handler->supports($message);
 

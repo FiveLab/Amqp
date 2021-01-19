@@ -59,7 +59,30 @@ class HandleExpiredMessageHandler implements ThrowableMessageHandlerInterface
      */
     public function supports(ReceivedMessageInterface $message): bool
     {
-        return $message->getRoutingKey() === $this->landfillRoutingKey;
+        $headers = $message->getHeaders();
+
+        if (!$headers->has('x-death')) {
+            // No expired message
+            return false;
+        }
+
+        $deaths = $headers->get('x-death');
+
+        if (!\count($deaths)) {
+            // Wrong x-death header (must be more then zero elements)
+            return false;
+        }
+
+        $death = $deaths[0];
+
+        if (!\array_key_exists('routing-keys', $death)) {
+            // Missed routing keys.
+            return false;
+        }
+
+        $landfillRoutingKey = $death['routing-keys'][0];
+
+        return $landfillRoutingKey === $this->landfillRoutingKey;
     }
 
     /**
