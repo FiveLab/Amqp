@@ -15,7 +15,7 @@ namespace FiveLab\Component\Amqp\Consumer\Loop;
 
 use FiveLab\Component\Amqp\Channel\ChannelInterface;
 use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
-use FiveLab\Component\Amqp\Consumer\Handler\FlushableMessageHandlerInterface;
+use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlerInterface;
 use FiveLab\Component\Amqp\Consumer\Handler\ThrowableMessageHandlerInterface;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareInterface;
@@ -37,7 +37,7 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
     private $queueFactory;
 
     /**
-     * @var FlushableMessageHandlerInterface
+     * @var MessageHandlerInterface
      */
     private $messageHandler;
 
@@ -61,12 +61,12 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
     /**
      * Constructor.
      *
-     * @param QueueFactoryInterface            $queueFactory
-     * @param FlushableMessageHandlerInterface $messageHandler
-     * @param ConsumerMiddlewares              $middlewares
-     * @param LoopConsumerConfiguration        $configuration
+     * @param QueueFactoryInterface     $queueFactory
+     * @param MessageHandlerInterface   $messageHandler
+     * @param ConsumerMiddlewares       $middlewares
+     * @param LoopConsumerConfiguration $configuration
      */
-    public function __construct(QueueFactoryInterface $queueFactory, FlushableMessageHandlerInterface $messageHandler, ConsumerMiddlewares $middlewares, LoopConsumerConfiguration $configuration)
+    public function __construct(QueueFactoryInterface $queueFactory, MessageHandlerInterface $messageHandler, ConsumerMiddlewares $middlewares, LoopConsumerConfiguration $configuration)
     {
         $this->queueFactory = $queueFactory;
         $this->messageHandler = $messageHandler;
