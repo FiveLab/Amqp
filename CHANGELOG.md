@@ -1,7 +1,7 @@
 CHANGELOG
 =========
 
-untagged
+v1.1.2
 --------
 
 * Add option `--messages` to run consumer command.
