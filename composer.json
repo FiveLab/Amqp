@@ -30,7 +30,8 @@
         "guzzlehttp/guzzle": "~6.3.0",
         "symfony/console": "~2.3|~4.0",
         "ramsey/uuid": "~3.0",
-        "fivelab/transactional": "~2.0"
+        "fivelab/transactional": "~2.0",
+        "psr/log": "*"
     },
 
     "suggest": {
