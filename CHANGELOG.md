@@ -1,7 +1,7 @@
 CHANGELOG
 =========
 
-untagged
+v1.1.1
 --------
 
 * Add logging consumer.
