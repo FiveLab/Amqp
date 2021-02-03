@@ -15,6 +15,8 @@ namespace FiveLab\Component\Amqp\Tests\Unit\Consumer;
 
 use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
 use FiveLab\Component\Amqp\Consumer\LoggingConsumer;
+use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareInterface;
+use FiveLab\Component\Amqp\Consumer\SingleConsumer;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -115,5 +117,33 @@ class LoggingConsumerTest extends TestCase
         $this->expectExceptionMessage('some foo bar');
 
         $this->loggingConsumer->run();
+    }
+
+    /**
+     * @test
+     */
+    public function shouldPushMiddlewareToOriginalConsumer()
+    {
+        $middlewareMock = self::createMock(ConsumerMiddlewareInterface::class);
+
+        $decoratedConsumer = self::createMock(SingleConsumer::class);
+        $decoratedConsumer->expects(self::once())
+            ->method('pushMiddleware')
+            ->with($middlewareMock);
+
+        $loggingConsumer = new LoggingConsumer($decoratedConsumer, $this->logger);
+        $loggingConsumer->pushMiddleware($middlewareMock);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldFailOnMiddlewarePushIfInterfaceNotImplemented()
+    {
+        self::expectException(\BadMethodCallException::class);
+        self::expectExceptionMessage('Decorated consumer must implement MiddlewareAwareInterface');
+
+        $middlewareMock = self::createMock(ConsumerMiddlewareInterface::class);
+        $this->loggingConsumer->pushMiddleware($middlewareMock);
     }
 }
