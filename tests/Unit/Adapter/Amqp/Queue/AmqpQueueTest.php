@@ -151,4 +151,18 @@ class AmqpQueueTest extends TestCase
 
         self::assertNull($message);
     }
+
+    /**
+     * @test
+     */
+    public function shouldSuccessGetCountMessages(): void
+    {
+        $this->originQueue->expects(self::once())
+            ->method('declareQueue')
+            ->willReturn(123);
+
+        $messages = $this->queue->countMessages();
+
+        self::assertEquals(123, $messages);
+    }
 }

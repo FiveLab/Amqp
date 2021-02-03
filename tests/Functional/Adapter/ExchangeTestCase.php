@@ -55,8 +55,6 @@ abstract class ExchangeTestCase extends RabbitMqTestCase
 
     /**
      * @test
-     *
-     * @group foo
      */
     public function shouldSuccessPublishViaDefaultExchange(): void
     {

@@ -61,4 +61,11 @@ interface QueueInterface
      * Purge a queue
      */
     public function purge(): void;
+
+    /**
+     * Get a count messages
+     *
+     * @return int
+     */
+    public function countMessages(): int;
 }

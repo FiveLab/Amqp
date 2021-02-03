@@ -23,7 +23,7 @@ class ConsumerMiddlewares implements \IteratorAggregate
     /**
      * @var array|ConsumerMiddlewareInterface[]
      */
-    private $middlewares = [];
+    private $middlewares;
 
     /**
      * Constructor.
@@ -42,7 +42,7 @@ class ConsumerMiddlewares implements \IteratorAggregate
      */
     public function push(ConsumerMiddlewareInterface $middleware): void
     {
-        \array_push($this->middlewares, $middleware);
+        $this->middlewares[] = $middleware;
     }
 
     /**
@@ -67,7 +67,7 @@ class ConsumerMiddlewares implements \IteratorAggregate
         $middlewares = $this->middlewares;
 
         while ($middleware = \array_pop($middlewares)) {
-            $lastExecutable = function (ReceivedMessageInterface $message) use ($middleware, $lastExecutable) {
+            $lastExecutable = static function (ReceivedMessageInterface $message) use ($middleware, $lastExecutable) {
                 return $middleware->handle($message, $lastExecutable);
             };
         }

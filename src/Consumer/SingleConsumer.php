@@ -126,6 +126,8 @@ class SingleConsumer implements ConsumerInterface, MiddlewareAwareInterface
                 }
             }, $this->configuration->getTagGenerator()->generate());
         } catch (StopAfterNExecutesException $error) {
+            $queue->getChannel()->getConnection()->disconnect();
+
             // Normal flow. Exit from loop.
             return;
         } catch (\Throwable $error) {
