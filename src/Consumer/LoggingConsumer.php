@@ -13,13 +13,14 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Consumer;
 
+use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareInterface;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
 use Psr\Log\LoggerInterface;
 
 /**
  * Decorate consumer for logging.
  */
-class LoggingConsumer implements ConsumerInterface
+class LoggingConsumer implements ConsumerInterface, MiddlewareAwareInterface
 {
     /**
      * @var ConsumerInterface
@@ -79,5 +80,17 @@ class LoggingConsumer implements ConsumerInterface
             'End consume on "%s" queue.',
             $this->getQueue()->getName()
         ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function pushMiddleware(ConsumerMiddlewareInterface $middleware): void
+    {
+        if (!$this->decoratedConsumer instanceof MiddlewareAwareInterface) {
+            throw new \BadMethodCallException('Decorated consumer must implement MiddlewareAwareInterface');
+        }
+
+        $this->decoratedConsumer->pushMiddleware($middleware);
     }
 }
