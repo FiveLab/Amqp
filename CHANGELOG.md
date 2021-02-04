@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+v1.1.4
+------
+
+* Implement `MiddlewareAwareInterface` in `LoggingConsumer` decorator.
+
+v1.1.3
+------
+
+* Disconnect after catch `StopAfterNExecutes` on `single consumer`.
+
 v1.1.2
 --------
 
