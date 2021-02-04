@@ -124,9 +124,9 @@ class LoggingConsumerTest extends TestCase
      */
     public function shouldPushMiddlewareToOriginalConsumer()
     {
-        $middlewareMock = self::createMock(ConsumerMiddlewareInterface::class);
+        $middlewareMock = $this->createMock(ConsumerMiddlewareInterface::class);
 
-        $decoratedConsumer = self::createMock(SingleConsumer::class);
+        $decoratedConsumer = $this->createMock(SingleConsumer::class);
         $decoratedConsumer->expects(self::once())
             ->method('pushMiddleware')
             ->with($middlewareMock);
@@ -140,10 +140,11 @@ class LoggingConsumerTest extends TestCase
      */
     public function shouldFailOnMiddlewarePushIfInterfaceNotImplemented()
     {
+        $middlewareMock = $this->createMock(ConsumerMiddlewareInterface::class);
+
         self::expectException(\BadMethodCallException::class);
         self::expectExceptionMessage('Decorated consumer must implement MiddlewareAwareInterface');
 
-        $middlewareMock = self::createMock(ConsumerMiddlewareInterface::class);
         $this->loggingConsumer->pushMiddleware($middlewareMock);
     }
 }
