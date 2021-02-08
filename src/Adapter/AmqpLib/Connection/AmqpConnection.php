@@ -40,7 +40,6 @@ class AmqpConnection implements ConnectionInterface, \SplSubject
 
     /**
      * Closes connection
-     * @throws \Exception
      */
     public function __destruct()
     {
@@ -78,7 +77,6 @@ class AmqpConnection implements ConnectionInterface, \SplSubject
 
     /**
      * {@inheritdoc}
-     * @throws \Exception
      */
     public function disconnect(): void
     {
@@ -127,7 +125,7 @@ class AmqpConnection implements ConnectionInterface, \SplSubject
     /**
      * {@inheritdoc}
      */
-    public function detach(SplObserver $observer)
+    public function detach(SplObserver $observer): void
     {
         unset($this->observers[\spl_object_hash($observer)]);
     }
@@ -135,7 +133,7 @@ class AmqpConnection implements ConnectionInterface, \SplSubject
     /**
      * {@inheritdoc}
      */
-    public function notify()
+    public function notify(): void
     {
         foreach ($this->observers as $observer) {
             $observer->update($this);

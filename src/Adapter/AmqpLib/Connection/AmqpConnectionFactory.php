@@ -43,22 +43,22 @@ class AmqpConnectionFactory implements ConnectionFactoryInterface
         $amqpLibConnection = new AMQPLazyConnection(
             $this->connectionOptions['host'],
             $this->connectionOptions['port'],
-            $this->connectionOptions['login'],
-            $this->connectionOptions['password'],
-            $this->connectionOptions['vhost'],
+            $this->connectionOptions['login'] ?? 'guest',
+            $this->connectionOptions['password'] ?? 'guest',
+            $this->connectionOptions['vhost'] ?? '/',
             false,
             'AMQPLAIN',
             null,
             'en_US',
             5.0,
-            $this->connectionOptions['read_timeout'],
+            $this->connectionOptions['read_timeout'] ?? 0,
             null,
             false,
-            $this->connectionOptions['heartbeat'],
-            $this->connectionOptions['read_timeout']
+            $this->connectionOptions['heartbeat'] ?? 0,
+            $this->connectionOptions['read_timeout'] ?? 0
         );
 
-        $this->connection = new AmqpConnection($amqpLibConnection, $this->connectionOptions['read_timeout']);
+        $this->connection = new AmqpConnection($amqpLibConnection, $this->connectionOptions['read_timeout'] ?? 0);
 
         return $this->connection;
     }

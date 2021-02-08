@@ -82,7 +82,7 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
     /**
      * {@inheritdoc}
      */
-    public function update(\SplSubject $subject)
+    public function update(\SplSubject $subject): void
     {
         $this->queue = null;
     }

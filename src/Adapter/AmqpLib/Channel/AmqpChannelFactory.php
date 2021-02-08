@@ -70,7 +70,7 @@ class AmqpChannelFactory implements ChannelFactoryInterface, \SplObserver
     /**
      * {@inheritdoc}
      */
-    public function update(\SplSubject $subject)
+    public function update(\SplSubject $subject): void
     {
         $this->channel = null;
     }

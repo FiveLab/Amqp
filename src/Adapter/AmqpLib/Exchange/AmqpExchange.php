@@ -97,7 +97,7 @@ class AmqpExchange implements ExchangeInterface
     /**
      * Declares exchange (creates or validates existing one)
      */
-    public function declare()
+    public function declare(): void
     {
         // Default exchange always exists and "declare" call is not permitted
         if (!$this->getName()) {
@@ -126,7 +126,7 @@ class AmqpExchange implements ExchangeInterface
      * @param string $exchangeName
      * @param string $routingKey
      */
-    public function bind(string $exchangeName, string $routingKey)
+    public function bind(string $exchangeName, string $routingKey): void
     {
         $this->channel->getChannel()->exchange_bind($this->getName(), $exchangeName, $routingKey);
     }
@@ -135,7 +135,7 @@ class AmqpExchange implements ExchangeInterface
      * @param string $exchangeName
      * @param string $routingKey
      */
-    public function unbind(string $exchangeName, string $routingKey)
+    public function unbind(string $exchangeName, string $routingKey): void
     {
         $this->channel->getChannel()->exchange_unbind($this->getName(), $exchangeName, $routingKey);
     }

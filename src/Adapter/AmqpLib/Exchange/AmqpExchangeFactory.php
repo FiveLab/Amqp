@@ -83,7 +83,7 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
     /**
      * {@inheritdoc}
      */
-    public function update(\SplSubject $subject)
+    public function update(\SplSubject $subject): void
     {
         $this->exchange = null;
     }

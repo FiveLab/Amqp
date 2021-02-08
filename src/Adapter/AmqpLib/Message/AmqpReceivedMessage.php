@@ -73,9 +73,9 @@ class AmqpReceivedMessage implements ReceivedMessageInterface
     public function getIdentifier(): Identifier
     {
         return new Identifier(
-            $this->message->get_properties()['message_id'],
-            $this->message->get_properties()['app_id'],
-            $this->message->get_properties()['user_id']
+            $this->message->get_properties()['message_id'] ?? '',
+            $this->message->get_properties()['app_id'] ?? '',
+            $this->message->get_properties()['user_id'] ?? ''
         );
     }
 

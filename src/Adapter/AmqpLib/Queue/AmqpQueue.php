@@ -167,7 +167,7 @@ class AmqpQueue implements QueueInterface
      * @param string $exchangeName
      * @param string $routingKey
      */
-    public function bind(string $exchangeName, string $routingKey)
+    public function bind(string $exchangeName, string $routingKey): void
     {
         $this->channel->getChannel()->queue_bind($this->getName(), $exchangeName, $routingKey);
     }
@@ -176,7 +176,7 @@ class AmqpQueue implements QueueInterface
      * @param string $exchangeName
      * @param string $routingKey
      */
-    public function unbind(string $exchangeName, string $routingKey)
+    public function unbind(string $exchangeName, string $routingKey): void
     {
         $this->channel->getChannel()->queue_unbind($this->getName(), $exchangeName, $routingKey);
     }
