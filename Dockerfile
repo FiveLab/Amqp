@@ -19,6 +19,7 @@ RUN \
         librabbitmq-dev && \
     printf '\n' | pecl install amqp && \
     yes | pecl install xdebug && \
+    docker-php-ext-install sockets && \
     docker-php-ext-enable amqp xdebug
 
 # Configure XDebug

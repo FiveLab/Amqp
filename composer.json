@@ -31,11 +31,14 @@
         "symfony/console": "~2.3|~4.0",
         "ramsey/uuid": "~3.0",
         "fivelab/transactional": "~2.0",
-        "psr/log": "*"
+        "psr/log": "*",
+        "php-amqplib/php-amqplib": "^2.12"
     },
 
     "suggest": {
         "ext-amqp": "For use amqp extension.",
+        "ext-sockets": "For php-amqplib",
+        "php-amqplib/php-amqplib": "pure PHP driver",
         "symfony/console": "For configure console commands for run consumer.",
         "ramsey/uuid": "For use UUID message id generator",
         "fivelab/transactional": "For use transactional layer with this wrapper."
