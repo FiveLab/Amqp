@@ -123,8 +123,9 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
      */
     public function shouldSuccessCreateExclusiveQueue(): void
     {
+        $queueName = 'test_queue_exclusive_'.uniqid();
         $definition = new QueueDefinition(
-            'test_queue_exclusive',
+            $queueName,
             null,
             null,
             true,
@@ -135,7 +136,7 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
         $factory = $this->createQueueFactory($definition);
         $factory->create();
 
-        $queueInfo = $this->management->queueByName('test_queue_exclusive');
+        $queueInfo = $this->management->queueByName($queueName);
 
         self::assertTrue($queueInfo['exclusive']);
     }

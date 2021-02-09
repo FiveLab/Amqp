@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Queue;
 
 use FiveLab\Component\Amqp\Channel\ChannelInterface;
+use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
 
 /**
@@ -40,6 +41,8 @@ interface QueueInterface
      *
      * @param \Closure $handler
      * @param string   $tag
+     *
+     * @throws ConsumerTimeoutExceedException
      */
     public function consume(\Closure $handler, string $tag = ''): void;
 

@@ -29,7 +29,10 @@ All entries of AMQP have a factory. It allow to create the real instances only o
 
 ### Adapters
 
-We create a library with able to support any adapters for connect to broker. But now, we support only **`ext-amqp`**. 
+We create a library with able to support any adapters for connect to broker. 
+Out-of-the-box supported drivers are:
+* **`ext-amqp`** 
+* composer php-amqplib
 
 Documentation
 -------------
