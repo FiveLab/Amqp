@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace FiveLab\Component\Amqp\Adapter\AmqpLib\Exchange;
 
@@ -10,6 +10,7 @@ use FiveLab\Component\Amqp\Channel\ChannelFactoryInterface;
 use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
 use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
 use FiveLab\Component\Amqp\Exchange\ExchangeInterface;
+use PhpAmqpLib\Wire\AMQPTable;
 
 /**
  * The factory for create exchanges provided via php-amqplib library.
@@ -65,14 +66,14 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
         $connection->attach($this);
 
         $exchange = new AmqpExchange($channel, $this->definition);
-        $exchange->declare();
+        $this->declare();
 
         foreach ($this->definition->getBindings() as $binding) {
-            $exchange->bind($binding->getExchangeName(), $binding->getRoutingKey());
+            $this->bind($binding->getExchangeName(), $binding->getRoutingKey());
         }
 
         foreach ($this->definition->getUnBindings() as $unbinding) {
-            $exchange->unbind($unbinding->getExchangeName(), $unbinding->getRoutingKey());
+            $this->unbind($unbinding->getExchangeName(), $unbinding->getRoutingKey());
         }
 
         $this->exchange = $exchange;
@@ -86,5 +87,53 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
     public function update(\SplSubject $subject): void
     {
         $this->exchange = null;
+    }
+
+    /**
+     * Declares exchange (creates or validates existing one)
+     */
+    private function declare(): void
+    {
+        $name = $this->definition->getName();
+
+        // Default exchange always exists and "declare" call is not permitted
+        if (!$name) {
+            return;
+        }
+
+        $arguments = new AMQPTable();
+
+        foreach ($this->definition->getArguments() as $argument) {
+            $arguments->set($argument->getName(), $argument->getValue());
+        }
+
+        $this->channelFactory->create()->getChannel()->exchange_declare(
+            $name,
+            $this->definition->getType(),
+            $this->definition->isPassive(),
+            $this->definition->isDurable(),
+            false,
+            false,
+            false,
+            $arguments
+        );
+    }
+
+    /**
+     * @param string $exchangeName
+     * @param string $routingKey
+     */
+    private function bind(string $exchangeName, string $routingKey): void
+    {
+        $this->channelFactory->create()->getChannel()->exchange_bind($this->definition->getName(), $exchangeName, $routingKey);
+    }
+
+    /**
+     * @param string $exchangeName
+     * @param string $routingKey
+     */
+    private function unbind(string $exchangeName, string $routingKey): void
+    {
+        $this->channelFactory->create()->getChannel()->exchange_unbind($this->definition->getName(), $exchangeName, $routingKey);
     }
 }

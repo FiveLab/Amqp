@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace FiveLab\Component\Amqp\Adapter\AmqpLib\Queue;
 
@@ -67,11 +67,11 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
         $queue->declare();
 
         foreach ($this->definition->getBindings() as $binding) {
-            $queue->bind($binding->getExchangeName(), $binding->getRoutingKey());
+            $this->bind($binding->getExchangeName(), $binding->getRoutingKey());
         }
 
         foreach ($this->definition->getUnBindings() as $unBinding) {
-            $queue->unbind($unBinding->getExchangeName(), $unBinding->getRoutingKey());
+            $this->unbind($unBinding->getExchangeName(), $unBinding->getRoutingKey());
         }
 
         $this->queue = $queue;
@@ -85,5 +85,23 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
     public function update(\SplSubject $subject): void
     {
         $this->queue = null;
+    }
+
+    /**
+     * @param string $exchangeName
+     * @param string $routingKey
+     */
+    private function bind(string $exchangeName, string $routingKey): void
+    {
+        $this->channelFactory->create()->getChannel()->queue_bind($this->definition->getName(), $exchangeName, $routingKey);
+    }
+
+    /**
+     * @param string $exchangeName
+     * @param string $routingKey
+     */
+    private function unbind(string $exchangeName, string $routingKey): void
+    {
+        $this->channelFactory->create()->getChannel()->queue_unbind($this->definition->getName(), $exchangeName, $routingKey);
     }
 }

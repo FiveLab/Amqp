@@ -143,6 +143,8 @@ class AmqpQueue implements QueueInterface
 
     /**
      * @return array|null   declare result, includes queue size
+     *
+     * @internal
      */
     public function declare(): ?array
     {
@@ -161,23 +163,5 @@ class AmqpQueue implements QueueInterface
             false,
             $arguments
         );
-    }
-
-    /**
-     * @param string $exchangeName
-     * @param string $routingKey
-     */
-    public function bind(string $exchangeName, string $routingKey): void
-    {
-        $this->channel->getChannel()->queue_bind($this->getName(), $exchangeName, $routingKey);
-    }
-
-    /**
-     * @param string $exchangeName
-     * @param string $routingKey
-     */
-    public function unbind(string $exchangeName, string $routingKey): void
-    {
-        $this->channel->getChannel()->queue_unbind($this->getName(), $exchangeName, $routingKey);
     }
 }
