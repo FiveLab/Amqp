@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+v1.2.0
+------
+
+* Add support [php-amqplib](https://github.com/php-amqplib/php-amqplib).
+
 v1.1.4
 ------
 
