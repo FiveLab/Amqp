@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+v1.2.1
+------
+
+* Fix for support `Symfony 5`.
+
 v1.2.0
 ------
 
