@@ -71,8 +71,10 @@ class RunRoundRobinConsumerCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->consumer->run();
+
+        return 0;
     }
 }
