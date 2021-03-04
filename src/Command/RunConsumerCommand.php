@@ -65,7 +65,7 @@ class RunConsumerCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $consumer = $this->consumerRegistry->get($input->getArgument('key'));
 
@@ -98,6 +98,8 @@ class RunConsumerCommand extends Command
         }
 
         $consumer->run();
+
+        return 0;
     }
 
     /**
