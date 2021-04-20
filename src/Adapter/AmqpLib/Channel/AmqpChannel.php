@@ -34,7 +34,7 @@ class AmqpChannel implements ChannelInterface
      * Construct
      *
      * @param object|AmqpConnection|SpoolConnection $connection
-     * @param AmqpLibChannel                 $channel
+     * @param AmqpLibChannel                        $channel
      */
     public function __construct(object $connection, AmqpLibChannel $channel)
     {
