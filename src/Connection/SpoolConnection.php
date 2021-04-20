@@ -14,12 +14,15 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Connection;
 
 use FiveLab\Component\Amqp\Exception\ConnectionException;
+use FiveLab\Component\Amqp\SplSubjectTrait;
 
 /**
  * Spool connection for "ext-amqp".
  */
 class SpoolConnection implements ConnectionInterface
 {
+    use SplSubjectTrait;
+
     /**
      * @var array|ConnectionInterface[]
      */
@@ -125,30 +128,6 @@ class SpoolConnection implements ConnectionInterface
     public function getReadTimeout(): float
     {
         return $this->getOriginConnection()->getReadTimeout();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function attach(\SplObserver $observer): void
-    {
-        $this->getOriginConnection()->attach($observer);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function detach(\SplObserver $observer): void
-    {
-        $this->getOriginConnection()->detach($observer);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function notify(): void
-    {
-        $this->getOriginConnection()->notify();
     }
 
     /**

@@ -16,16 +16,14 @@ namespace FiveLab\Component\Amqp\Adapter\Amqp\Connection;
 use FiveLab\Component\Amqp\Connection\ConnectionInterface;
 use FiveLab\Component\Amqp\Exception\BadCredentialsException;
 use FiveLab\Component\Amqp\Exception\ConnectionException;
+use FiveLab\Component\Amqp\SplSubjectTrait;
 
 /**
  * The connection provided via php-amqp extension.
  */
 class AmqpConnection implements ConnectionInterface
 {
-    /**
-     * @var \SplObserver[]
-     */
-    private array $observers = [];
+    use SplSubjectTrait;
 
     /**
      * @var \AMQPConnection
@@ -109,35 +107,5 @@ class AmqpConnection implements ConnectionInterface
     public function getReadTimeout(): float
     {
         return $this->connection->getReadTimeout();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function attach(\SplObserver $observer): void
-    {
-        $hash = \spl_object_hash($observer);
-
-        if (!\array_key_exists($hash, $this->observers)) {
-            $this->observers[\spl_object_hash($observer)] = $observer;
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function detach(\SplObserver $observer): void
-    {
-        unset($this->observers[\spl_object_hash($observer)]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function notify(): void
-    {
-        foreach ($this->observers as $observer) {
-            $observer->update($this);
-        }
     }
 }

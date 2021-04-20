@@ -9,6 +9,7 @@ use FiveLab\Component\Amqp\Channel\ChannelFactoryInterface;
 use FiveLab\Component\Amqp\Channel\ChannelInterface;
 use FiveLab\Component\Amqp\Channel\Definition\ChannelDefinition;
 use FiveLab\Component\Amqp\Connection\ConnectionFactoryInterface;
+use FiveLab\Component\Amqp\Connection\SpoolConnection;
 
 /**
  * The factory for create channel provided via php-amqplib library.
@@ -51,7 +52,7 @@ class AmqpChannelFactory implements ChannelFactoryInterface, \SplObserver
 
         $connection = $this->connectionFactory->create();
 
-        if (!$connection instanceof AmqpConnection) {
+        if (!$connection instanceof AmqpConnection && !$connection instanceof SpoolConnection) {
             throw new \InvalidArgumentException(\sprintf(
                 'The connection "%s" does not support creating php-amqplib channels.',
                 \get_class($connection)
@@ -59,6 +60,10 @@ class AmqpChannelFactory implements ChannelFactoryInterface, \SplObserver
         }
 
         $connection->attach($this);
+
+        if (!$connection->isConnected()) {
+            $connection->connect();
+        }
 
         $channel = $connection->getConnection()->channel();
 

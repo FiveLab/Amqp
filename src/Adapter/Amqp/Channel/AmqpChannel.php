@@ -16,6 +16,7 @@ namespace FiveLab\Component\Amqp\Adapter\Amqp\Channel;
 use FiveLab\Component\Amqp\Adapter\Amqp\Connection\AmqpConnection;
 use FiveLab\Component\Amqp\Channel\ChannelInterface;
 use FiveLab\Component\Amqp\Connection\ConnectionInterface;
+use FiveLab\Component\Amqp\Connection\SpoolConnection;
 
 /**
  * The channel provided via php-amqp extension.
@@ -23,9 +24,9 @@ use FiveLab\Component\Amqp\Connection\ConnectionInterface;
 class AmqpChannel implements ChannelInterface
 {
     /**
-     * @var AmqpConnection
+     * @var AmqpConnection|SpoolConnection
      */
-    private AmqpConnection $connection;
+    private $connection;
 
     /**
      * @var \AMQPChannel
@@ -35,11 +36,20 @@ class AmqpChannel implements ChannelInterface
     /**
      * Constructor.
      *
-     * @param AmqpConnection $connection
-     * @param \AMQPChannel   $channel
+     * @param object|AmqpConnection|SpoolConnection $connection
+     * @param \AMQPChannel                          $channel
      */
-    public function __construct(AmqpConnection $connection, \AMQPChannel $channel)
+    public function __construct(object $connection, \AMQPChannel $channel)
     {
+        if (!$connection instanceof AmqpConnection && !$connection instanceof SpoolConnection) {
+            throw new \InvalidArgumentException(\sprintf(
+                'Invalid connection. Must be a "%s" or "%s". But "%s" given.',
+                AmqpConnection::class,
+                SpoolConnection::class,
+                \get_class($connection)
+            ));
+        }
+
         $this->connection = $connection;
         $this->channel = $channel;
     }

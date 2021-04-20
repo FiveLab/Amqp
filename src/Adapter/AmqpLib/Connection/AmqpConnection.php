@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FiveLab\Component\Amqp\Adapter\AmqpLib\Connection;
 
 use FiveLab\Component\Amqp\Connection\ConnectionInterface;
+use FiveLab\Component\Amqp\SplSubjectTrait;
 use PhpAmqpLib\Connection\AbstractConnection;
 use SplObserver;
 
@@ -13,10 +14,7 @@ use SplObserver;
  */
 class AmqpConnection implements ConnectionInterface
 {
-    /**
-     * @var array|\SplObserver[]
-     */
-    private array $observers = [];
+    use SplSubjectTrait;
 
     /**
      * @var AbstractConnection
@@ -108,35 +106,5 @@ class AmqpConnection implements ConnectionInterface
     public function getReadTimeout(): float
     {
         return $this->readTimeout;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function attach(SplObserver $observer): void
-    {
-        $hash = \spl_object_hash($observer);
-
-        if (!\array_key_exists($hash, $this->observers)) {
-            $this->observers[\spl_object_hash($observer)] = $observer;
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function detach(SplObserver $observer): void
-    {
-        unset($this->observers[\spl_object_hash($observer)]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function notify(): void
-    {
-        foreach ($this->observers as $observer) {
-            $observer->update($this);
-        }
     }
 }

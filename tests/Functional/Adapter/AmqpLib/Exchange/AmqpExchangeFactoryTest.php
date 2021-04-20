@@ -8,6 +8,7 @@ use FiveLab\Component\Amqp\Adapter\AmqpLib\Channel\AmqpChannelFactory;
 use FiveLab\Component\Amqp\Adapter\AmqpLib\Connection\AmqpConnectionFactory;
 use FiveLab\Component\Amqp\Adapter\AmqpLib\Exchange\AmqpExchangeFactory;
 use FiveLab\Component\Amqp\Channel\Definition\ChannelDefinition;
+use FiveLab\Component\Amqp\Connection\SpoolConnectionFactory;
 use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
 use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
 use FiveLab\Component\Amqp\Tests\Functional\Adapter\ExchangeFactoryTestCase;
