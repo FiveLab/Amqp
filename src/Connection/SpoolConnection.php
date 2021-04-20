@@ -148,7 +148,7 @@ class SpoolConnection implements ConnectionInterface
      */
     public function notify(): void
     {
-        $this->getOriginConnection()->notify();;
+        $this->getOriginConnection()->notify();
     }
 
     /**
