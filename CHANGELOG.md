@@ -1,11 +1,14 @@
 CHANGELOG
 =========
 
-vX.X.X
+v1.3.0
 ------
 
 * Remove support PHP 7.3 and early.
 * Add support PHP 8.0.
+* Fix Spool connection for possible use for all adapters.
+
+> Note: spool connection does not have backward compatibility. Class was be moved to `Connection` folder. 
 
 v1.2.1
 ------

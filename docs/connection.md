@@ -15,7 +15,7 @@ If we can't connect, we try to connect to third node.
 <?php
 
 use FiveLab\Component\Amqp\Adapter\Amqp\Connection\AmqpConnectionFactory;
-use FiveLab\Component\Amqp\Adapter\Amqp\Connection\SpoolAmqpConnectionFactory;
+use FiveLab\Component\Amqp\Connection\SpoolConnectionFactory;
 
 $primaryConnectionFactory = new AmqpConnectionFactory([
     'host'            => 'host-1',
@@ -35,7 +35,7 @@ $reserveConnectionFactory = new AmqpConnectionFactory([
     'connect_timeout' => 2,
 ]);
 
-$connectionFactory = new SpoolAmqpConnectionFactory($primaryConnectionFactory, $reserveConnectionFactory);
+$connectionFactory = new SpoolConnectionFactory($primaryConnectionFactory, $reserveConnectionFactory);
 
 $connection = $connectionFactory->create();
 
