@@ -23,12 +23,12 @@ class ListConsumersCommandTest extends TestCase
     /**
      * @var ArrayInput
      */
-    private $input;
+    private ArrayInput $input;
 
     /**
      * @var BufferedOutput
      */
-    private $output;
+    private BufferedOutput $output;
 
     /**
      * {@inheritdoc}

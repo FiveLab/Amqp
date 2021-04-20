@@ -23,7 +23,6 @@ use FiveLab\Component\Amqp\Consumer\SingleConsumer;
 use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlers;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Exception\MessageHandlerNotSupportedException;
-use FiveLab\Component\Amqp\Exception\StopAfterNExecutesException;
 use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
 use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
 use FiveLab\Component\Amqp\Exchange\Registry\ExchangeFactoryRegistry;
@@ -41,17 +40,17 @@ abstract class SingleConsumerTestCase extends RabbitMqTestCase
     /**
      * @var QueueFactoryInterface
      */
-    private $queueFactory;
+    private QueueFactoryInterface $queueFactory;
 
     /**
      * @var QueueFactoryInterface
      */
-    private $proxyQueueFactory;
+    private QueueFactoryInterface $proxyQueueFactory;
 
     /**
      * @var ExchangeFactoryRegistryInterface
      */
-    private $exchangeRegistry;
+    private ExchangeFactoryRegistryInterface $exchangeRegistry;
 
     /**
      * Create the queue factory

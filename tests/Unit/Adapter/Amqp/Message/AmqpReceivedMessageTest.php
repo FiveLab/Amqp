@@ -26,17 +26,17 @@ class AmqpReceivedMessageTest extends TestCase
     /**
      * @var \AMQPQueue|MockObject
      */
-    private $queue;
+    private \AMQPQueue $queue;
 
     /**
      * @var \AMQPEnvelope|MockObject
      */
-    private $envelope;
+    private \AMQPEnvelope $envelope;
 
     /**
      * @var AmqpReceivedMessage
      */
-    private $receivedMessage;
+    private AmqpReceivedMessage $receivedMessage;
 
     /**
      * {@inheritdoc}

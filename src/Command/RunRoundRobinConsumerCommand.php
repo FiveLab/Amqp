@@ -29,7 +29,7 @@ class RunRoundRobinConsumerCommand extends Command
     /**
      * @var RoundRobinConsumer
      */
-    private $consumer;
+    private RoundRobinConsumer $consumer;
 
     /**
      * Constructor.

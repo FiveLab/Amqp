@@ -23,7 +23,7 @@ class ConsumerMiddlewares implements \IteratorAggregate
     /**
      * @var array|ConsumerMiddlewareInterface[]
      */
-    private $middlewares;
+    private array $middlewares;
 
     /**
      * Constructor.
@@ -50,7 +50,7 @@ class ConsumerMiddlewares implements \IteratorAggregate
      *
      * @return \ArrayIterator|ConsumerMiddlewareInterface[]
      */
-    public function getIterator()
+    public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator($this->middlewares);
     }

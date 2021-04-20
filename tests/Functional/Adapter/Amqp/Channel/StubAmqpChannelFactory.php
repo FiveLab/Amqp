@@ -23,12 +23,12 @@ class StubAmqpChannelFactory extends AmqpChannelFactory
     /**
      * @var AmqpConnection
      */
-    private $connection;
+    private AmqpConnection $connection;
 
     /**
      * @var \AMQPChannel
      */
-    private $channel;
+    private \AMQPChannel $channel;
 
     /**
      * Constructor.

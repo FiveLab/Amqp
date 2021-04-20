@@ -24,12 +24,12 @@ class DelayPublisherTest extends TestCase
     /**
      * @var PublisherInterface
      */
-    private $originalPublisher;
+    private PublisherInterface $originalPublisher;
 
     /**
      * @var DelayPublisher
      */
-    private $delayPublisher;
+    private DelayPublisher $delayPublisher;
 
     /**
      * {@inheritdoc}

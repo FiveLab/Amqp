@@ -21,17 +21,17 @@ class RoundRobinConsumerConfiguration
     /**
      * @var int
      */
-    private $timeout;
+    private int $timeout;
 
     /**
      * @var int
      */
-    private $executesMessagesPerConsumer;
+    private int $executesMessagesPerConsumer;
 
     /**
      * @var float
      */
-    private $consumerReadTimeout;
+    private float $consumerReadTimeout;
 
     /**
      * Constructor.

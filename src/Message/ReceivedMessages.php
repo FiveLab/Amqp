@@ -21,7 +21,7 @@ class ReceivedMessages implements \IteratorAggregate, \Countable
     /**
      * @var ReceivedMessageInterface[]
      */
-    protected $messages = [];
+    protected array $messages = [];
 
     /**
      * Constructor.

@@ -36,29 +36,29 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
     /**
      * @var QueueFactoryInterface
      */
-    private $queueFactory;
+    private QueueFactoryInterface $queueFactory;
 
     /**
      * @var FlushableMessageHandlerInterface
      */
-    private $messageHandler;
+    private FlushableMessageHandlerInterface $messageHandler;
 
     /**
      * @var ConsumerMiddlewares
      */
-    private $middlewares;
+    private ConsumerMiddlewares $middlewares;
 
     /**
      * @var SpoolConsumerConfiguration
      */
-    private $configuration;
+    private SpoolConsumerConfiguration $configuration;
 
     /**
      * Indicate what we should throw exception if consumer timeout exceed.
      *
      * @var bool
      */
-    private $throwConsumerTimeoutExceededException = false;
+    private bool $throwConsumerTimeoutExceededException = false;
 
     /**
      * Constructor.
@@ -114,13 +114,13 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
 
             $this->configureBeforeConsume($channel);
 
-            $messages = new MutableReceivedMessages();
+            $receivedMessages = new MutableReceivedMessages();
             $endTime = \microtime(true) + $this->configuration->getTimeout();
 
             try {
                 $countOfProcessedMessages = 0;
 
-                $this->queueFactory->create()->consume(function (ReceivedMessageInterface $message) use ($executable, $messages, &$endTime, &$countOfProcessedMessages) {
+                $this->queueFactory->create()->consume(function (ReceivedMessageInterface $message) use ($executable, $receivedMessages, &$endTime, &$countOfProcessedMessages) {
                     try {
                         $executable($message);
                     } catch (ConsumerTimeoutExceedException $error) {
@@ -128,23 +128,23 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
                         // this exception for transfer control to next catch and test success while iteration.
                         // In this case we don't flush message and only add message to buffer.
                         $countOfProcessedMessages++;
-                        $messages->push($message);
+                        $receivedMessages->push($message);
 
                         throw $error;
                     } catch (StopAfterNExecutesException $error) {
                         // We must stop after N executes. In this case we flush all messages and exit from loop.
-                        $messages->push($message);
+                        $receivedMessages->push($message);
 
                         throw $error;
                     } catch (\Throwable $e) {
                         // We catch error on processing messages. We should nack for all received messages.
                         $message->nack($this->configuration->isShouldRequeueOnError());
 
-                        foreach ($messages as $message) {
-                            $message->nack($this->configuration->isShouldRequeueOnError());
+                        foreach ($receivedMessages as $receivedMessage) {
+                            $receivedMessage->nack($this->configuration->isShouldRequeueOnError());
                         }
 
-                        $messages->clear();
+                        $receivedMessages->clear();
 
                         throw $e;
                     }
@@ -156,24 +156,24 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
                         ));
                     }
 
-                    $messages->push($message);
+                    $receivedMessages->push($message);
                     $countOfProcessedMessages++;
 
                     if ($countOfProcessedMessages >= $this->configuration->getPrefetchCount()) {
                         // Flush by count messages
-                        $this->flushMessages($messages);
+                        $this->flushMessages($receivedMessages);
                         $countOfProcessedMessages = 0;
                     }
 
                     if (\microtime(true) > $endTime) {
                         // We must flush by timeout. In some cases we can use many messages in bucket, and wait to max
                         // process many time.
-                        $this->flushMessages($messages);
+                        $this->flushMessages($receivedMessages);
                         $endTime = \microtime(true) + $this->configuration->getTimeout();
                     }
                 }, $this->configuration->getTagGenerator()->generate());
             } catch (ConsumerTimeoutExceedException $e) {
-                $this->flushMessages($messages);
+                $this->flushMessages($receivedMessages);
 
                 // Note: we can't cancel consumer, because rabbitmq can send next message to client
                 // and client attach to existence consumer. As result we can receive error: orphaned envelope.
@@ -187,7 +187,7 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
                 }
             } catch (StopAfterNExecutesException $error) {
                 // We must stop next loop.
-                $this->flushMessages($messages);
+                $this->flushMessages($receivedMessages);
 
                 // We must reconnect to broker because client don't return messages to queue on failed.
                 $channel->getConnection()->disconnect();

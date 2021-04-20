@@ -25,7 +25,7 @@ class MessageHandlers implements MessageHandlerInterface, FlushableMessageHandle
     /**
      * @var array|MessageHandlerInterface[]
      */
-    private $handlers = [];
+    private array $handlers;
 
     /**
      * Constructor.

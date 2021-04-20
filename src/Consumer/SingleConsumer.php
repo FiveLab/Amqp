@@ -30,22 +30,22 @@ class SingleConsumer implements ConsumerInterface, MiddlewareAwareInterface
     /**
      * @var QueueFactoryInterface
      */
-    private $queueFactory;
+    private QueueFactoryInterface $queueFactory;
 
     /**
      * @var MessageHandlerInterface
      */
-    private $messageHandler;
+    private MessageHandlerInterface $messageHandler;
 
     /**
      * @var ConsumerMiddlewares
      */
-    private $middlewares;
+    private ConsumerMiddlewares $middlewares;
 
     /**
      * @var ConsumerConfiguration
      */
-    private $configuration;
+    private ConsumerConfiguration $configuration;
 
     /**
      * Constructor.

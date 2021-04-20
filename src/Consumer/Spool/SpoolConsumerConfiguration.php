@@ -26,23 +26,23 @@ class SpoolConsumerConfiguration extends ConsumerConfiguration
      *
      * @var float
      */
-    private $timeout;
+    private float $timeout;
 
     /**
      * The timeout for receive next messages
      *
      * @var float
      */
-    private $readTimeout;
+    private float $readTimeout;
 
     /**
      * Constructor.
      *
-     * @param int                           $countMessages
-     * @param float                         $timeout
-     * @param float                         $readTimeout
-     * @param bool                          $requeueOnError
-     * @param ConsumerTagGeneratorInterface $tagGenerator
+     * @param int                                $countMessages
+     * @param float                              $timeout
+     * @param float                              $readTimeout
+     * @param bool                               $requeueOnError
+     * @param ConsumerTagGeneratorInterface|null $tagGenerator
      */
     public function __construct(int $countMessages, float $timeout, float $readTimeout = 0.0, bool $requeueOnError = true, ConsumerTagGeneratorInterface $tagGenerator = null)
     {

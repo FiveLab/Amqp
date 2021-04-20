@@ -21,12 +21,12 @@ class Options
     /**
      * @var bool
      */
-    private $persistent;
+    private bool $persistent;
 
     /**
      * @var int
      */
-    private $expiration;
+    private int $expiration;
 
     /**
      * Constructor.

@@ -24,7 +24,7 @@ class QueueFactoryRegistry implements QueueFactoryRegistryInterface
     /**
      * @var array|QueueFactoryInterface[]
      */
-    private $factories = [];
+    private array $factories = [];
 
     /**
      * Add the factory to registry

@@ -23,17 +23,17 @@ class SavepointPublisherDecorator implements SavepointPublisherInterface
     /**
      * @var PublisherInterface
      */
-    private $publisher;
+    private PublisherInterface $publisher;
 
     /**
      * @var array
      */
-    private $savepoints = [];
+    private array $savepoints = [];
 
     /**
      * @var string
      */
-    private $activeSavepoint = '';
+    private string $activeSavepoint = '';
 
     /**
      * Constructor.
@@ -108,7 +108,7 @@ class SavepointPublisherDecorator implements SavepointPublisherInterface
      */
     public function flush(): void
     {
-        foreach ($this->savepoints as $savepointName => $messages) {
+        foreach ($this->savepoints as $messages) {
             foreach ($messages as $messageInfo) {
                 $this->publisher->publish($messageInfo[0], $messageInfo[1]);
             }

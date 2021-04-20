@@ -17,17 +17,17 @@ class AmqpChannel implements ChannelInterface
     /**
      * @var AmqpConnection
      */
-    private $connection;
+    private AmqpConnection $connection;
 
     /**
      * @var AmqpLibChannel
      */
-    private $channel;
+    private AmqpLibChannel $channel;
 
     /**
      * @var int
      */
-    private $prefetchCount = 1;
+    private int $prefetchCount = 3;
 
     /**
      * @param AmqpConnection $connection

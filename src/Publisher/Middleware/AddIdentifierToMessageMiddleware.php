@@ -24,26 +24,26 @@ use FiveLab\Component\Amqp\Message\MessageInterface;
 class AddIdentifierToMessageMiddleware implements PublisherMiddlewareInterface
 {
     /**
-     * @var MessageIdGeneratorInterface
+     * @var MessageIdGeneratorInterface|null
      */
-    private $messageIdGenerator;
+    private ?MessageIdGeneratorInterface $messageIdGenerator;
 
     /**
-     * @var string
+     * @var string|null
      */
-    private $appId;
+    private ?string $appId;
 
     /**
-     * @var string
+     * @var string|null
      */
-    private $userId;
+    private ?string $userId;
 
     /**
      * Constructor.
      *
-     * @param MessageIdGeneratorInterface $messageIdGenerator
-     * @param string                      $appId
-     * @param string                      $userId
+     * @param MessageIdGeneratorInterface|null $messageIdGenerator
+     * @param string|null                      $appId
+     * @param string|null                      $userId
      */
     public function __construct(MessageIdGeneratorInterface $messageIdGenerator = null, string $appId = null, string $userId = null)
     {

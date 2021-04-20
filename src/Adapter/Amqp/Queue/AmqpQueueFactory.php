@@ -28,17 +28,17 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
     /**
      * @var ChannelFactoryInterface
      */
-    private $channelFactory;
+    private ChannelFactoryInterface $channelFactory;
 
     /**
      * @var QueueDefinition
      */
-    private $definition;
+    private QueueDefinition $definition;
 
     /**
-     * @var AmqpQueue
+     * @var AmqpQueue|null
      */
-    private $queue;
+    private ?AmqpQueue $queue = null;
 
     /**
      * Constructor.
@@ -100,7 +100,7 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
     /**
      * {@inheritdoc}
      */
-    public function update(\SplSubject $subject)
+    public function update(\SplSubject $subject): void
     {
         $this->queue = null;
     }

@@ -24,12 +24,12 @@ class DelayPublisher implements DelayPublisherInterface
     /**
      * @var PublisherInterface
      */
-    private $publisher;
+    private PublisherInterface $publisher;
 
     /**
      * @var string
      */
-    private $landfillRoutingKey;
+    private string $landfillRoutingKey;
 
     /**
      * Constructor.

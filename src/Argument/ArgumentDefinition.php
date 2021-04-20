@@ -21,7 +21,7 @@ class ArgumentDefinition
     /**
      * @var string
      */
-    private $name;
+    private string $name;
 
     /**
      * @var mixed

@@ -26,17 +26,17 @@ class InitializeQueuesCommandTest extends TestCase
     /**
      * @var QueueFactoryRegistry
      */
-    private $registry;
+    private QueueFactoryRegistry $registry;
 
     /**
      * @var ArrayInput
      */
-    private $input;
+    private ArrayInput $input;
 
     /**
      * @var BufferedOutput
      */
-    private $output;
+    private BufferedOutput $output;
 
     /**
      * {@inheritdoc}

@@ -22,14 +22,14 @@ use FiveLab\Component\Amqp\Connection\ConnectionInterface;
 class SpoolAmqpConnectionFactory implements ConnectionFactoryInterface
 {
     /**
-     * @var AmqpConnectionFactory
+     * @var array|AmqpConnectionFactory[]
      */
-    private $factories;
+    private array $factories;
 
     /**
-     * @var SpoolAmqpConnection
+     * @var SpoolAmqpConnection|null
      */
-    private $connection;
+    private ?SpoolAmqpConnection $connection = null;
 
     /**
      * Constructor.
@@ -54,7 +54,7 @@ class SpoolAmqpConnectionFactory implements ConnectionFactoryInterface
             return $this->connection;
         }
 
-        $connections = \array_map(function (AmqpConnectionFactory $factory) {
+        $connections = \array_map(static function (AmqpConnectionFactory $factory) {
             return $factory->create();
         }, $this->factories);
 

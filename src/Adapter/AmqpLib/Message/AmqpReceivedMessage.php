@@ -20,19 +20,21 @@ class AmqpReceivedMessage implements ReceivedMessageInterface
     /**
      * @var AmqpQueue
      */
-    private $queue;
+    private AmqpQueue $queue;
 
     /**
      * @var AMQPMessage
      */
-    private $message;
+    private AMQPMessage $message;
 
     /**
      * @var bool
      */
-    private $answered = false;
+    private bool $answered = false;
 
     /**
+     * Construct
+     *
      * @param AmqpQueue   $queue
      * @param AMQPMessage $message
      */

@@ -17,8 +17,8 @@ use FiveLab\Component\Amqp\Channel\ChannelInterface;
 use FiveLab\Component\Amqp\Command\RunConsumerCommand;
 use FiveLab\Component\Amqp\Connection\ConnectionInterface;
 use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
+use FiveLab\Component\Amqp\Consumer\ConsumerWithMiddlewaresInterface;
 use FiveLab\Component\Amqp\Consumer\Middleware\StopAfterNExecutesMiddleware;
-use FiveLab\Component\Amqp\Consumer\MiddlewareAwareInterface;
 use FiveLab\Component\Amqp\Consumer\Registry\ConsumerRegistryInterface;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
@@ -32,22 +32,22 @@ class RunConsumerCommandTest extends TestCase
     /**
      * @var ConsumerRegistryInterface|MockObject
      */
-    private $registry;
+    private ConsumerRegistryInterface $registry;
 
     /**
      * @var ConnectionInterface|MockObject
      */
-    private $connection;
+    private ConnectionInterface $connection;
 
     /**
      * @var ChannelInterface|MockObject
      */
-    private $channel;
+    private ChannelInterface $channel;
 
     /**
      * @var QueueInterface|MockObject
      */
-    private $queue;
+    private QueueInterface $queue;
 
     /**
      * {@inheritdoc}
@@ -183,7 +183,7 @@ class RunConsumerCommandTest extends TestCase
      */
     public function shouldSuccessExecuteWithCountMessages(): void
     {
-        $consumer = $this->createMock([ConsumerInterface::class, MiddlewareAwareInterface::class]);
+        $consumer = $this->createMock(ConsumerWithMiddlewaresInterface::class);
 
         $consumer->expects(self::once())
             ->method('run');

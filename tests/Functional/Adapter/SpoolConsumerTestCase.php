@@ -32,12 +32,12 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
     /**
      * @var QueueFactoryInterface
      */
-    private $queueFactory;
+    private QueueFactoryInterface $queueFactory;
 
     /**
      * @var MessageHandlerMock
      */
-    private $messageHandler;
+    private MessageHandlerMock $messageHandler;
 
     /**
      * {@inheritdoc}

@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Unit\Consumer\Middleware;
 
-use FiveLab\Component\Amqp\Adapter\Amqp\Message\AmqpReceivedMessage;
 use FiveLab\Component\Amqp\Consumer\Middleware\ProxyMessageToAnotherExchangeMiddleware;
 use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
 use FiveLab\Component\Amqp\Exchange\ExchangeInterface;
@@ -27,22 +26,22 @@ class ProxyMessageToAnotherExchangeMiddlewareTest extends TestCase
     /**
      * @var ExchangeFactoryRegistryInterface|MockObject
      */
-    private $exchangeFactoryRegistry;
+    private ExchangeFactoryRegistryInterface $exchangeFactoryRegistry;
 
     /**
      * @var ExchangeFactoryInterface|MockObject
      */
-    private $exchangeFactory;
+    private ExchangeFactoryInterface $exchangeFactory;
 
     /**
      * @var ExchangeInterface|MockObject
      */
-    private $exchange;
+    private ExchangeInterface $exchange;
 
     /**
      * @var ProxyMessageToAnotherExchangeMiddleware
      */
-    private $middleware;
+    private ProxyMessageToAnotherExchangeMiddleware $middleware;
 
     /**
      * {@inheritdoc}

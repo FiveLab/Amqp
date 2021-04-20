@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Functional;
 
-use FiveLab\Component\Amqp\Adapter\Amqp\Queue\AmqpQueue;
 use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use PHPUnit\Framework\TestCase;
@@ -21,14 +20,14 @@ use PHPUnit\Framework\TestCase;
 abstract class RabbitMqTestCase extends TestCase
 {
     /**
-     * @var AmqpManagement
+     * @var AmqpManagement|null
      */
-    protected $management;
+    protected ?AmqpManagement $management = null;
 
     /**
-     * @var AmqpClearer
+     * @var AmqpClearer|null
      */
-    protected $clearer;
+    protected ?AmqpClearer $clearer = null;
 
     /**
      * {@inheritdoc}

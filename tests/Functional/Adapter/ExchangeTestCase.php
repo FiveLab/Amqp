@@ -28,7 +28,7 @@ abstract class ExchangeTestCase extends RabbitMqTestCase
     /**
      * @var ExchangeInterface
      */
-    private $exchange;
+    private ExchangeInterface $exchange;
 
     /**
      * Create exchange factory for testing

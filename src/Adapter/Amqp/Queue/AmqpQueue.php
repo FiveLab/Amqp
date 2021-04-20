@@ -28,12 +28,12 @@ class AmqpQueue implements QueueInterface
     /**
      * @var AmqpChannel
      */
-    private $channel;
+    private AmqpChannel $channel;
 
     /**
      * @var \AMQPQueue
      */
-    private $queue;
+    private \AMQPQueue $queue;
 
     /**
      * Constructor.
@@ -75,7 +75,7 @@ class AmqpQueue implements QueueInterface
                 $handler($receivedMessage);
             }, AMQP_NOPARAM, $tag);
         } catch (\AMQPQueueException $e) {
-            if (false !== \strpos(\strtolower($e->getMessage()), 'consumer timeout exceed')) {
+            if (false !== \stripos($e->getMessage(), 'consumer timeout exceed')) {
                 throw new ConsumerTimeoutExceedException('Consumer timeout exceed.', 0, $e);
             }
 

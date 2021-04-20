@@ -25,12 +25,12 @@ class StopAfterNExecutesMiddleware implements ConsumerMiddlewareInterface
     /**
      * @var int
      */
-    private $stopAfterExecutes;
+    private int $stopAfterExecutes;
 
     /**
      * @var int
      */
-    private $executesCounter = 0;
+    private int $executesCounter = 0;
 
     /**
      * Constructor.

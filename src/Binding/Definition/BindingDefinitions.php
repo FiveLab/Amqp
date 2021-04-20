@@ -21,7 +21,7 @@ class BindingDefinitions implements \IteratorAggregate, \Countable
     /**
      * @var array|BindingDefinition[]
      */
-    private $bindings;
+    private array $bindings;
 
     /**
      * Constructor.
@@ -38,7 +38,7 @@ class BindingDefinitions implements \IteratorAggregate, \Countable
      *
      * @return \ArrayIterator|BindingDefinition[]
      */
-    public function getIterator()
+    public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator($this->bindings);
     }

@@ -21,12 +21,12 @@ class BindingDefinition
     /**
      * @var string
      */
-    private $exchangeName;
+    private string $exchangeName;
 
     /**
      * @var string
      */
-    private $routingKey;
+    private string $routingKey;
 
     /**
      * Constructor.

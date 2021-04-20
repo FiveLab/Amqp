@@ -29,7 +29,7 @@ class PublisherTest extends RabbitMqTestCase
     /**
      * @var Publisher
      */
-    private $publisher;
+    private Publisher $publisher;
 
     /**
      * {@inheritdoc}

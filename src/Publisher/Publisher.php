@@ -25,12 +25,12 @@ class Publisher implements PublisherInterface
     /**
      * @var ExchangeFactoryInterface
      */
-    private $exchangeFactory;
+    private ExchangeFactoryInterface $exchangeFactory;
 
     /**
      * @var PublisherMiddlewares
      */
-    private $middlewares;
+    private PublisherMiddlewares $middlewares;
 
     /**
      * Constructor.

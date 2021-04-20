@@ -29,17 +29,17 @@ class HandleExpiredMessageHandlerTest extends TestCase
     /**
      * @var PublisherRegistryInterface|MockObject
      */
-    private $publisherRegistry;
+    private PublisherRegistryInterface $publisherRegistry;
 
     /**
      * @var PublisherInterface
      */
-    private $delayPublisher;
+    private PublisherInterface $delayPublisher;
 
     /**
      * @var HandleExpiredMessageHandler
      */
-    private $handler;
+    private HandleExpiredMessageHandler $handler;
 
     /**
      * {@inheritdoc}

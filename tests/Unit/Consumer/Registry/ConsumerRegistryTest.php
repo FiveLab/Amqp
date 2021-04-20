@@ -78,7 +78,7 @@ class ConsumerRegistryTest extends TestCase
     private function createUniqueConsumer(): ConsumerInterface
     {
         $consumer = $this->createMock(ConsumerInterface::class);
-        $consumer->uniqueIdentifier = \uniqid();
+        $consumer->uniqueIdentifier = \uniqid('', true);
 
         return $consumer;
     }

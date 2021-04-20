@@ -24,7 +24,7 @@ class ConsumerRegistry implements ConsumerRegistryInterface
     /**
      * @var array|ConsumerInterface[]
      */
-    private $consumers = [];
+    private array $consumers = [];
 
     /**
      * Add consumer to registry

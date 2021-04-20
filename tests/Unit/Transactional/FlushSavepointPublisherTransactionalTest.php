@@ -23,12 +23,12 @@ class FlushSavepointPublisherTransactionalTest extends TestCase
     /**
      * @var SavepointPublisherInterface|MockObject
      */
-    private $publisher;
+    private SavepointPublisherInterface $publisher;
 
     /**
      * @var FlushSavepointPublisherTransactional
      */
-    private $transactional;
+    private FlushSavepointPublisherTransactional $transactional;
 
     /**
      * {@inheritdoc}
@@ -81,11 +81,11 @@ class FlushSavepointPublisherTransactionalTest extends TestCase
      */
     public function shouldSuccessExecute(): void
     {
-        $this->publisher->expects(self::at(0))
+        $this->publisher->expects(self::once())
             ->method('start')
             ->with('savepoint_0');
 
-        $this->publisher->expects(self::at(1))
+        $this->publisher->expects(self::once())
             ->method('flush');
 
         $result = $this->transactional->execute(static function () {
@@ -103,11 +103,11 @@ class FlushSavepointPublisherTransactionalTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('some foo');
 
-        $this->publisher->expects(self::at(0))
+        $this->publisher->expects(self::once())
             ->method('start')
             ->with('savepoint_0');
 
-        $this->publisher->expects(self::at(1))
+        $this->publisher->expects(self::once())
             ->method('rollback')
             ->with('savepoint_0');
 
@@ -121,19 +121,18 @@ class FlushSavepointPublisherTransactionalTest extends TestCase
      */
     public function shouldSuccessExecuteWithControlNestingLevel(): void
     {
-        $this->publisher->expects(self::at(0))
+        $this->publisher->expects(self::exactly(2))
             ->method('start')
-            ->with('savepoint_0');
+            ->withConsecutive(
+                ['savepoint_0'],
+                ['savepoint_1']
+            );
 
-        $this->publisher->expects(self::at(1))
-            ->method('start')
-            ->with('savepoint_1');
-
-        $this->publisher->expects(self::at(2))
+        $this->publisher->expects(self::once())
             ->method('rollback')
             ->with('savepoint_1');
 
-        $this->publisher->expects(self::at(3))
+        $this->publisher->expects(self::once())
             ->method('flush');
 
         $this->transactional->execute(function () {
