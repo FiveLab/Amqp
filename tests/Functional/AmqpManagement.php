@@ -20,12 +20,12 @@ class AmqpManagement
     /**
      * @var Client
      */
-    private $client;
+    private Client $client;
 
     /**
      * @var string
      */
-    private $vhost;
+    private string $vhost;
 
     /**
      * Constructor.

@@ -16,7 +16,6 @@ namespace FiveLab\Component\Amqp\Tests\Unit\Publisher;
 use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
 use FiveLab\Component\Amqp\Exchange\ExchangeInterface;
 use FiveLab\Component\Amqp\Message\Message;
-use FiveLab\Component\Amqp\Message\MessageInterface;
 use FiveLab\Component\Amqp\Message\Payload;
 use FiveLab\Component\Amqp\Publisher\Middleware\PublisherMiddlewares;
 use FiveLab\Component\Amqp\Publisher\Publisher;
@@ -28,22 +27,22 @@ class PublisherTest extends TestCase
     /**
      * @var ExchangeInterface|MockObject
      */
-    private $exchange;
+    private ExchangeInterface $exchange;
 
     /**
      * @var ExchangeFactoryInterface|MockObject
      */
-    private $exchangeFactory;
+    private ExchangeFactoryInterface $exchangeFactory;
 
     /**
      * @var PublisherMiddlewares
      */
-    private $middlewares;
+    private PublisherMiddlewares $middlewares;
 
     /**
      * @var Publisher
      */
-    private $publisher;
+    private Publisher $publisher;
 
     /**
      * {@inheritdoc}

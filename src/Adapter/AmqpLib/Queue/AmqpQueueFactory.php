@@ -19,17 +19,17 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
     /**
      * @var ChannelFactoryInterface
      */
-    private $channelFactory;
+    private ChannelFactoryInterface $channelFactory;
 
     /**
      * @var QueueDefinition
      */
-    private $definition;
+    private QueueDefinition $definition;
 
     /**
-     * @var AmqpQueue
+     * @var AmqpQueue|null
      */
-    private $queue;
+    private ?AmqpQueue $queue = null;
 
     /**
      * @param ChannelFactoryInterface $channelFactory

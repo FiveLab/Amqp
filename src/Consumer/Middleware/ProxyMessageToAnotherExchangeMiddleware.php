@@ -26,12 +26,12 @@ class ProxyMessageToAnotherExchangeMiddleware implements ConsumerMiddlewareInter
     /**
      * @var ExchangeFactoryRegistryInterface
      */
-    private $exchangeFactoryRegistry;
+    private ExchangeFactoryRegistryInterface $exchangeFactoryRegistry;
 
     /**
      * @var string
      */
-    private $toExchange;
+    private string $toExchange;
 
     /**
      * Constructor.

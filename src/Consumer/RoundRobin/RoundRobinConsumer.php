@@ -30,17 +30,17 @@ class RoundRobinConsumer implements ConsumerInterface
     /**
      * @var RoundRobinConsumerConfiguration
      */
-    private $configuration;
+    private RoundRobinConsumerConfiguration $configuration;
 
     /**
      * @var ConsumerInterface[]|MiddlewareAwareInterface[]
      */
-    private $consumers;
+    private array $consumers;
 
     /**
-     * @var \Closure
+     * @var \Closure|null
      */
-    private $changeConsumerHandler;
+    private ?\Closure $changeConsumerHandler = null;
 
     /**
      * Constructor.
@@ -115,9 +115,7 @@ class RoundRobinConsumer implements ConsumerInterface
 
                 try {
                     $consumer->run();
-                } catch (StopAfterNExecutesException $e) {
-                    // Normal flow. We should run next consumer.
-                } catch (ConsumerTimeoutExceedException $e) {
+                } catch (StopAfterNExecutesException | ConsumerTimeoutExceedException $e) {
                     // Normal flow. We should run next consumer.
                 }
 

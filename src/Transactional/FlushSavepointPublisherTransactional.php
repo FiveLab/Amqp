@@ -25,17 +25,17 @@ class FlushSavepointPublisherTransactional extends AbstractTransactional
     /**
      * @var SavepointPublisherInterface
      */
-    private $publisher;
+    private SavepointPublisherInterface $publisher;
 
     /**
      * @var array
      */
-    private $keys = [];
+    private array $keys = [];
 
     /**
      * @var int
      */
-    private $nestingLevel = 0;
+    private int $nestingLevel = 0;
 
     /**
      * Constructor.

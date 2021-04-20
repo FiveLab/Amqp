@@ -26,37 +26,37 @@ class ExchangeDefinition
     /**
      * @var string
      */
-    private $name;
+    private string $name;
 
     /**
      * @var string
      */
-    private $type;
+    private string $type;
 
     /**
      * @var bool
      */
-    private $durable;
+    private bool $durable;
 
     /**
      * @var bool
      */
-    private $passive;
+    private bool $passive;
 
     /**
      * @var ArgumentDefinitions
      */
-    private $arguments;
+    private ArgumentDefinitions $arguments;
 
     /**
      * @var BindingDefinitions|BindingDefinition[]
      */
-    private $bindings;
+    private BindingDefinitions $bindings;
 
     /**
      * @var BindingDefinitions|BindingDefinition[]
      */
-    private $unbindings;
+    private BindingDefinitions $unbindings;
 
     /**
      * Constructor.

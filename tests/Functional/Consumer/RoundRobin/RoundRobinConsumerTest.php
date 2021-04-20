@@ -34,22 +34,22 @@ class RoundRobinConsumerTest extends RabbitMqTestCase
     /**
      * @var MessageHandlerMock
      */
-    private $handler1;
+    private MessageHandlerMock $handler1;
 
     /**
      * @var MessageHandlerMock
      */
-    private $handler2;
+    private MessageHandlerMock $handler2;
 
     /**
      * @var AmqpQueueFactory
      */
-    private $queueFactory1;
+    private AmqpQueueFactory $queueFactory1;
 
     /**
      * @var AmqpQueueFactory
      */
-    private $queueFactory2;
+    private AmqpQueueFactory $queueFactory2;
 
     /**
      * {@inheritdoc}}

@@ -23,28 +23,23 @@ class AmqpQueue implements QueueInterface
     /**
      * @var AmqpChannel
      */
-    private $channel;
+    private AmqpChannel $channel;
 
     /**
      * @var QueueDefinition
      */
-    private $definition;
+    private QueueDefinition $definition;
 
     /**
-     * @var bool
-     */
-    private $autoAck;
-
-    /**
+     * Construct
+     *
      * @param AmqpChannel     $channel
      * @param QueueDefinition $definition
-     * @param bool            $autoAck
      */
-    public function __construct(AmqpChannel $channel, QueueDefinition $definition, bool $autoAck = true)
+    public function __construct(AmqpChannel $channel, QueueDefinition $definition)
     {
         $this->channel = $channel;
         $this->definition = $definition;
-        $this->autoAck = $autoAck;
     }
 
     /**
@@ -67,7 +62,7 @@ class AmqpQueue implements QueueInterface
                 $this->getName(),
                 $tag,
                 false,
-                !$this->autoAck,
+                false,
                 $this->definition->isExclusive(),
                 false,
                 function (AMQPMessage $message) use ($handler) {
@@ -85,7 +80,7 @@ class AmqpQueue implements QueueInterface
                 $this->cancelConsumer($tag);
             }
 
-            if ($e instanceof AMQPTimeoutException || false !== \strpos(\strtolower($e->getMessage()), 'consumer timeout exceed')) {
+            if ($e instanceof AMQPTimeoutException || false !== \stripos($e->getMessage(), 'consumer timeout exceed')) {
                 throw new ConsumerTimeoutExceedException('Consumer timeout exceed.', 0, $e);
             }
 

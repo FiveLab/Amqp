@@ -34,29 +34,29 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
     /**
      * @var QueueFactoryInterface
      */
-    private $queueFactory;
+    private QueueFactoryInterface $queueFactory;
 
     /**
      * @var MessageHandlerInterface
      */
-    private $messageHandler;
+    private MessageHandlerInterface $messageHandler;
 
     /**
      * @var ConsumerMiddlewares
      */
-    private $middlewares;
+    private ConsumerMiddlewares $middlewares;
 
     /**
      * @var LoopConsumerConfiguration
      */
-    private $configuration;
+    private LoopConsumerConfiguration $configuration;
 
     /**
      * Indicate what we should throw exception if consumer timeout exceed.
      *
      * @var bool
      */
-    private $throwConsumerTimeoutExceededException = false;
+    private bool $throwConsumerTimeoutExceededException = false;
 
     /**
      * Constructor.

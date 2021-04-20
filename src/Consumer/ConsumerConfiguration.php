@@ -24,17 +24,17 @@ class ConsumerConfiguration
     /**
      * @var bool
      */
-    private $requeueOnError;
+    private bool $requeueOnError;
 
     /**
      * @var int
      */
-    private $prefetchCount;
+    private int $prefetchCount;
 
     /**
      * @var ConsumerTagGeneratorInterface
      */
-    private $tagGenerator;
+    private ConsumerTagGeneratorInterface $tagGenerator;
 
     /**
      * Constructor.

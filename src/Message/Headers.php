@@ -21,9 +21,9 @@ use FiveLab\Component\Amqp\Exception\HeaderNotFoundException;
 class Headers
 {
     /**
-     * @var string
+     * @var array
      */
-    private $headers;
+    private array $headers;
 
     /**
      * Constructor.

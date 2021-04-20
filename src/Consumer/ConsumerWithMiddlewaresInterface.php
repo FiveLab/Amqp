@@ -11,11 +11,11 @@
 
 declare(strict_types = 1);
 
-namespace FiveLab\Component\Amqp\Publisher;
+namespace FiveLab\Component\Amqp\Consumer;
 
 /**
- * A maker interface for control delay publishers.
+ * A grouped interface for consumer with middlewares.
  */
-interface DelayPublisherInterface extends PublisherInterface
+interface ConsumerWithMiddlewaresInterface extends ConsumerInterface, MiddlewareAwareInterface
 {
 }

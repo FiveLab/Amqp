@@ -27,7 +27,7 @@ class ListConsumersCommand extends Command
     /**
      * @var array|string[]
      */
-    private $consumers;
+    private array $consumers;
 
     /**
      * Constructor.

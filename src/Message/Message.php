@@ -21,30 +21,30 @@ class Message implements MessageInterface
     /**
      * @var Payload
      */
-    private $payload;
+    private Payload $payload;
 
     /**
      * @var Options
      */
-    private $options;
+    private Options $options;
 
     /**
-     * @var array
+     * @var Headers
      */
-    private $headers;
+    private Headers $headers;
 
     /**
      * @var Identifier
      */
-    private $identifier;
+    private Identifier $identifier;
 
     /**
      * Constructor.
      *
-     * @param Payload    $payload
-     * @param Options    $options
-     * @param Headers    $headers
-     * @param Identifier $identifier
+     * @param Payload         $payload
+     * @param Options|null    $options
+     * @param Headers|null    $headers
+     * @param Identifier|null $identifier
      */
     public function __construct(Payload $payload, Options $options = null, Headers $headers = null, Identifier $identifier = null)
     {

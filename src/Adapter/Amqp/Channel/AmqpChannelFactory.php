@@ -27,17 +27,17 @@ class AmqpChannelFactory implements ChannelFactoryInterface, \SplObserver
     /**
      * @var ConnectionFactoryInterface
      */
-    private $connectionFactory;
+    private ConnectionFactoryInterface $connectionFactory;
 
     /**
      * @var ChannelDefinition
      */
-    private $definition;
+    private ChannelDefinition $definition;
 
     /**
-     * @var AmqpChannel
+     * @var AmqpChannel|null
      */
-    private $channel;
+    private ?AmqpChannel $channel = null;
 
     /**
      * Constructor.
@@ -85,7 +85,7 @@ class AmqpChannelFactory implements ChannelFactoryInterface, \SplObserver
     /**
      * {@inheritdoc}
      */
-    public function update(\SplSubject $subject)
+    public function update(\SplSubject $subject): void
     {
         $this->channel = null;
     }

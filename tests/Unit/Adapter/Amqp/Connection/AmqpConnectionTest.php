@@ -24,12 +24,12 @@ class AmqpConnectionTest extends TestCase
     /**
      * @var \AMQPConnection|MockObject
      */
-    private $realConnection;
+    private \AMQPConnection $realConnection;
 
     /**
      * @var AmqpConnection
      */
-    private $connection;
+    private AmqpConnection $connection;
 
     /**
      * {@inheritdoc}

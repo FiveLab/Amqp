@@ -26,12 +26,12 @@ class AmqpExchange implements ExchangeInterface
     /**
      * @var AmqpChannel
      */
-    private $channel;
+    private AmqpChannel $channel;
 
     /**
      * @var \AMQPExchange
      */
-    private $exchange;
+    private \AMQPExchange $exchange;
 
     /**
      * Constructor.

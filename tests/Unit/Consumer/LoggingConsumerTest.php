@@ -26,17 +26,17 @@ class LoggingConsumerTest extends TestCase
     /**
      * @var LoggerInterface
      */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * @var ConsumerInterface
      */
-    private $decoratedConsumer;
+    private ConsumerInterface $decoratedConsumer;
 
     /**
      * @var LoggingConsumer
      */
-    private $loggingConsumer;
+    private LoggingConsumer $loggingConsumer;
 
     /**
      * {@inheritdoc}
@@ -82,16 +82,15 @@ class LoggingConsumerTest extends TestCase
      */
     public function shouldSuccessRunOnSuccess(): void
     {
-        $this->logger->expects(self::at(0))
+        $this->logger->expects(self::exactly(2))
             ->method('info')
-            ->with('Start consume on "foo-bar" queue.');
+            ->withConsecutive(
+                ['Start consume on "foo-bar" queue.'],
+                ['End consume on "foo-bar" queue.']
+            );
 
         $this->decoratedConsumer->expects(self::once())
             ->method('run');
-
-        $this->logger->expects(self::at(1))
-            ->method('info')
-            ->with('End consume on "foo-bar" queue.');
 
         $this->loggingConsumer->run();
     }
@@ -101,7 +100,7 @@ class LoggingConsumerTest extends TestCase
      */
     public function shouldSuccessRunOnFail(): void
     {
-        $this->logger->expects(self::at(0))
+        $this->logger->expects(self::once())
             ->method('info')
             ->with('Start consume on "foo-bar" queue.');
 
@@ -109,7 +108,7 @@ class LoggingConsumerTest extends TestCase
             ->method('run')
             ->willThrowException(new \RuntimeException('some foo bar'));
 
-        $this->logger->expects(self::at(1))
+        $this->logger->expects(self::once())
             ->method('error')
             ->with(self::stringStartsWith('Error consume: RuntimeException some foo bar in file'));
 
@@ -122,7 +121,7 @@ class LoggingConsumerTest extends TestCase
     /**
      * @test
      */
-    public function shouldPushMiddlewareToOriginalConsumer()
+    public function shouldPushMiddlewareToOriginalConsumer(): void
     {
         $middlewareMock = $this->createMock(ConsumerMiddlewareInterface::class);
 
@@ -138,12 +137,12 @@ class LoggingConsumerTest extends TestCase
     /**
      * @test
      */
-    public function shouldFailOnMiddlewarePushIfInterfaceNotImplemented()
+    public function shouldFailOnMiddlewarePushIfInterfaceNotImplemented(): void
     {
         $middlewareMock = $this->createMock(ConsumerMiddlewareInterface::class);
 
-        self::expectException(\BadMethodCallException::class);
-        self::expectExceptionMessage('Decorated consumer must implement MiddlewareAwareInterface');
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Decorated consumer must implement MiddlewareAwareInterface');
 
         $this->loggingConsumer->pushMiddleware($middlewareMock);
     }

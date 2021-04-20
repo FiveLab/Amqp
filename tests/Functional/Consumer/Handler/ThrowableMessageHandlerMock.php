@@ -19,24 +19,24 @@ use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
 class ThrowableMessageHandlerMock extends MessageHandlerMock implements ThrowableMessageHandlerInterface
 {
     /**
-     * @var \Throwable
+     * @var \Throwable|null
      */
-    private $shouldThrowException;
+    private ?\Throwable $shouldThrowException = null;
 
     /**
-     * @var ReceivedMessageInterface
+     * @var ReceivedMessageInterface|null
      */
-    private $catchReceivedMessage;
+    private ?ReceivedMessageInterface $catchReceivedMessage = null;
 
     /**
-     * @var \Throwable
+     * @var \Throwable|null
      */
-    private $catchError;
+    private ?\Throwable $catchError = null;
 
     /**
-     * @var \Closure
+     * @var \Closure|null
      */
-    private $catchHandler;
+    private ?\Closure $catchHandler = null;
 
     /**
      * {@inheritdoc}

@@ -27,14 +27,14 @@ class AmqpQueueTest extends TestCase
     private $originQueue;
 
     /**
-     * @var \AMQPChannel|MockObject
+     * @var AmqpChannel|MockObject
      */
-    private $originChannel;
+    private AmqpChannel $originChannel;
 
     /**
      * @var AmqpQueue
      */
-    private $queue;
+    private AmqpQueue $queue;
 
     /**
      * {@inheritdoc}

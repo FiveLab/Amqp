@@ -14,19 +14,19 @@ use SplObserver;
 class AmqpConnection implements ConnectionInterface, \SplSubject
 {
     /**
-     * @var \SplObserver[]
+     * @var array|\SplObserver[]
      */
-    private $observers = [];
+    private array $observers = [];
 
     /**
      * @var AbstractConnection
      */
-    private $connection;
+    private AbstractConnection $connection;
 
     /**
      * @var float
      */
-    private $readTimeout;
+    private float $readTimeout;
 
     /**
      * @param AbstractConnection $connection
@@ -113,7 +113,7 @@ class AmqpConnection implements ConnectionInterface, \SplSubject
     /**
      * {@inheritdoc}
      */
-    public function attach(SplObserver $observer)
+    public function attach(SplObserver $observer): void
     {
         $hash = \spl_object_hash($observer);
 

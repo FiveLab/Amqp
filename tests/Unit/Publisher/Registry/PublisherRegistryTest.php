@@ -23,7 +23,7 @@ class PublisherRegistryTest extends TestCase
     /**
      * @var PublisherRegistry
      */
-    private $registry;
+    private PublisherRegistry $registry;
 
     /**
      * {@inheritdoc}

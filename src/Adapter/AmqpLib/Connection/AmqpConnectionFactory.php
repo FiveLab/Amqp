@@ -16,14 +16,16 @@ class AmqpConnectionFactory implements ConnectionFactoryInterface
     /**
      * @var array
      */
-    private $connectionOptions;
+    private array $connectionOptions;
 
     /**
-     * @var AmqpConnection
+     * @var AmqpConnection|null
      */
-    private $connection;
+    private ?AmqpConnection $connection = null;
 
     /**
+     * Construct
+     *
      * @param array $connectionOptions
      */
     public function __construct(array $connectionOptions)

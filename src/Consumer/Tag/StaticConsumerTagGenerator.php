@@ -21,7 +21,7 @@ class StaticConsumerTagGenerator implements ConsumerTagGeneratorInterface
     /**
      * @var string
      */
-    private $consumerTag;
+    private string $consumerTag;
 
     /**
      * Constructor.

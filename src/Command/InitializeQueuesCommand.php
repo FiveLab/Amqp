@@ -28,12 +28,12 @@ class InitializeQueuesCommand extends Command
     /**
      * @var QueueFactoryRegistryInterface
      */
-    private $registry;
+    private QueueFactoryRegistryInterface $registry;
 
     /**
      * @var array
      */
-    private $queues;
+    private array $queues;
 
     /**
      * Constructor.

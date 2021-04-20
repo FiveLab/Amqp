@@ -34,7 +34,7 @@ class RunConsumerCommand extends Command
     /**
      * @var ConsumerRegistryInterface
      */
-    private $consumerRegistry;
+    private ConsumerRegistryInterface $consumerRegistry;
 
     /**
      * Constructor.

@@ -24,7 +24,7 @@ class ExchangeFactoryRegistry implements ExchangeFactoryRegistryInterface
     /**
      * @var array|ExchangeFactoryInterface[]
      */
-    private $factories = [];
+    private array $factories = [];
 
     /**
      * Add exchange factory to registry

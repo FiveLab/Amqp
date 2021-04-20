@@ -28,17 +28,17 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
     /**
      * @var ChannelFactoryInterface
      */
-    private $channelFactory;
+    private ChannelFactoryInterface $channelFactory;
 
     /**
      * @var ExchangeDefinition
      */
-    private $definition;
+    private ExchangeDefinition $definition;
 
     /**
-     * @var AmqpExchange
+     * @var AmqpExchange|null
      */
-    private $exchange;
+    private ?AmqpExchange $exchange = null;
 
     /**
      * Constructor.
@@ -104,7 +104,7 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
     /**
      * {@inheritdoc}
      */
-    public function update(\SplSubject $subject)
+    public function update(\SplSubject $subject): void
     {
         $this->exchange = null;
     }

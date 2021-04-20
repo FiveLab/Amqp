@@ -20,12 +20,12 @@ class AmqpExchange implements ExchangeInterface
     /**
      * @var AmqpChannel
      */
-    private $channel;
+    private AmqpChannel $channel;
 
     /**
      * @var ExchangeDefinition
      */
-    private $definition;
+    private ExchangeDefinition $definition;
 
     /**
      * @param AmqpChannel        $channel

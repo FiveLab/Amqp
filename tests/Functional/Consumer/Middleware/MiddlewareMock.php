@@ -21,7 +21,7 @@ class MiddlewareMock implements ConsumerMiddlewareInterface
     /**
      * @var array
      */
-    private $receivedMessages = [];
+    private array $receivedMessages = [];
 
     /**
      * {@inheritdoc}

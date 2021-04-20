@@ -27,17 +27,17 @@ class AmqpExchangeTest extends TestCase
     /**
      * @var AmqpChannel
      */
-    private $channel;
+    private AmqpChannel $channel;
 
     /**
      * @var \AMQPExchange|MockObject
      */
-    private $originalExchange;
+    private \AMQPExchange $originalExchange;
 
     /**
      * @var AmqpExchange
      */
-    private $exchange;
+    private AmqpExchange $exchange;
 
     /**
      * {@inheritdoc}

@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Publisher\Middleware;
 
 use FiveLab\Component\Amqp\Message\MessageInterface;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
 
 /**
  * The collection for store middlewares for consumers.
@@ -24,7 +23,7 @@ class PublisherMiddlewares implements \IteratorAggregate
     /**
      * @var array|PublisherMiddlewareInterface[]
      */
-    private $middlewares = [];
+    private array $middlewares;
 
     /**
      * Constructor.

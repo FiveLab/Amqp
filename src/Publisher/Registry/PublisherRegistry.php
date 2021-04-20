@@ -24,7 +24,7 @@ class PublisherRegistry implements PublisherRegistryInterface
     /**
      * @var array|PublisherInterface[]
      */
-    private $publishers = [];
+    private array $publishers = [];
 
     /**
      * Add publisher to registry

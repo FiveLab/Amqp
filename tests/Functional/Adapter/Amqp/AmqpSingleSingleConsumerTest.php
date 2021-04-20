@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Functional\Adapter\Amqp;
 
 use FiveLab\Component\Amqp\Adapter\Amqp\Channel\AmqpChannelFactory;
-use FiveLab\Component\Amqp\Adapter\Amqp\Connection\AmqpConnection;
 use FiveLab\Component\Amqp\Adapter\Amqp\Connection\AmqpConnectionFactory;
 use FiveLab\Component\Amqp\Adapter\Amqp\Exchange\AmqpExchangeFactory;
 use FiveLab\Component\Amqp\Adapter\Amqp\Queue\AmqpQueueFactory;
@@ -23,7 +22,6 @@ use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
 use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
-use FiveLab\Component\Amqp\Tests\Functional\Adapter\Amqp\Channel\StubAmqpChannelFactory;
 use FiveLab\Component\Amqp\Tests\Functional\Adapter\SingleConsumerTestCase;
 
 class AmqpSingleSingleConsumerTest extends SingleConsumerTestCase

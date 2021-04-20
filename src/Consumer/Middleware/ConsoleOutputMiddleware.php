@@ -24,7 +24,7 @@ class ConsoleOutputMiddleware implements ConsumerMiddlewareInterface
     /**
      * @var OutputInterface
      */
-    private $output;
+    private OutputInterface $output;
 
     /**
      * Constructor.

@@ -17,7 +17,7 @@ use FiveLab\Component\Amqp\Message\Message;
 use FiveLab\Component\Amqp\Message\Payload;
 use FiveLab\Component\Amqp\Publisher\PublisherInterface;
 use FiveLab\Component\Amqp\Publisher\SavepointPublisherDecorator;
-use PHPUnit\Framework\MockObject\Matcher\Invocation;
+use PHPUnit\Framework\MockObject\Rule\InvocationOrder;
 use PHPUnit\Framework\TestCase;
 
 class SavepointPublisherTest extends TestCase
@@ -25,12 +25,12 @@ class SavepointPublisherTest extends TestCase
     /**
      * @var PublisherInterface
      */
-    private $originalPublisher;
+    private PublisherInterface $originalPublisher;
 
     /**
      * @var SavepointPublisherDecorator
      */
-    private $publisher;
+    private SavepointPublisherDecorator $publisher;
 
     /**
      * {@inheritdoc}
@@ -80,9 +80,13 @@ class SavepointPublisherTest extends TestCase
      */
     public function shouldSuccessPublishWithManySavepoints(): void
     {
-        $this->expectPublish(self::at(0), 'foo.1', new Message(new Payload('1')));
-        $this->expectPublish(self::at(1), 'foo.2', new Message(new Payload('2')));
-        $this->expectPublish(self::at(2), 'foo.3', new Message(new Payload('3')));
+        $this->originalPublisher->expects(self::exactly(3))
+            ->method('publish')
+            ->withConsecutive(
+                [new Message(new Payload('1')), 'foo.1'],
+                [new Message(new Payload('2')), 'foo.2'],
+                [new Message(new Payload('3')), 'foo.3']
+            );
 
         $this->publisher->start('savepoint_1');
         $this->publisher->publish(new Message(new Payload('1')), 'foo.1');
@@ -146,11 +150,11 @@ class SavepointPublisherTest extends TestCase
     /**
      * Create executable
      *
-     * @param Invocation   $invocation
-     * @param string|null  $expectedRouting
-     * @param Message|null $expectedMessage
+     * @param InvocationOrder $invocation
+     * @param string|null     $expectedRouting
+     * @param Message|null    $expectedMessage
      */
-    private function expectPublish(Invocation $invocation, string $expectedRouting, Message $expectedMessage): void
+    private function expectPublish(InvocationOrder $invocation, string $expectedRouting, Message $expectedMessage): void
     {
         $this->originalPublisher->expects($invocation)
             ->method('publish')

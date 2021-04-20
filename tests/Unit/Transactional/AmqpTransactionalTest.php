@@ -24,12 +24,12 @@ class AmqpTransactionalTest extends TestCase
     /**
      * @var ChannelInterface|MockObject
      */
-    private $channel;
+    private ChannelInterface $channel;
 
     /**
      * @var AmqpTransactional
      */
-    private $transactional;
+    private AmqpTransactional $transactional;
 
     /**
      * {@inheritdoc}
@@ -40,6 +40,7 @@ class AmqpTransactionalTest extends TestCase
 
         /** @var ChannelFactoryInterface|MockObject $channelFactory */
         $channelFactory = $this->createMock(ChannelFactoryInterface::class);
+
         $channelFactory->expects(self::any())
             ->method('create')
             ->willReturn($this->channel);
@@ -85,10 +86,10 @@ class AmqpTransactionalTest extends TestCase
      */
     public function shouldSuccessExecute(): void
     {
-        $this->channel->expects(self::at(0))
+        $this->channel->expects(self::once())
             ->method('startTransaction');
 
-        $this->channel->expects(self::at(1))
+        $this->channel->expects(self::once())
             ->method('commitTransaction');
 
         $result = $this->transactional->execute(static function () {
@@ -106,10 +107,10 @@ class AmqpTransactionalTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('some foo');
 
-        $this->channel->expects(self::at(0))
+        $this->channel->expects(self::once())
             ->method('startTransaction');
 
-        $this->channel->expects(self::at(1))
+        $this->channel->expects(self::once())
             ->method('rollbackTransaction');
 
         $this->transactional->execute(static function () {
@@ -122,10 +123,10 @@ class AmqpTransactionalTest extends TestCase
      */
     public function shouldSuccessExecuteWithControlNestingLevel(): void
     {
-        $this->channel->expects(self::at(0))
+        $this->channel->expects(self::once())
             ->method('startTransaction');
 
-        $this->channel->expects(self::at(1))
+        $this->channel->expects(self::once())
             ->method('commitTransaction');
 
         $this->transactional->begin();
@@ -142,10 +143,10 @@ class AmqpTransactionalTest extends TestCase
      */
     public function shouldFailExecuteWithControlNestingLevel(): void
     {
-        $this->channel->expects(self::at(0))
+        $this->channel->expects(self::once())
             ->method('startTransaction');
 
-        $this->channel->expects(self::at(1))
+        $this->channel->expects(self::once())
             ->method('rollbackTransaction');
 
         $this->transactional->begin();

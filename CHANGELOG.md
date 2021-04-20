@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+vX.X.X
+------
+
+* Remove support PHP 7.3 and early.
+* Add support PHP 8.0.
+
 v1.2.1
 ------
 

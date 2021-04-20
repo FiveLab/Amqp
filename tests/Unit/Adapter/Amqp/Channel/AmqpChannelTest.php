@@ -23,17 +23,17 @@ class AmqpChannelTest extends TestCase
     /**
      * @var AmqpConnection|MockObject
      */
-    private $connection;
+    private AmqpConnection $connection;
 
     /**
      * @var \AMQPChannel|MockObject
      */
-    private $amqpChannel;
+    private \AMQPChannel $amqpChannel;
 
     /**
      * @var AmqpChannel
      */
-    private $channel;
+    private AmqpChannel $channel;
 
     /**
      * {@inheritdoc}

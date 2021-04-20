@@ -27,17 +27,17 @@ class AmqpReceivedMessage implements ReceivedMessageInterface
     /**
      * @var \AMQPQueue
      */
-    private $queue;
+    private \AMQPQueue $queue;
 
     /**
      * @var \AMQPEnvelope
      */
-    private $envelope;
+    private \AMQPEnvelope $envelope;
 
     /**
      * @var bool
      */
-    private $answered = false;
+    private bool $answered = false;
 
     /**
      * Constructor.

@@ -26,17 +26,17 @@ class InitializeExchangesCommandTest extends TestCase
     /**
      * @var ExchangeFactoryRegistry
      */
-    private $registry;
+    private ExchangeFactoryRegistry $registry;
 
     /**
      * @var ArrayInput
      */
-    private $input;
+    private ArrayInput $input;
 
     /**
      * @var BufferedOutput
      */
-    private $output;
+    private BufferedOutput $output;
 
     /**
      * {@inheritdoc}

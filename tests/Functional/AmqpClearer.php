@@ -21,7 +21,7 @@ class AmqpClearer
     /**
      * @var AmqpManagement
      */
-    private $management;
+    private AmqpManagement $management;
 
     /**
      * Constructor.

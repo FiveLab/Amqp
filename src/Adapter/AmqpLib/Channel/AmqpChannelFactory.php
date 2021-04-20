@@ -18,17 +18,17 @@ class AmqpChannelFactory implements ChannelFactoryInterface, \SplObserver
     /**
      * @var ConnectionFactoryInterface
      */
-    private $connectionFactory;
+    private ConnectionFactoryInterface $connectionFactory;
 
     /**
      * @var ChannelDefinition
      */
-    private $definition;
+    private ChannelDefinition $definition;
 
     /**
-     * @var AmqpChannel
+     * @var AmqpChannel|null
      */
-    private $channel;
+    private ?AmqpChannel $channel = null;
 
     /**
      * @param ConnectionFactoryInterface $connectionFactory

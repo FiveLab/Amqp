@@ -13,10 +13,10 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Queue\Definition;
 
-use FiveLab\Component\Amqp\Argument\ArgumentDefinitions;
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
-use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
+use FiveLab\Component\Amqp\Argument\ArgumentDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 
 /**
  * The definition for describe queue.
@@ -26,54 +26,54 @@ class QueueDefinition
     /**
      * @var string
      */
-    private $name;
+    private string $name;
 
     /**
      * @var bool
      */
-    private $durable;
+    private bool $durable;
 
     /**
      * @var bool
      */
-    private $passive;
+    private bool $passive;
 
     /**
      * @var bool
      */
-    private $exclusive;
+    private bool $exclusive;
 
     /**
      * @var bool
      */
-    private $autoDelete;
+    private bool $autoDelete;
 
     /**
-     * @var array|BindingDefinition[]
+     * @var BindingDefinitions|BindingDefinition[]
      */
-    private $bindings;
+    private BindingDefinitions $bindings;
 
     /**
-     * @var array|BindingDefinition[]
+     * @var BindingDefinitions|BindingDefinition[]
      */
-    private $unBindings;
+    private BindingDefinitions $unBindings;
 
     /**
-     * @var array
+     * @var ArgumentDefinitions|ArgumentDefinition[]
      */
-    private $arguments;
+    private ArgumentDefinitions $arguments;
 
     /**
      * Constructor.
      *
-     * @param string              $name
-     * @param BindingDefinitions  $bindings
-     * @param BindingDefinitions  $unBindings
-     * @param bool                $durable
-     * @param bool                $passive
-     * @param bool                $exclusive
-     * @param bool                $autoDelete
-     * @param ArgumentDefinitions $arguments
+     * @param string                   $name
+     * @param BindingDefinitions|null  $bindings
+     * @param BindingDefinitions|null  $unBindings
+     * @param bool                     $durable
+     * @param bool                     $passive
+     * @param bool                     $exclusive
+     * @param bool                     $autoDelete
+     * @param ArgumentDefinitions|null $arguments
      */
     public function __construct(string $name, BindingDefinitions $bindings = null, BindingDefinitions $unBindings = null, bool $durable = true, bool $passive = false, bool $exclusive = false, bool $autoDelete = false, ArgumentDefinitions $arguments = null)
     {

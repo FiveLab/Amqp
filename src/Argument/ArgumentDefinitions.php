@@ -21,7 +21,7 @@ class ArgumentDefinitions implements \IteratorAggregate, \Countable
     /**
      * @var ArgumentDefinition[]
      */
-    private $arguments;
+    private array $arguments;
 
     /**
      * Constructor.

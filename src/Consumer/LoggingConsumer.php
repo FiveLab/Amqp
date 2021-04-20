@@ -25,12 +25,12 @@ class LoggingConsumer implements ConsumerInterface, MiddlewareAwareInterface
     /**
      * @var ConsumerInterface
      */
-    private $decoratedConsumer;
+    private ConsumerInterface $decoratedConsumer;
 
     /**
      * @var LoggerInterface
      */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * Constructor.

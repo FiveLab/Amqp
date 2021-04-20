@@ -24,12 +24,12 @@ class AmqpTransactional extends AbstractTransactional
     /**
      * @var ChannelFactoryInterface
      */
-    private $channelFactory;
+    private ChannelFactoryInterface $channelFactory;
 
     /**
      * @var int
      */
-    private $nestingLevel = 0;
+    private int $nestingLevel = 0;
 
     /**
      * Constructor.

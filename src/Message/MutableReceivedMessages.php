@@ -25,7 +25,7 @@ class MutableReceivedMessages extends ReceivedMessages
      */
     public function push(ReceivedMessageInterface $message): void
     {
-        \array_push($this->messages, $message);
+        $this->messages[] = $message;
     }
 
     /**

@@ -16,7 +16,6 @@ namespace FiveLab\Component\Amqp\Adapter\Amqp\Connection;
 use FiveLab\Component\Amqp\Connection\ConnectionInterface;
 use FiveLab\Component\Amqp\Exception\BadCredentialsException;
 use FiveLab\Component\Amqp\Exception\ConnectionException;
-use SplObserver;
 
 /**
  * The connection provided via php-amqp extension.
@@ -26,12 +25,12 @@ class AmqpConnection implements ConnectionInterface, \SplSubject
     /**
      * @var \SplObserver[]
      */
-    private $observers = [];
+    private array $observers = [];
 
     /**
      * @var \AMQPConnection
      */
-    private $connection;
+    private \AMQPConnection $connection;
 
     /**
      * Constructor.
@@ -115,7 +114,7 @@ class AmqpConnection implements ConnectionInterface, \SplSubject
     /**
      * {@inheritdoc}
      */
-    public function attach(SplObserver $observer)
+    public function attach(\SplObserver $observer): void
     {
         $hash = \spl_object_hash($observer);
 
@@ -127,7 +126,7 @@ class AmqpConnection implements ConnectionInterface, \SplSubject
     /**
      * {@inheritdoc}
      */
-    public function detach(SplObserver $observer)
+    public function detach(\SplObserver $observer): void
     {
         unset($this->observers[\spl_object_hash($observer)]);
     }
@@ -135,7 +134,7 @@ class AmqpConnection implements ConnectionInterface, \SplSubject
     /**
      * {@inheritdoc}
      */
-    public function notify()
+    public function notify(): void
     {
         foreach ($this->observers as $observer) {
             $observer->update($this);

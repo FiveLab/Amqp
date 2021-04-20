@@ -25,22 +25,22 @@ class DelayMessage implements MessageInterface
     /**
      * @var MessageInterface
      */
-    private $message;
+    private MessageInterface $message;
 
     /**
      * @var string
      */
-    private $publisherKey;
+    private string $publisherKey;
 
     /**
      * @var string
      */
-    private $routingKey;
+    private string $routingKey;
 
     /**
      * @var int
      */
-    private $counter;
+    private int $counter;
 
     /**
      * Constructor.

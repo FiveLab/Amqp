@@ -78,7 +78,7 @@ class ExchangeFactoryRegistryTest extends TestCase
     private function createUniqueFactory(): ExchangeFactoryInterface
     {
         $factory = $this->createMock(ExchangeFactoryInterface::class);
-        $factory->uniqueIdentifier = \uniqid();
+        $factory->uniqueIdentifier = \uniqid('', true);
 
         return $factory;
     }

@@ -23,12 +23,12 @@ class SpoolAmqpConnection extends AmqpConnection
     /**
      * @var array|AmqpConnection[]
      */
-    private $connections;
+    private array $connections;
 
     /**
-     * @var AmqpConnection
+     * @var AmqpConnection|null
      */
-    private $originConnection;
+    private ?AmqpConnection $originConnection = null;
 
     /**
      * Constructor.

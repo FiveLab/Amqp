@@ -32,17 +32,17 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
     /**
      * @var QueueFactoryInterface
      */
-    private $queueFactory;
+    private QueueFactoryInterface $queueFactory;
 
     /**
      * @var MessageHandlerMock
      */
-    private $messageHandler;
+    private MessageHandlerMock $messageHandler;
 
     /**
      * @var ThrowableMessageHandlerMock
      */
-    private $throwableMessageHandler;
+    private ThrowableMessageHandlerMock $throwableMessageHandler;
 
     /**
      * {@inheritdoc}

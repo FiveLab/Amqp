@@ -21,17 +21,17 @@ class Payload
     /**
      * @var string
      */
-    private $data;
+    private string $data;
 
     /**
      * @var string
      */
-    private $contentType;
+    private string $contentType;
 
     /**
      * @var string|null
      */
-    private $contentEncoding;
+    private ?string $contentEncoding;
 
     /**
      * Constructor.

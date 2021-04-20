@@ -28,12 +28,12 @@ class InitializeExchangesCommand extends Command
     /**
      * @var ExchangeFactoryRegistryInterface
      */
-    private $registry;
+    private ExchangeFactoryRegistryInterface $registry;
 
     /**
      * @var array
      */
-    private $exchanges;
+    private array $exchanges;
 
     /**
      * Constructor.

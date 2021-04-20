@@ -28,17 +28,17 @@ class HandleExpiredMessageHandler implements ThrowableMessageHandlerInterface
     /**
      * @var PublisherRegistryInterface
      */
-    private $publisherRegistry;
+    private PublisherRegistryInterface $publisherRegistry;
 
     /**
      * @var PublisherInterface
      */
-    private $delayPublisher;
+    private PublisherInterface $delayPublisher;
 
     /**
      * @var string
      */
-    private $landfillRoutingKey;
+    private string $landfillRoutingKey;
 
     /**
      * Constructor.

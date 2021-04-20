@@ -23,27 +23,27 @@ class MessageHandlerMock implements MessageHandlerInterface, FlushableMessageHan
     /**
      * @var string
      */
-    private $supportsRoutingKey;
+    private string $supportsRoutingKey;
 
     /**
      * @var array|ReceivedMessageInterface[]
      */
-    private $receivedMessages = [];
+    private array $receivedMessages = [];
 
     /**
      * @var array|ReceivedMessageInterface[]
      */
-    private $flushedMessages = [];
+    private array $flushedMessages = [];
 
     /**
-     * @var \Closure
+     * @var \Closure|null
      */
-    private $handleCallback;
+    private ?\Closure $handleCallback;
 
     /**
-     * @var \Closure
+     * @var \Closure|null
      */
-    private $flushCallback;
+    private ?\Closure $flushCallback = null;
 
     /**
      * Constructor.
