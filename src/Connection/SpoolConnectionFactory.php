@@ -11,32 +11,29 @@
 
 declare(strict_types = 1);
 
-namespace FiveLab\Component\Amqp\Adapter\Amqp\Connection;
-
-use FiveLab\Component\Amqp\Connection\ConnectionFactoryInterface;
-use FiveLab\Component\Amqp\Connection\ConnectionInterface;
+namespace FiveLab\Component\Amqp\Connection;
 
 /**
  * The factory for make a SpoolConnection via "ext-amqp".
  */
-class SpoolAmqpConnectionFactory implements ConnectionFactoryInterface
+class SpoolConnectionFactory implements ConnectionFactoryInterface
 {
     /**
-     * @var array|AmqpConnectionFactory[]
+     * @var array|ConnectionFactoryInterface[]
      */
     private array $factories;
 
     /**
-     * @var SpoolAmqpConnection|null
+     * @var SpoolConnection|null
      */
-    private ?SpoolAmqpConnection $connection = null;
+    private ?SpoolConnection $connection = null;
 
     /**
      * Constructor.
      *
-     * @param AmqpConnectionFactory ...$factories
+     * @param ConnectionFactoryInterface ...$factories
      */
-    public function __construct(AmqpConnectionFactory ...$factories)
+    public function __construct(ConnectionFactoryInterface ...$factories)
     {
         if (!\count($factories)) {
             throw new \InvalidArgumentException('Connection factories must be more than zero.');
@@ -54,11 +51,11 @@ class SpoolAmqpConnectionFactory implements ConnectionFactoryInterface
             return $this->connection;
         }
 
-        $connections = \array_map(static function (AmqpConnectionFactory $factory) {
+        $connections = \array_map(static function (ConnectionFactoryInterface $factory) {
             return $factory->create();
         }, $this->factories);
 
-        $this->connection = new SpoolAmqpConnection(...$connections);
+        $this->connection = new SpoolConnection(...$connections);
 
         return $this->connection;
     }

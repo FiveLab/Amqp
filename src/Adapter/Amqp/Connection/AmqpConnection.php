@@ -20,7 +20,7 @@ use FiveLab\Component\Amqp\Exception\ConnectionException;
 /**
  * The connection provided via php-amqp extension.
  */
-class AmqpConnection implements ConnectionInterface, \SplSubject
+class AmqpConnection implements ConnectionInterface
 {
     /**
      * @var \SplObserver[]

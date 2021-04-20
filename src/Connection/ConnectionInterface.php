@@ -19,7 +19,7 @@ use FiveLab\Component\Amqp\Exception\ConnectionException;
 /**
  * All connections should implement this interface.
  */
-interface ConnectionInterface
+interface ConnectionInterface extends \SplSubject
 {
     /**
      * Connect to amqp.

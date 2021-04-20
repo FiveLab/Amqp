@@ -11,7 +11,7 @@ use SplObserver;
 /**
  * The connection provided via php-amqplib library.
  */
-class AmqpConnection implements ConnectionInterface, \SplSubject
+class AmqpConnection implements ConnectionInterface
 {
     /**
      * @var array|\SplObserver[]
