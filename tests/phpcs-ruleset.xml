@@ -6,5 +6,7 @@
         <exclude name="Symfony.Commenting.ClassComment.Missing"/>
         <exclude name="Symfony.Commenting.Annotations"/>
         <exclude name="Symfony.Functions.ScopeOrder"/>
+        <exclude name="Symfony.Commenting.License"/>
+        <exclude name="Zend.NamingConventions.ValidVariableName.MemberVarContainsNumbers"/>
     </rule>
 </ruleset>
