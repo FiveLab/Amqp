@@ -66,14 +66,14 @@ class QueueDefinition
     /**
      * Constructor.
      *
-     * @param string                   $name
-     * @param BindingDefinitions|null  $bindings
-     * @param BindingDefinitions|null  $unBindings
-     * @param bool                     $durable
-     * @param bool                     $passive
-     * @param bool                     $exclusive
-     * @param bool                     $autoDelete
-     * @param ArgumentDefinitions|null $arguments
+     * @param string                                       $name
+     * @param BindingDefinitions|null                      $bindings
+     * @param BindingDefinitions|null                      $unBindings
+     * @param bool                                         $durable
+     * @param bool                                         $passive
+     * @param bool                                         $exclusive
+     * @param bool                                         $autoDelete
+     * @param ArgumentDefinitions<ArgumentDefinition>|null $arguments
      */
     public function __construct(string $name, BindingDefinitions $bindings = null, BindingDefinitions $unBindings = null, bool $durable = true, bool $passive = false, bool $exclusive = false, bool $autoDelete = false, ArgumentDefinitions $arguments = null)
     {

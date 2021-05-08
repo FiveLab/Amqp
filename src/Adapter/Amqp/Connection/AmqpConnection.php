@@ -98,6 +98,7 @@ class AmqpConnection implements ConnectionInterface
      */
     public function setReadTimeout(float $timeout): void
     {
+        // @phpstan-ignore-next-line
         $this->connection->setReadTimeout($timeout);
     }
 

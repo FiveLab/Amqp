@@ -21,14 +21,14 @@ use FiveLab\Component\Amqp\Exception\HeaderNotFoundException;
 class Headers
 {
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     private array $headers;
 
     /**
      * Constructor.
      *
-     * @param array $headers
+     * @param array<string, mixed> $headers
      */
     public function __construct(array $headers)
     {
@@ -71,7 +71,7 @@ class Headers
     /**
      * Get all headers from collection
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function all(): array
     {

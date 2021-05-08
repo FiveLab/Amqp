@@ -22,7 +22,7 @@ use FiveLab\Component\Amqp\Connection\ConnectionInterface;
 class AmqpConnectionFactory implements ConnectionFactoryInterface
 {
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     private array $connectionOptions;
 
@@ -34,7 +34,7 @@ class AmqpConnectionFactory implements ConnectionFactoryInterface
     /**
      * Constructor.
      *
-     * @param array $connectionOptions
+     * @param array<string, mixed> $connectionOptions
      */
     public function __construct(array $connectionOptions)
     {

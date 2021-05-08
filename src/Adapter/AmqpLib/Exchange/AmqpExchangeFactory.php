@@ -56,7 +56,7 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
         if (!$channel instanceof AmqpChannel) {
             throw new \InvalidArgumentException(\sprintf(
                 'The channel "%s" does not support for create exchange.',
-                $channel
+                \get_class($channel)
             ));
         }
 
@@ -107,7 +107,10 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
             $arguments->set($argument->getName(), $argument->getValue());
         }
 
-        $this->channelFactory->create()->getChannel()->exchange_declare(
+        /** @var AmqpChannel $channel */
+        $channel = $this->channelFactory->create();
+
+        $channel->getChannel()->exchange_declare(
             $name,
             $this->definition->getType(),
             $this->definition->isPassive(),
@@ -125,7 +128,10 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
      */
     private function bind(string $exchangeName, string $routingKey): void
     {
-        $this->channelFactory->create()->getChannel()->exchange_bind($this->definition->getName(), $exchangeName, $routingKey);
+        /** @var AmqpChannel $channel */
+        $channel = $this->channelFactory->create();
+
+        $channel->getChannel()->exchange_bind($this->definition->getName(), $exchangeName, $routingKey);
     }
 
     /**
@@ -134,6 +140,9 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
      */
     private function unbind(string $exchangeName, string $routingKey): void
     {
-        $this->channelFactory->create()->getChannel()->exchange_unbind($this->definition->getName(), $exchangeName, $routingKey);
+        /** @var AmqpChannel $channel */
+        $channel = $this->channelFactory->create();
+
+        $channel->getChannel()->exchange_unbind($this->definition->getName(), $exchangeName, $routingKey);
     }
 }

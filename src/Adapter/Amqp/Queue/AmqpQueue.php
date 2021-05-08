@@ -99,6 +99,7 @@ class AmqpQueue implements QueueInterface
         $envelope = $this->queue->get();
 
         if ($envelope) {
+            // @phpstan-ignore-next-line
             return new AmqpReceivedMessage($this->queue, $envelope);
         }
 

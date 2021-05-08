@@ -26,7 +26,7 @@ class SavepointPublisherDecorator implements SavepointPublisherInterface
     private PublisherInterface $publisher;
 
     /**
-     * @var array
+     * @var array<string, array<int, mixed>>
      */
     private array $savepoints = [];
 

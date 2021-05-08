@@ -31,7 +31,7 @@ class InitializeExchangesCommand extends Command
     private ExchangeFactoryRegistryInterface $registry;
 
     /**
-     * @var array
+     * @var array<string>
      */
     private array $exchanges;
 
@@ -39,7 +39,7 @@ class InitializeExchangesCommand extends Command
      * Constructor.
      *
      * @param ExchangeFactoryRegistryInterface $registry
-     * @param array                            $exchanges
+     * @param array<string>                    $exchanges
      * @param string                           $name
      */
     public function __construct(ExchangeFactoryRegistryInterface $registry, array $exchanges, string $name = self::DEFAULT_NAME)

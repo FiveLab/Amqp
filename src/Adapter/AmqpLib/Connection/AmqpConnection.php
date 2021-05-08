@@ -70,7 +70,7 @@ class AmqpConnection implements ConnectionInterface
      */
     public function isConnected(): bool
     {
-        return $this->connection && $this->connection->isConnected();
+        return $this->connection->isConnected();
     }
 
     /**

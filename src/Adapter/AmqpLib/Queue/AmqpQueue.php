@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Adapter\AmqpLib\Queue;
 
@@ -137,7 +137,9 @@ class AmqpQueue implements QueueInterface
     }
 
     /**
-     * @return array|null   declare result, includes queue size
+     * Declare queue
+     *
+     * @return array<mixed>|null Declare result, includes queue size
      *
      * @internal
      */

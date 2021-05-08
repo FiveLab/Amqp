@@ -66,7 +66,7 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
         if (!$channel instanceof AmqpChannel) {
             throw new \InvalidArgumentException(\sprintf(
                 'The channel "%s" does not support for create exchange.',
-                $channel
+                \get_class($channel)
             ));
         }
 

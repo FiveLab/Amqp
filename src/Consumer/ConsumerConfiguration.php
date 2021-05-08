@@ -63,7 +63,7 @@ class ConsumerConfiguration
     /**
      * Get prefetch count
      *
-     * @return int|null
+     * @return int
      */
     public function getPrefetchCount():  int
     {

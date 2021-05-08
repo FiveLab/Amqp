@@ -76,6 +76,7 @@ class AmqpChannelFactory implements ChannelFactoryInterface, \SplObserver
             $connection->connect();
         }
 
+        /** @var AmqpConnection $connection */
         $channel = new \AMQPChannel($connection->getConnection());
 
         $this->channel = new AmqpChannel($connection, $channel);

@@ -93,7 +93,10 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
      */
     private function bind(string $exchangeName, string $routingKey): void
     {
-        $this->channelFactory->create()->getChannel()->queue_bind($this->definition->getName(), $exchangeName, $routingKey);
+        /** @var AmqpChannel $channel */
+        $channel = $this->channelFactory->create();
+
+        $channel->getChannel()->queue_bind($this->definition->getName(), $exchangeName, $routingKey);
     }
 
     /**
@@ -102,6 +105,9 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
      */
     private function unbind(string $exchangeName, string $routingKey): void
     {
-        $this->channelFactory->create()->getChannel()->queue_unbind($this->definition->getName(), $exchangeName, $routingKey);
+        /** @var AmqpChannel $channel */
+        $channel = $this->channelFactory->create();
+
+        $channel->getChannel()->queue_unbind($this->definition->getName(), $exchangeName, $routingKey);
     }
 }

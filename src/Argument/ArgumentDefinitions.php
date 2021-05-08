@@ -15,6 +15,8 @@ namespace FiveLab\Component\Amqp\Argument;
 
 /**
  * The collection for store all arguments.
+ *
+ * @implements \IteratorAggregate<ArgumentDefinition>
  */
 class ArgumentDefinitions implements \IteratorAggregate, \Countable
 {
@@ -35,6 +37,8 @@ class ArgumentDefinitions implements \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @return \ArrayIterator<int, ArgumentDefinition>
      */
     public function getIterator(): iterable
     {
@@ -52,7 +56,7 @@ class ArgumentDefinitions implements \IteratorAggregate, \Countable
     /**
      * Get arguments in array presentation
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function toArray(): array
     {

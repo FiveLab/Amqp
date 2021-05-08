@@ -17,6 +17,8 @@ use FiveLab\Component\Amqp\Message\MessageInterface;
 
 /**
  * The collection for store middlewares for consumers.
+ *
+ * @implements \IteratorAggregate<PublisherMiddlewareInterface>
  */
 class PublisherMiddlewares implements \IteratorAggregate
 {
@@ -38,7 +40,7 @@ class PublisherMiddlewares implements \IteratorAggregate
     /**
      * {@inheritdoc}
      *
-     * @return \ArrayIterator|PublisherMiddlewareInterface[]
+     * @return \ArrayIterator<int, PublisherMiddlewareInterface>
      */
     public function getIterator(): \ArrayIterator
     {
@@ -58,7 +60,7 @@ class PublisherMiddlewares implements \IteratorAggregate
 
         while ($middleware = \array_pop($middlewares)) {
             $lastExecutable = static function (MessageInterface $message, string $routingKey) use ($middleware, $lastExecutable) {
-                return $middleware->handle($message, $lastExecutable, $routingKey);
+                $middleware->handle($message, $lastExecutable, $routingKey);
             };
         }
 

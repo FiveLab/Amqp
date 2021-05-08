@@ -67,7 +67,7 @@ class RunConsumerCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $consumer = $this->consumerRegistry->get($input->getArgument('key'));
+        $consumer = $this->consumerRegistry->get((string) $input->getArgument('key'));
 
         // Verify input parameters
         if ($input->getOption('loop') && !$input->getOption('read-timeout')) {

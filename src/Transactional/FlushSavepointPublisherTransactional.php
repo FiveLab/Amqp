@@ -28,7 +28,7 @@ class FlushSavepointPublisherTransactional extends AbstractTransactional
     private SavepointPublisherInterface $publisher;
 
     /**
-     * @var array
+     * @var array<string>
      */
     private array $keys = [];
 
@@ -81,6 +81,7 @@ class FlushSavepointPublisherTransactional extends AbstractTransactional
 
         $key = \array_pop($this->keys);
 
+        // @phpstan-ignore-next-line
         $this->publisher->rollback($key);
     }
 }

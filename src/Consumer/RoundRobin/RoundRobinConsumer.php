@@ -33,7 +33,7 @@ class RoundRobinConsumer implements ConsumerInterface
     private RoundRobinConsumerConfiguration $configuration;
 
     /**
-     * @var ConsumerInterface[]|MiddlewareAwareInterface[]
+     * @var ConsumerInterface[] & MiddlewareAwareInterface[]
      */
     private array $consumers;
 
@@ -45,8 +45,8 @@ class RoundRobinConsumer implements ConsumerInterface
     /**
      * Constructor.
      *
-     * @param RoundRobinConsumerConfiguration $configuration
-     * @param ConsumerInterface               ...$consumers
+     * @param RoundRobinConsumerConfiguration              $configuration
+     * @param ConsumerInterface & MiddlewareAwareInterface ...$consumers
      */
     public function __construct(RoundRobinConsumerConfiguration $configuration, ConsumerInterface ...$consumers)
     {

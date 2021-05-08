@@ -31,7 +31,7 @@ class InitializeQueuesCommand extends Command
     private QueueFactoryRegistryInterface $registry;
 
     /**
-     * @var array
+     * @var array<string>
      */
     private array $queues;
 
@@ -39,7 +39,7 @@ class InitializeQueuesCommand extends Command
      * Constructor.
      *
      * @param QueueFactoryRegistryInterface $registry
-     * @param array                         $queues
+     * @param array<string>                 $queues
      * @param string                        $name
      */
     public function __construct(QueueFactoryRegistryInterface $registry, array $queues, string $name = self::DEFAULT_NAME)

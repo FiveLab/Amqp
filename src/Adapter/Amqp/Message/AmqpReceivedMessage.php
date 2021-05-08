@@ -58,6 +58,7 @@ class AmqpReceivedMessage implements ReceivedMessageInterface
     {
         $body = $this->envelope->getBody();
 
+        // @phpstan-ignore-next-line
         if (false === $body) {
             // getBody method can return false, if length of message is zero.
             // @see https://github.com/php-amqp/php-amqp/blob/1205d3287df0a9ec762a6594b4fa018ed9637d21/amqp_envelope.c#L101

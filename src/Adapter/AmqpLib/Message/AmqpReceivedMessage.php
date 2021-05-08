@@ -94,7 +94,7 @@ class AmqpReceivedMessage implements ReceivedMessageInterface
      */
     public function getRoutingKey(): string
     {
-        return $this->message->getRoutingKey();
+        return (string) $this->message->getRoutingKey();
     }
 
     /**

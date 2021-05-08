@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Adapter\AmqpLib\Channel;
 
@@ -65,6 +65,7 @@ class AmqpChannelFactory implements ChannelFactoryInterface, \SplObserver
             $connection->connect();
         }
 
+        /** @var AmqpConnection $connection */
         $channel = $connection->getConnection()->channel();
 
         $this->channel = new AmqpChannel($connection, $channel);

@@ -25,15 +25,15 @@ class ListConsumersCommand extends Command
     private const DEFAULT_NAME = 'event-broker:consumer:list';
 
     /**
-     * @var array|string[]
+     * @var array<string>
      */
     private array $consumers;
 
     /**
      * Constructor.
      *
-     * @param array  $consumers
-     * @param string $name
+     * @param array<string> $consumers
+     * @param string        $name
      */
     public function __construct(array $consumers, string $name = self::DEFAULT_NAME)
     {

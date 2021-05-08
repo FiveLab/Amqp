@@ -36,7 +36,7 @@ class SpoolConnection implements ConnectionInterface
     /**
      * Constructor.
      *
-     * @param array|ConnectionInterface ...$connections
+     * @param ConnectionInterface ...$connections
      */
     public function __construct(ConnectionInterface ...$connections)
     {
@@ -50,13 +50,14 @@ class SpoolConnection implements ConnectionInterface
     /**
      * Proxy call to original connection
      *
-     * @param string $methodName
-     * @param array  $arguments
+     * @param string            $methodName
+     * @param array<int, mixed> $arguments
      *
      * @return mixed
      */
     public function __call(string $methodName, array $arguments)
     {
+        // @phpstan-ignore-next-line
         return \call_user_func_array([$this->getOriginConnection(), $methodName], $arguments);
     }
 
@@ -79,6 +80,7 @@ class SpoolConnection implements ConnectionInterface
             }
         }
 
+        // @phpstan-ignore-next-line
         throw $firstException;
     }
 
