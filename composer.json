@@ -24,6 +24,7 @@
 
     "require-dev": {
         "ext-amqp": "*",
+        "ext-sockets": "*",
         "phpunit/phpunit": "~9.0",
         "phpmetrics/phpmetrics": "~2.7",
         "phpstan/phpstan": "~0.12.85",
