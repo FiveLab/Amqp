@@ -9,18 +9,18 @@
  * file that was distributed with this source code
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace FiveLab\Component\Amqp\Adapter\AmqpLib\Connection;
 
 use FiveLab\Component\Amqp\Connection\ConnectionFactoryInterface;
 use FiveLab\Component\Amqp\Connection\ConnectionInterface;
-use PhpAmqpLib\Connection\AMQPLazyConnection;
+use PhpAmqpLib\Connection\AMQPLazySocketConnection;
 
 /**
- * The factory for create connection provided via php-amqplib library.
+ * The factory for create ext-sockets based connection provided via php-amqplib library.
  */
-class AmqpConnectionFactory implements ConnectionFactoryInterface
+class AmqpSocketsConnectionFactory implements ConnectionFactoryInterface
 {
     /**
      * @var array<string, mixed>
@@ -33,8 +33,6 @@ class AmqpConnectionFactory implements ConnectionFactoryInterface
     private ?AmqpConnection $connection = null;
 
     /**
-     * Construct
-     *
      * @param array<string, mixed> $connectionOptions
      */
     public function __construct(array $connectionOptions)
@@ -51,7 +49,7 @@ class AmqpConnectionFactory implements ConnectionFactoryInterface
             return $this->connection;
         }
 
-        $amqpLibConnection = new AMQPLazyConnection(
+        $amqpLibConnection = new AMQPLazySocketConnection(
             $this->connectionOptions['host'],
             $this->connectionOptions['port'],
             $this->connectionOptions['login'] ?? 'guest',
@@ -61,12 +59,11 @@ class AmqpConnectionFactory implements ConnectionFactoryInterface
             $this->connectionOptions['login_method'] ?? 'AMQPLAIN',
             $this->connectionOptions['login_response'] ?? null,
             $this->connectionOptions['locale'] ?? 'en_US',
-            $this->connectionOptions['connection_timeout'] ?? 5.0,
-            $this->connectionOptions['read_write_timeout'] ?? $this->connectionOptions['read_timeout'] ?? 0,
-            null,
+            $this->connectionOptions['read_timeout'] ?? 0,
             $this->connectionOptions['keepalive'] ?? false,
+            $this->connectionOptions['write_timeout'] ?? 0.0,
             $this->connectionOptions['heartbeat'] ?? 0,
-            $this->connectionOptions['channel_rpc_timeout'] ?? $this->connectionOptions['read_timeout'] ?? 0
+            $this->connectionOptions['channel_rpc_timeout'] ?? 0
         );
 
         $this->connection = new AmqpConnection($amqpLibConnection, $this->connectionOptions['read_timeout'] ?? 0);
