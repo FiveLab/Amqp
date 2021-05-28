@@ -85,10 +85,6 @@ class AmqpQueue implements QueueInterface
                 $amqplibChannel->wait(null, false, $this->getChannel()->getConnection()->getReadTimeout());
             }
         } catch (\Throwable $e) {
-            if ($amqplibChannel->is_consuming()) {
-                $this->cancelConsumer($tag);
-            }
-
             if ($e instanceof AMQPTimeoutException || false !== \stripos($e->getMessage(), 'consumer timeout exceed')) {
                 throw new ConsumerTimeoutExceedException('Consumer timeout exceed.', 0, $e);
             }
