@@ -2,14 +2,3 @@
     level: 8
     paths:
         - src
-
-    ignoreErrors:
-        -
-            # Symfony console commands - (int) $input->getOption('foo-bar')
-            message: '#Cannot cast array<string>\|bool\|string\|null to int.#'
-            path: src/
-
-        -
-            # Symfony console commands - (int) $input->getArgument('foo-bar')
-            message: '#Cannot cast array<string>\|string\|null to string.#'
-            path: src/

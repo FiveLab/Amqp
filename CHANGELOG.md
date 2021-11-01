@@ -1,10 +1,20 @@
 CHANGELOG
 =========
 
-v1.3.1
+v1.4.1
 ------
 
 * Add support priority for message options.
+
+v1.4.0
+------
+
+??
+
+v1.3.1
+------
+
+??
 
 v1.3.0
 ------
