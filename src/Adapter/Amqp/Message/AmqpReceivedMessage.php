@@ -79,7 +79,8 @@ class AmqpReceivedMessage implements ReceivedMessageInterface
     {
         return new Options(
             $this->envelope->getDeliveryMode() === 2,
-            $this->envelope->getExpiration() ? (int) $this->envelope->getExpiration() : 0
+            $this->envelope->getExpiration() ? (int) $this->envelope->getExpiration() : 0,
+            $this->envelope->getPriority()
         );
     }
 

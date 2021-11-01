@@ -137,6 +137,30 @@ abstract class ExchangeTestCase extends RabbitMqTestCase
     /**
      * @test
      */
+    public function shouldSuccessPublishWithoutPriority(): void
+    {
+        $message = new Message(new Payload('some foo bar'));
+
+        $retrieveMessage = $this->publishMessage($message);
+
+        self::assertArrayNotHasKey('priority', $retrieveMessage['properties']);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldSuccessPublishWithPriority(): void
+    {
+        $message = new Message(new Payload('some foo bar'), new Options(true, 0, 5));
+
+        $retrieveMessage = $this->publishMessage($message);
+
+        self::assertEquals(5, $retrieveMessage['properties']['priority']);
+    }
+
+    /**
+     * @test
+     */
     public function shouldSuccessPublishWithHeaders(): void
     {
         $message = new Message(new Payload('some foo bar'), null, new Headers([

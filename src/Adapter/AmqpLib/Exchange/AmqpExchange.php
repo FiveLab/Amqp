@@ -79,6 +79,10 @@ class AmqpExchange implements ExchangeInterface
             $options['expiration'] = $message->getOptions()->getExpiration();
         }
 
+        if (null !== $message->getOptions()->getPriority()) {
+            $options['priority'] = $message->getOptions()->getPriority();
+        }
+
         if ($message->getPayload()->getContentEncoding()) {
             $options['content_encoding'] = $message->getPayload()->getContentEncoding();
         }

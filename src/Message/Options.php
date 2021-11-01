@@ -29,15 +29,22 @@ class Options
     private int $expiration;
 
     /**
+     * @var int|null
+     */
+    private ?int $priority;
+
+    /**
      * Constructor.
      *
-     * @param bool $persistent
-     * @param int  $expiration
+     * @param bool     $persistent
+     * @param int      $expiration
+     * @param int|null $priority
      */
-    public function __construct(bool $persistent = true, int $expiration = 0)
+    public function __construct(bool $persistent = true, int $expiration = 0, int $priority = null)
     {
         $this->persistent = $persistent;
         $this->expiration = $expiration;
+        $this->priority = $priority;
     }
 
     /**
@@ -58,5 +65,15 @@ class Options
     public function getExpiration(): int
     {
         return $this->expiration;
+    }
+
+    /**
+     * Get priority
+     *
+     * @return int|null
+     */
+    public function getPriority(): ?int
+    {
+        return $this->priority;
     }
 }
