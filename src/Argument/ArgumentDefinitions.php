@@ -40,7 +40,7 @@ class ArgumentDefinitions implements \IteratorAggregate, \Countable
      *
      * @return \ArrayIterator<int, ArgumentDefinition>
      */
-    public function getIterator(): iterable
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->arguments);
     }
