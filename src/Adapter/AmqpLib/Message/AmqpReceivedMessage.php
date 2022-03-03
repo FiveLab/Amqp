@@ -154,6 +154,12 @@ class AmqpReceivedMessage implements ReceivedMessageInterface
      */
     public function getHeaders(): Headers
     {
-        return new Headers(\iterator_to_array($this->message->get_properties()['application_headers'] ?? []));
+        $headers = $this->message->get_properties()['application_headers'] ?? [];
+
+        if ($headers instanceof \Traversable) {
+            $headers = \iterator_to_array($headers);
+        }
+
+        return new Headers($headers);
     }
 }
