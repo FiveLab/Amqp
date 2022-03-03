@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+v1.4.2
+------
+
+* Some bug fixes.
+
 v1.4.1
 ------
 
