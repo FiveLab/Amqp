@@ -36,6 +36,7 @@ class AddHeaderToMessageMiddlewareTest extends TestCase
         $next = static function (MessageInterface $message, string $routingKey) use (&$executed) {
             $executed = true;
             self::assertEquals('foo.bar', $routingKey);
+
             self::assertEquals(new Message(
                 new Payload('foo'),
                 new Options(),

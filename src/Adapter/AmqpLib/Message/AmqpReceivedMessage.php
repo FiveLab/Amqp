@@ -42,7 +42,7 @@ class AmqpReceivedMessage implements ReceivedMessageInterface
     private bool $answered = false;
 
     /**
-     * Construct
+     * Constructor.
      *
      * @param AmqpQueue   $queue
      * @param AMQPMessage $message

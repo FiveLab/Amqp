@@ -96,16 +96,12 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
     }
 
     /**
-     * @tes
+     * Note: test must override this method for correct set throw error.
+     *
+     * @test
      */
     public function shouldThrowExceptionWithCreatePassiveQueueAndQueueWasNotFound(): void
     {
-        $this->expectException(\AMQPQueueException::class);
-        $this->expectExceptionMessage(\sprintf(
-            'Server channel error: 404, message: NOT_FOUND - no queue \'foo\' in vhost \'%s\'',
-            $this->getRabbitMqVhost()
-        ));
-
         $definition = new QueueDefinition(
             'foo',
             null,
@@ -123,7 +119,8 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
      */
     public function shouldSuccessCreateExclusiveQueue(): void
     {
-        $queueName = 'test_queue_exclusive_'.uniqid();
+        $queueName = 'test_queue_exclusive_'.\uniqid();
+
         $definition = new QueueDefinition(
             $queueName,
             null,

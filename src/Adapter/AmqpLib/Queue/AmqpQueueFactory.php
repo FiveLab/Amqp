@@ -41,6 +41,8 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
     private ?AmqpQueue $queue = null;
 
     /**
+     * Constructor.
+     *
      * @param ChannelFactoryInterface $channelFactory
      * @param QueueDefinition         $definition
      */
@@ -97,6 +99,8 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
     }
 
     /**
+     * Bind queue to route
+     *
      * @param string $exchangeName
      * @param string $routingKey
      */
@@ -109,6 +113,8 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
     }
 
     /**
+     * Unbind queue from route
+     *
      * @param string $exchangeName
      * @param string $routingKey
      */

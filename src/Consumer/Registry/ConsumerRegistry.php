@@ -51,4 +51,12 @@ class ConsumerRegistry implements ConsumerRegistryInterface
             $key
         ));
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function all(): array
+    {
+        return $this->consumers;
+    }
 }

@@ -9,7 +9,7 @@
  * file that was distributed with this source code
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Adapter\AmqpLib\Connection;
 
@@ -33,6 +33,8 @@ class AmqpSocketsConnectionFactory implements ConnectionFactoryInterface
     private ?AmqpConnection $connection = null;
 
     /**
+     * Constructor.
+     *
      * @param array<string, mixed> $connectionOptions
      */
     public function __construct(array $connectionOptions)

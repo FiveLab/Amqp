@@ -114,6 +114,7 @@ class MessageHandlersTest extends TestCase
         $handlers = new MessageHandlers($handler1, $handler2);
 
         $this->expectException(\RuntimeException::class);
+
         $this->expectExceptionMessage(\sprintf(
             'The message handler "%s" does not support flushable mechanism.',
             \get_class($handler2)

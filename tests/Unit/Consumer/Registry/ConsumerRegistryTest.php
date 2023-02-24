@@ -43,10 +43,28 @@ class ConsumerRegistryTest extends TestCase
     /**
      * @test
      */
+    public function shouldSuccessGetAll(): void
+    {
+        $consumer1 = $this->createUniqueConsumer();
+        $consumer2 = $this->createUniqueConsumer();
+
+        $registry = new ConsumerRegistry();
+        $registry->add('c1', $consumer1);
+        $registry->add('c2', $consumer2);
+
+        self::assertEquals([
+            'c1' => $consumer1,
+            'c2' => $consumer2,
+        ], $registry->all());
+    }
+
+    /**
+     * @test
+     */
     public function shouldThrowExceptionIfConsumerWasNotFound(): void
     {
-        self::expectException(ConsumerNotFoundException::class);
-        self::expectExceptionMessage('The consumer with key "some" was not found.');
+        $this->expectException(ConsumerNotFoundException::class);
+        $this->expectExceptionMessage('The consumer with key "some" was not found.');
 
         $consumer = $this->createUniqueConsumer();
 
@@ -60,10 +78,10 @@ class ConsumerRegistryTest extends TestCase
     /**
      * @test
      */
-    public function shouldThrowEceptionIfRegistryEmpty(): void
+    public function shouldThrowExceptionIfRegistryEmpty(): void
     {
-        self::expectException(ConsumerNotFoundException::class);
-        self::expectExceptionMessage('The consumer with key "foo" was not found.');
+        $this->expectException(ConsumerNotFoundException::class);
+        $this->expectExceptionMessage('The consumer with key "foo" was not found.');
 
         $registry = new ConsumerRegistry();
 

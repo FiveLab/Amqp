@@ -17,6 +17,7 @@ use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
 use FiveLab\Component\Amqp\Consumer\Loop\LoopConsumer;
 use FiveLab\Component\Amqp\Consumer\Middleware\StopAfterNExecutesMiddleware;
 use FiveLab\Component\Amqp\Consumer\MiddlewareAwareInterface;
+use FiveLab\Component\Amqp\Consumer\Registry\ConsumerRegistryInterface;
 use FiveLab\Component\Amqp\Consumer\Spool\SpoolConsumer;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Exception\StopAfterNExecutesException;
@@ -33,9 +34,9 @@ class RoundRobinConsumer implements ConsumerInterface
     private RoundRobinConsumerConfiguration $configuration;
 
     /**
-     * @var ConsumerInterface[] & MiddlewareAwareInterface[]
+     * @var ConsumerRegistryInterface
      */
-    private array $consumers;
+    private ConsumerRegistryInterface $consumerRegistry;
 
     /**
      * @var \Closure|null
@@ -45,22 +46,13 @@ class RoundRobinConsumer implements ConsumerInterface
     /**
      * Constructor.
      *
-     * @param RoundRobinConsumerConfiguration              $configuration
-     * @param ConsumerInterface & MiddlewareAwareInterface ...$consumers
+     * @param RoundRobinConsumerConfiguration $configuration
+     * @param ConsumerRegistryInterface       $consumerRegistry
      */
-    public function __construct(RoundRobinConsumerConfiguration $configuration, ConsumerInterface ...$consumers)
+    public function __construct(RoundRobinConsumerConfiguration $configuration, ConsumerRegistryInterface $consumerRegistry)
     {
-        foreach ($consumers as $consumer) {
-            if (!$consumer instanceof MiddlewareAwareInterface) {
-                throw new \InvalidArgumentException(\sprintf(
-                    'All consumers in round robin should implement %s.',
-                    MiddlewareAwareInterface::class
-                ));
-            }
-        }
-
         $this->configuration = $configuration;
-        $this->consumers = $consumers;
+        $this->consumerRegistry = $consumerRegistry;
     }
 
     /**
@@ -89,8 +81,20 @@ class RoundRobinConsumer implements ConsumerInterface
         $readTimeout = $this->configuration->getConsumerReadTimeout();
         $stopAfterNExecutes = $this->configuration->getExecutesMessagesPerConsumer();
 
+        /** @var (ConsumerInterface & MiddlewareAwareInterface)[] $allConsumers */
+        $allConsumers = $this->consumerRegistry->all();
+
+        foreach ($allConsumers as $consumer) {
+            if (!$consumer instanceof MiddlewareAwareInterface) {
+                throw new \InvalidArgumentException(\sprintf(
+                    'All consumers in round robin should implement %s.',
+                    MiddlewareAwareInterface::class
+                ));
+            }
+        }
+
         // Prepare consumers
-        foreach ($this->consumers as $consumer) {
+        foreach ($allConsumers as $consumer) {
             $connection = $consumer->getQueue()->getChannel()->getConnection();
             $connection->setReadTimeout($readTimeout);
 
@@ -105,7 +109,7 @@ class RoundRobinConsumer implements ConsumerInterface
         $endOfTime = $this->configuration->getTimeout() ? $time + $this->configuration->getTimeout() : 0;
 
         while (true) {
-            $consumers = $this->consumers;
+            $consumers = $allConsumers;
 
             /** @var ConsumerInterface $consumer */
             while ($consumer = \array_shift($consumers)) {
