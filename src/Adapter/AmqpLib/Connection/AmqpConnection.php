@@ -16,7 +16,6 @@ namespace FiveLab\Component\Amqp\Adapter\AmqpLib\Connection;
 use FiveLab\Component\Amqp\Connection\ConnectionInterface;
 use FiveLab\Component\Amqp\SplSubjectTrait;
 use PhpAmqpLib\Connection\AbstractConnection;
-use SplObserver;
 
 /**
  * The connection provided via php-amqplib library.
@@ -36,6 +35,8 @@ class AmqpConnection implements ConnectionInterface
     private float $readTimeout;
 
     /**
+     * Constructor.
+     *
      * @param AbstractConnection $connection
      * @param float              $readTimeout
      */

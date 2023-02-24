@@ -1,6 +1,15 @@
 <?php
 
-declare(strict_types=1);
+/*
+ * This file is part of the FiveLab Amqp package
+ *
+ * (c) FiveLab
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code
+ */
+
+declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Functional\Adapter\AmqpLibSockets\Queue;
 
@@ -27,6 +36,7 @@ class AmqpQueueFactoryTest extends QueueFactoryTestCase
             'password'     => $this->getRabbitMqPassword(),
             'read_timeout' => 2,
         ]);
+
         $channelFactory = new AmqpChannelFactory($connectionFactory, new ChannelDefinition());
 
         return new AmqpQueueFactory($channelFactory, $definition);

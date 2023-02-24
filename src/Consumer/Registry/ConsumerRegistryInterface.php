@@ -31,4 +31,11 @@ interface ConsumerRegistryInterface
      * @throws ConsumerNotFoundException
      */
     public function get(string $key): ConsumerInterface;
+
+    /**
+     * Get all consumers
+     *
+     * @return array<string, ConsumerInterface>
+     */
+    public function all(): array;
 }

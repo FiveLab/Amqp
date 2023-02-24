@@ -33,7 +33,7 @@ class AmqpConnectionFactory implements ConnectionFactoryInterface
     private ?AmqpConnection $connection = null;
 
     /**
-     * Construct
+     * Constructor.
      *
      * @param array<string, mixed> $connectionOptions
      */

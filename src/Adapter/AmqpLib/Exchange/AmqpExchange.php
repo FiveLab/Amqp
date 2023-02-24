@@ -37,6 +37,8 @@ class AmqpExchange implements ExchangeInterface
     private ExchangeDefinition $definition;
 
     /**
+     * Constructor.
+     *
      * @param AmqpChannel        $channel
      * @param ExchangeDefinition $definition
      */

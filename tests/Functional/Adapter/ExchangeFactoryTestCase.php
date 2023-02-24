@@ -174,6 +174,7 @@ abstract class ExchangeFactoryTestCase extends RabbitMqTestCase
     public function shouldThrowExceptionOnCreatePassiveIfExchangeNotFound(): void
     {
         $this->expectException(\AMQPExchangeException::class);
+
         $this->expectExceptionMessage(\sprintf(
             'Server channel error: 404, message: NOT_FOUND - no exchange \'some\' in vhost \'%s\'',
             $this->getRabbitMqVhost()

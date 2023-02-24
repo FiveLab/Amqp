@@ -47,10 +47,7 @@ class PublisherTest extends RabbitMqTestCase
         ]);
 
         $channelFactory = new AmqpChannelFactory($connectionFactory, new ChannelDefinition());
-        $exchangeFactory = new AmqpExchangeFactory($channelFactory, new ExchangeDefinition(
-            'test',
-            'direct'
-        ));
+        $exchangeFactory = new AmqpExchangeFactory($channelFactory, new ExchangeDefinition('test', 'direct'));
 
         $exchangeFactory->create();
 

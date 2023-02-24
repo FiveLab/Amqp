@@ -1,6 +1,15 @@
 <?php
 
-declare(strict_types=1);
+/*
+ * This file is part of the FiveLab Amqp package
+ *
+ * (c) FiveLab
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code
+ */
+
+declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Functional\Adapter\AmqpLib\Exchange;
 
@@ -8,7 +17,6 @@ use FiveLab\Component\Amqp\Adapter\AmqpLib\Channel\AmqpChannelFactory;
 use FiveLab\Component\Amqp\Adapter\AmqpLib\Connection\AmqpConnectionFactory;
 use FiveLab\Component\Amqp\Adapter\AmqpLib\Exchange\AmqpExchangeFactory;
 use FiveLab\Component\Amqp\Channel\Definition\ChannelDefinition;
-use FiveLab\Component\Amqp\Connection\SpoolConnectionFactory;
 use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
 use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
 use FiveLab\Component\Amqp\Tests\Functional\Adapter\ExchangeFactoryTestCase;
@@ -41,6 +49,7 @@ class AmqpExchangeFactoryTest extends ExchangeFactoryTestCase
     public function shouldThrowExceptionOnCreatePassiveIfExchangeNotFound(): void
     {
         $this->expectException(AMQPProtocolChannelException::class);
+
         $this->expectExceptionMessage(\sprintf(
             'NOT_FOUND - no exchange \'some\' in vhost \'%s\'',
             $this->getRabbitMqVhost()

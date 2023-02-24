@@ -42,6 +42,8 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
     private ?AmqpExchange $exchange = null;
 
     /**
+     * Constructor.
+     *
      * @param ChannelFactoryInterface $channelFactory
      * @param ExchangeDefinition      $definition
      */
@@ -132,6 +134,8 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
     }
 
     /**
+     * Bind to route key.
+     *
      * @param string $exchangeName
      * @param string $routingKey
      */
@@ -144,6 +148,8 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
     }
 
     /**
+     * Unbind from route key.
+     *
      * @param string $exchangeName
      * @param string $routingKey
      */

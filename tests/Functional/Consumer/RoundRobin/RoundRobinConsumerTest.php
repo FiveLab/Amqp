@@ -21,6 +21,7 @@ use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Channel\Definition\ChannelDefinition;
 use FiveLab\Component\Amqp\Consumer\ConsumerConfiguration;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
+use FiveLab\Component\Amqp\Consumer\Registry\ConsumerRegistry;
 use FiveLab\Component\Amqp\Consumer\SingleConsumer;
 use FiveLab\Component\Amqp\Consumer\RoundRobin\RoundRobinConsumer;
 use FiveLab\Component\Amqp\Consumer\RoundRobin\RoundRobinConsumerConfiguration;
@@ -52,7 +53,7 @@ class RoundRobinConsumerTest extends RabbitMqTestCase
     private AmqpQueueFactory $queueFactory2;
 
     /**
-     * {@inheritdoc}}
+     * {@inheritdoc}
      */
     protected function setUp(): void
     {
@@ -102,9 +103,13 @@ class RoundRobinConsumerTest extends RabbitMqTestCase
         $consumer1 = new SingleConsumer($this->queueFactory1, $this->handler1, new ConsumerMiddlewares(), new ConsumerConfiguration());
         $consumer2 = new SingleConsumer($this->queueFactory2, $this->handler2, new ConsumerMiddlewares(), new ConsumerConfiguration());
 
+        $consumerRegistry = new ConsumerRegistry();
+        $consumerRegistry->add('c1', $consumer1);
+        $consumerRegistry->add('c2', $consumer2);
+
         $configuration = new RoundRobinConsumerConfiguration(1, 1, 5);
 
-        $roundRobin = new RoundRobinConsumer($configuration, $consumer1, $consumer2);
+        $roundRobin = new RoundRobinConsumer($configuration, $consumerRegistry);
 
         try {
             $roundRobin->run();

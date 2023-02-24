@@ -148,7 +148,6 @@ class HandleExpiredMessageHandlerTest extends TestCase
             ->method('getIdentifier')
             ->willReturn(new Identifier('qq'));
 
-
         $this->delayPublisher->expects(self::once())
             ->method('publish')
             ->with(new Message(

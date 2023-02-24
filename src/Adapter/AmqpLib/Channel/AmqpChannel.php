@@ -40,7 +40,7 @@ class AmqpChannel implements ChannelInterface
     private int $prefetchCount = 3;
 
     /**
-     * Construct
+     * Constructor.
      *
      * @param object|AmqpConnection|SpoolConnection $connection
      * @param AmqpLibChannel                        $channel
@@ -61,7 +61,7 @@ class AmqpChannel implements ChannelInterface
     }
 
     /**
-     * closes channel
+     * Closes channel
      */
     public function __destruct()
     {
@@ -79,7 +79,7 @@ class AmqpChannel implements ChannelInterface
     }
 
     /**
-     * @return ConnectionInterface
+     * {@inheritdoc}
      */
     public function getConnection(): ConnectionInterface
     {

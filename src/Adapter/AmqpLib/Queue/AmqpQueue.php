@@ -40,7 +40,7 @@ class AmqpQueue implements QueueInterface
     private QueueDefinition $definition;
 
     /**
-     * Construct
+     * Constructor.
      *
      * @param AmqpChannel     $channel
      * @param QueueDefinition $definition
@@ -80,6 +80,7 @@ class AmqpQueue implements QueueInterface
                     $handler($receivedMessage);
                 }
             );
+
             // Loop as long as the channel has callbacks registered
             while ($amqplibChannel->is_consuming()) {
                 $amqplibChannel->wait(null, false, $this->getChannel()->getConnection()->getReadTimeout());
