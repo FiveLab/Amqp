@@ -63,16 +63,6 @@ class InitializeQueuesCommandTest extends TestCase
     /**
      * @test
      */
-    public function shouldSuccessConfigureWithCustomName(): void
-    {
-        $command = new InitializeQueuesCommand($this->registry, [], 'some');
-
-        self::assertEquals('some', $command->getName());
-    }
-
-    /**
-     * @test
-     */
     public function shouldSuccessExecuteWithoutExchanges(): void
     {
         $this->createFactory('test_1', false);

@@ -22,7 +22,15 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ListConsumersCommand extends Command
 {
-    private const DEFAULT_NAME = 'event-broker:consumer:list';
+    /**
+     * @var string
+     */
+    protected static $defaultName = 'event-broker:consumer:list';
+
+    /**
+     * @var string
+     */
+    protected static $defaultDescription = 'List of possible consumers.';
 
     /**
      * @var array<string>
@@ -33,22 +41,12 @@ class ListConsumersCommand extends Command
      * Constructor.
      *
      * @param array<string> $consumers
-     * @param string        $name
      */
-    public function __construct(array $consumers, string $name = self::DEFAULT_NAME)
+    public function __construct(array $consumers)
     {
-        parent::__construct($name);
+        parent::__construct();
 
         $this->consumers = $consumers;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure(): void
-    {
-        $this
-            ->setDescription('List of possible consumers.');
     }
 
     /**

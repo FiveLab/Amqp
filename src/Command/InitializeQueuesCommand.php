@@ -23,7 +23,15 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class InitializeQueuesCommand extends Command
 {
-    private const DEFAULT_NAME = 'event-broker:initialize:queues';
+    /**
+     * @var string
+     */
+    protected static $defaultName = 'event-broker:initialize:queues';
+
+    /**
+     * @var string
+     */
+    protected static $defaultDescription = 'Initialize queues.';
 
     /**
      * @var QueueFactoryRegistryInterface
@@ -40,23 +48,13 @@ class InitializeQueuesCommand extends Command
      *
      * @param QueueFactoryRegistryInterface $registry
      * @param array<string>                 $queues
-     * @param string                        $name
      */
-    public function __construct(QueueFactoryRegistryInterface $registry, array $queues, string $name = self::DEFAULT_NAME)
+    public function __construct(QueueFactoryRegistryInterface $registry, array $queues)
     {
-        parent::__construct($name);
+        parent::__construct();
 
         $this->registry = $registry;
         $this->queues = $queues;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure(): void
-    {
-        $this
-            ->setDescription('Initialize queues.');
     }
 
     /**

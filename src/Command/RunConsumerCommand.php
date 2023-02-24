@@ -29,7 +29,15 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class RunConsumerCommand extends Command
 {
-    private const DEFAULT_NAME = 'event-broker:consumer:run';
+    /**
+     * @var string
+     */
+    protected static $defaultName = 'event-broker:consumer:run';
+
+    /**
+     * @var string
+     */
+    protected static $defaultDescription = 'Run consumer.';
 
     /**
      * @var ConsumerRegistryInterface
@@ -40,11 +48,10 @@ class RunConsumerCommand extends Command
      * Constructor.
      *
      * @param ConsumerRegistryInterface $consumerRegistry
-     * @param string                    $name
      */
-    public function __construct(ConsumerRegistryInterface $consumerRegistry, string $name = self::DEFAULT_NAME)
+    public function __construct(ConsumerRegistryInterface $consumerRegistry)
     {
-        parent::__construct($name);
+        parent::__construct();
 
         $this->consumerRegistry = $consumerRegistry;
     }
@@ -55,7 +62,6 @@ class RunConsumerCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription('Run consumer.')
             ->addArgument('key', InputArgument::REQUIRED, 'The key of consumer.')
             ->addOption('read-timeout', null, InputOption::VALUE_REQUIRED, 'Set the read timeout for RabbitMQ.')
             ->addOption('loop', null, InputOption::VALUE_NONE, 'Loop consume (used only with read-timeout).')

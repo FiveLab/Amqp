@@ -24,7 +24,15 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class RunRoundRobinConsumerCommand extends Command
 {
-    private const DEFAULT_NAME = 'event-broker:consumer:round-robin';
+    /**
+     * @var string
+     */
+    protected static $defaultName = 'event-broker:consumer:round-robin';
+
+    /**
+     * @var string
+     */
+    protected static $defaultDescription = 'Run round robin consumer.';
 
     /**
      * @var RoundRobinConsumer
@@ -35,22 +43,12 @@ class RunRoundRobinConsumerCommand extends Command
      * Constructor.
      *
      * @param RoundRobinConsumer $consumer
-     * @param string             $name
      */
-    public function __construct(RoundRobinConsumer $consumer, string $name = self::DEFAULT_NAME)
+    public function __construct(RoundRobinConsumer $consumer)
     {
-        parent::__construct($name);
+        parent::__construct();
 
         $this->consumer = $consumer;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure(): void
-    {
-        $this
-            ->setDescription('Run round robin consumer.');
     }
 
     /**

@@ -23,7 +23,15 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class InitializeExchangesCommand extends Command
 {
-    private const DEFAULT_NAME = 'event-broker:initialize:exchanges';
+    /**
+     * @var string
+     */
+    protected static $defaultName = 'event-broker:initialize:exchanges';
+
+    /**
+     * @var string
+     */
+    protected static $defaultDescription = 'Initialize exchanges.';
 
     /**
      * @var ExchangeFactoryRegistryInterface
@@ -40,23 +48,13 @@ class InitializeExchangesCommand extends Command
      *
      * @param ExchangeFactoryRegistryInterface $registry
      * @param array<string>                    $exchanges
-     * @param string                           $name
      */
-    public function __construct(ExchangeFactoryRegistryInterface $registry, array $exchanges, string $name = self::DEFAULT_NAME)
+    public function __construct(ExchangeFactoryRegistryInterface $registry, array $exchanges)
     {
-        parent::__construct($name);
+        parent::__construct();
 
         $this->registry = $registry;
         $this->exchanges = $exchanges;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure(): void
-    {
-        $this
-            ->setDescription('Initialize exchanges.');
     }
 
     /**

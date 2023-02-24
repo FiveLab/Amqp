@@ -112,16 +112,6 @@ class RunConsumerCommandTest extends TestCase
     /**
      * @test
      */
-    public function shouldSuccessConfigureWithCustomName(): void
-    {
-        $command = new RunConsumerCommand($this->registry, 'some');
-
-        self::assertEquals('some', $command->getName());
-    }
-
-    /**
-     * @test
-     */
     public function shouldSuccessExecuteWithoutAnyParameters(): void
     {
         $consumer = $this->createMock(ConsumerInterface::class);

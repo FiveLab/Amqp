@@ -48,16 +48,6 @@ class RunRoundRobinConsumerCommandTest extends TestCase
     /**
      * @test
      */
-    public function shouldSuccessCreateWithCustomName(): void
-    {
-        $command = new RunRoundRobinConsumerCommand($this->consumer, 'some');
-
-        self::assertEquals('some', $command->getName());
-    }
-
-    /**
-     * @test
-     */
     public function shouldSuccessRun(): void
     {
         $command = new RunRoundRobinConsumerCommand($this->consumer);

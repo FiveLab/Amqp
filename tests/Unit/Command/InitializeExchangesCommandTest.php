@@ -63,16 +63,6 @@ class InitializeExchangesCommandTest extends TestCase
     /**
      * @test
      */
-    public function shouldSuccessConfigureWithCustomName(): void
-    {
-        $command = new InitializeExchangesCommand($this->registry, [], 'some');
-
-        self::assertEquals('some', $command->getName());
-    }
-
-    /**
-     * @test
-     */
     public function shouldSuccessExecuteWithoutExchanges(): void
     {
         $this->createFactory('test_1', false);
