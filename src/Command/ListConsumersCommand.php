@@ -52,6 +52,15 @@ class ListConsumersCommand extends Command
     /**
      * {@inheritdoc}
      */
+    protected function configure(): void
+    {
+        $this
+            ->setDescription(self::$defaultDescription);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('Possible consumers are:');

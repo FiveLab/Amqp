@@ -62,6 +62,7 @@ class RunConsumerCommand extends Command
     protected function configure(): void
     {
         $this
+            ->setDescription(self::$defaultDescription)
             ->addArgument('key', InputArgument::REQUIRED, 'The key of consumer.')
             ->addOption('read-timeout', null, InputOption::VALUE_REQUIRED, 'Set the read timeout for RabbitMQ.')
             ->addOption('loop', null, InputOption::VALUE_NONE, 'Loop consume (used only with read-timeout).')

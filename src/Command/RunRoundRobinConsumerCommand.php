@@ -54,6 +54,15 @@ class RunRoundRobinConsumerCommand extends Command
     /**
      * {@inheritdoc}
      */
+    protected function configure(): void
+    {
+        $this
+            ->setDescription(self::$defaultDescription);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         $this->consumer->setChangeConsumerHandler(static function (ConsumerInterface $consumer) use ($output) {
