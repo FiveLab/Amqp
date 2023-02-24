@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+v1.5.1
+------
+
+* Use lazy console commands.
+
 v1.5.0
 ------
 
