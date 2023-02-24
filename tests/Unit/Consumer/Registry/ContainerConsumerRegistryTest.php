@@ -56,10 +56,7 @@ class ContainerConsumerRegistryTest extends TestCase
                 ['consumer_2', $this->consumers[1]],
             ]);
 
-        $this->registry = new ContainerConsumerRegistry($container, [
-            'consumer_1',
-            'consumer_2',
-        ]);
+        $this->registry = new ContainerConsumerRegistry($container);
     }
 
     /**
@@ -83,19 +80,6 @@ class ContainerConsumerRegistryTest extends TestCase
         $this->expectExceptionMessage('The consumer with key "foo" was not found.');
 
         $this->registry->get('foo');
-    }
-
-    /**
-     * @test
-     */
-    public function shouldSuccessGetAll(): void
-    {
-        $consumers = $this->registry->all();
-
-        self::assertEquals([
-            'consumer_1' => $this->consumers[0],
-            'consumer_2' => $this->consumers[1],
-        ], $consumers);
     }
 
     /**

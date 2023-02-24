@@ -43,24 +43,6 @@ class ConsumerRegistryTest extends TestCase
     /**
      * @test
      */
-    public function shouldSuccessGetAll(): void
-    {
-        $consumer1 = $this->createUniqueConsumer();
-        $consumer2 = $this->createUniqueConsumer();
-
-        $registry = new ConsumerRegistry();
-        $registry->add('c1', $consumer1);
-        $registry->add('c2', $consumer2);
-
-        self::assertEquals([
-            'c1' => $consumer1,
-            'c2' => $consumer2,
-        ], $registry->all());
-    }
-
-    /**
-     * @test
-     */
     public function shouldThrowExceptionIfConsumerWasNotFound(): void
     {
         $this->expectException(ConsumerNotFoundException::class);

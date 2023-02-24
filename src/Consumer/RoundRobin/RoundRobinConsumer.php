@@ -39,6 +39,11 @@ class RoundRobinConsumer implements ConsumerInterface
     private ConsumerRegistryInterface $consumerRegistry;
 
     /**
+     * @var array<string>
+     */
+    private array $consumers;
+
+    /**
      * @var \Closure|null
      */
     private ?\Closure $changeConsumerHandler = null;
@@ -48,11 +53,13 @@ class RoundRobinConsumer implements ConsumerInterface
      *
      * @param RoundRobinConsumerConfiguration $configuration
      * @param ConsumerRegistryInterface       $consumerRegistry
+     * @param array<string>                   $consumers
      */
-    public function __construct(RoundRobinConsumerConfiguration $configuration, ConsumerRegistryInterface $consumerRegistry)
+    public function __construct(RoundRobinConsumerConfiguration $configuration, ConsumerRegistryInterface $consumerRegistry, array $consumers)
     {
         $this->configuration = $configuration;
         $this->consumerRegistry = $consumerRegistry;
+        $this->consumers = $consumers;
     }
 
     /**
@@ -82,7 +89,9 @@ class RoundRobinConsumer implements ConsumerInterface
         $stopAfterNExecutes = $this->configuration->getExecutesMessagesPerConsumer();
 
         /** @var (ConsumerInterface & MiddlewareAwareInterface)[] $allConsumers */
-        $allConsumers = $this->consumerRegistry->all();
+        $allConsumers = \array_map(function (string $consumerKey) {
+            return $this->consumerRegistry->get($consumerKey);
+        }, $this->consumers);
 
         foreach ($allConsumers as $consumer) {
             if (!$consumer instanceof MiddlewareAwareInterface) {
@@ -119,7 +128,7 @@ class RoundRobinConsumer implements ConsumerInterface
 
                 try {
                     $consumer->run();
-                } catch (StopAfterNExecutesException | ConsumerTimeoutExceedException $e) {
+                } catch (StopAfterNExecutesException|ConsumerTimeoutExceedException $e) {
                     // Normal flow. We should run next consumer.
                 }
 

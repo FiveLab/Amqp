@@ -28,20 +28,13 @@ class ContainerConsumerRegistry implements ConsumerRegistryInterface
     private ContainerInterface $container;
 
     /**
-     * @var array<string>
-     */
-    private array $ids;
-
-    /**
      * Constructor.
      *
      * @param ContainerInterface $container
-     * @param string[]           $ids
      */
-    public function __construct(ContainerInterface $container, array $ids)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->ids = $ids;
     }
 
     /**
@@ -57,19 +50,5 @@ class ContainerConsumerRegistry implements ConsumerRegistryInterface
         }
 
         return $this->container->get($key);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function all(): array
-    {
-        $consumers = [];
-
-        foreach ($this->ids as $id) {
-            $consumers[$id] = $this->get($id);
-        }
-
-        return $consumers;
     }
 }
