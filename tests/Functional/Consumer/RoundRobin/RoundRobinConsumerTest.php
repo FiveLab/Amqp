@@ -109,7 +109,7 @@ class RoundRobinConsumerTest extends RabbitMqTestCase
 
         $configuration = new RoundRobinConsumerConfiguration(1, 1, 5);
 
-        $roundRobin = new RoundRobinConsumer($configuration, $consumerRegistry);
+        $roundRobin = new RoundRobinConsumer($configuration, $consumerRegistry, ['c1', 'c2']);
 
         try {
             $roundRobin->run();
