@@ -1,8 +1,8 @@
 CHANGELOG
 =========
 
-next release (1.5.0)
---------------------
+v1.5.0
+------
 
 * Add consumer registry based on Psr Container.
 * Change constructor signature for `RoundRobinConsumer` (pass registry instead of list of consumers). 
