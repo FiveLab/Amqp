@@ -33,7 +33,7 @@ class AmqpChannelFactory implements ChannelFactoryInterface, \SplObserver
     /**
      * @var ChannelDefinition
      */
-    private ChannelDefinition $definition;
+    private ChannelDefinition $definition; // @phpstan-ignore-line
 
     /**
      * @var AmqpChannel|null

@@ -118,7 +118,7 @@ class RunConsumerCommand extends Command
      */
     private function runInLoop(ConsumerInterface $consumer): void
     {
-        while (true) {
+        while (true) { // @phpstan-ignore-line
             try {
                 $consumer->run();
             } catch (ConsumerTimeoutExceedException $e) {
