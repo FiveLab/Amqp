@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,6 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * The command for list possible consumers.
  */
+#[AsCommand(name: 'event-broker:consumer:list', description: 'List of possible consumers.')]
 class ListConsumersCommand extends Command
 {
     /**

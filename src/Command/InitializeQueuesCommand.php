@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Command;
 
 use FiveLab\Component\Amqp\Queue\Registry\QueueFactoryRegistryInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -21,6 +22,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * The command for initialize queues.
  */
+#[AsCommand(name: 'event-broker:initialize:queues', description: 'Initialize queues.')]
 class InitializeQueuesCommand extends Command
 {
     /**

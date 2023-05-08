@@ -29,7 +29,7 @@ class AmqpReceivedMessage implements ReceivedMessageInterface
     /**
      * @var AmqpQueue
      */
-    private AmqpQueue $queue;
+    private AmqpQueue $queue; // @phpstan-ignore-line
 
     /**
      * @var AMQPMessage
