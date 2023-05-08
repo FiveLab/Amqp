@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+v1.6.0
+------
+
+* Require php version: `>= 8.0`
+* Require symfony packages (dev requirements): `~5.4 | ~6.0`
+
 v1.5.1
 ------
 
