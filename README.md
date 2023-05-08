@@ -55,18 +55,18 @@ For easy development you can use the `Docker`.
   and development.
 
 ```bash
-$ docker network create --driver bridge event-broker-amqp
-$ docker run -d \
-    --network event-broker-amqp \
-    --name event-broker-amqp-rabbitmq \
+docker network create --driver bridge amqp
+docker run -d \
+    --network amqp \
+    --name amqp-rabbitmq \
     rabbitmq:management
-$ docker build -t event-broker-amqp .
-$ docker run -it --rm \
-    --name event-broker-amqp \
+docker build -t amqp .
+docker run -it --rm \
+    --name amqp \
     -v $(pwd):/code \
-    --network event-broker-amqp \
-    -e "RABBITMQ_HOST=event-broker-amqp-rabbitmq" \
-    event-broker-amqp bash
+    --network amqp \
+    -e "RABBITMQ_HOST=amqp-rabbitmq" \
+    amqp bash
 
 ```
 
@@ -75,16 +75,15 @@ $ docker run -it --rm \
 After success run and attach to container you must install vendors:
 
 ```bash
-$ composer update
+composer update
 ```
 
 Before create the PR or merge into develop, please run next commands for validate code:
 
 ```bash
-$ ./bin/phpunit
+./bin/phpunit
 
-$ ./bin/phpcs --config-set show_warnings 0
-$ ./bin/phpcs --standard=vendor/escapestudios/symfony2-coding-standard/Symfony/ src/
-$ ./bin/phpcs --standard=tests/phpcs-ruleset.xml tests/
-
+./bin/phpcs --config-set show_warnings 0
+./bin/phpcs --standard=vendor/escapestudios/symfony2-coding-standard/Symfony/ src/
+./bin/phpcs --standard=tests/phpcs-ruleset.xml tests/
 ```

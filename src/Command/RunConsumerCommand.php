@@ -18,6 +18,7 @@ use FiveLab\Component\Amqp\Consumer\Middleware\StopAfterNExecutesMiddleware;
 use FiveLab\Component\Amqp\Consumer\MiddlewareAwareInterface;
 use FiveLab\Component\Amqp\Consumer\Registry\ConsumerRegistryInterface;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,6 +28,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * The command for run consumer.
  */
+#[AsCommand(name: 'event-broker:consumer:run', description: 'Run consumer.')]
 class RunConsumerCommand extends Command
 {
     /**

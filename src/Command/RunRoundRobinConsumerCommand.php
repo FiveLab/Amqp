@@ -15,6 +15,7 @@ namespace FiveLab\Component\Amqp\Command;
 
 use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
 use FiveLab\Component\Amqp\Consumer\RoundRobin\RoundRobinConsumer;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,6 +23,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Command for run round robin consumer
  */
+#[AsCommand(name: 'event-broker:consumer:round-robin', description: 'Run round robin consumer.')]
 class RunRoundRobinConsumerCommand extends Command
 {
     /**

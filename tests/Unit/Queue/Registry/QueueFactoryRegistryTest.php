@@ -77,9 +77,6 @@ class QueueFactoryRegistryTest extends TestCase
      */
     private function createUniqueFactory(): QueueFactoryInterface
     {
-        $factory = $this->createMock(QueueFactoryInterface::class);
-        $factory->uniqueIdentifier = \uniqid('', true);
-
-        return $factory;
+        return $this->createMock(QueueFactoryInterface::class);
     }
 }

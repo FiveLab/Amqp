@@ -89,11 +89,6 @@ class ContainerConsumerRegistryTest extends TestCase
      */
     private function makeUniqueConsumer(): ConsumerInterface
     {
-        $consumer = $this->createMock(ConsumerInterface::class);
-
-        // phpcs:ignore Zend.NamingConventions.ValidVariableName.NotCamelCaps
-        $consumer->__unique = \uniqid((string) \random_int(0, PHP_INT_MAX), true);
-
-        return $consumer;
+        return $this->createMock(ConsumerInterface::class);
     }
 }
