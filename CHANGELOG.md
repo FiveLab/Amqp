@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+v1.7.0
+------
+
+* Nothing changes. This version required for increase minor version of `amqp-bundle`.
+
 v1.6.0
 ------
 
