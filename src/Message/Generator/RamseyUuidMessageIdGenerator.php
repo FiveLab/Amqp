@@ -18,7 +18,7 @@ use Ramsey\Uuid\Uuid;
 /**
  * Generate message id based on UUID.
  */
-readonly class UuidMessageIdGenerator implements MessageIdGeneratorInterface
+readonly class RamseyUuidMessageIdGenerator implements MessageIdGeneratorInterface
 {
     /**
      * {@inheritdoc}

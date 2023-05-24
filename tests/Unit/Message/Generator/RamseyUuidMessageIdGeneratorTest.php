@@ -13,16 +13,16 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Unit\Message\Generator;
 
-use FiveLab\Component\Amqp\Message\Generator\UuidMessageIdGenerator;
+use FiveLab\Component\Amqp\Message\Generator\RamseyUuidMessageIdGenerator;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-class UuidMessageIdGeneratorTest extends TestCase
+class RamseyUuidMessageIdGeneratorTest extends TestCase
 {
     #[Test]
     public function shouldSuccessGenerate(): void
     {
-        $generator = new UuidMessageIdGenerator();
+        $generator = new RamseyUuidMessageIdGenerator();
 
         self::assertNotEmpty($generator->generate());
     }
