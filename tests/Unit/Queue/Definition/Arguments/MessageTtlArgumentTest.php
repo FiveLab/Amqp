@@ -14,18 +14,17 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Unit\Queue\Definition\Arguments;
 
 use FiveLab\Component\Amqp\Queue\Definition\Arguments\MessageTtlArgument;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class MessageTtlArgumentTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreate(): void
     {
         $argument = new MessageTtlArgument(123);
 
-        self::assertEquals('x-message-ttl', $argument->getName());
-        self::assertEquals(123, $argument->getValue());
+        self::assertEquals('x-message-ttl', $argument->name);
+        self::assertEquals(123, $argument->value);
     }
 }

@@ -16,13 +16,13 @@ namespace FiveLab\Component\Amqp\Tests\Unit\Adapter\Amqp\Connection;
 use FiveLab\Component\Amqp\Adapter\Amqp\Connection\AmqpConnection;
 use FiveLab\Component\Amqp\Exception\BadCredentialsException;
 use FiveLab\Component\Amqp\Exception\ConnectionException;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class AmqpConnectionTest extends TestCase
 {
     /**
-     * @var \AMQPConnection|MockObject
+     * @var \AMQPConnection
      */
     private \AMQPConnection $realConnection;
 
@@ -44,9 +44,7 @@ class AmqpConnectionTest extends TestCase
         $this->connection = new AmqpConnection($this->realConnection);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessConnect(): void
     {
         $this->realConnection->expects(self::once())
@@ -55,9 +53,7 @@ class AmqpConnectionTest extends TestCase
         $this->connection->connect();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessThrowExceptionIfCredentialsInvalid(): void
     {
         $this->expectException(BadCredentialsException::class);
@@ -70,9 +66,7 @@ class AmqpConnectionTest extends TestCase
         $this->connection->connect();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessThrowExceptionIfCannotConnect(): void
     {
         $this->expectException(ConnectionException::class);
@@ -85,9 +79,7 @@ class AmqpConnectionTest extends TestCase
         $this->connection->connect();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGetConnection(): void
     {
         $realConnection = $this->connection->getConnection();
@@ -95,9 +87,7 @@ class AmqpConnectionTest extends TestCase
         self::assertEquals($this->realConnection, $realConnection);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCheckConnected(): void
     {
         $this->realConnection->expects(self::once())
@@ -109,9 +99,7 @@ class AmqpConnectionTest extends TestCase
         self::assertTrue($connected);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessDisconnect(): void
     {
         $this->realConnection->expects(self::once())
@@ -120,9 +108,7 @@ class AmqpConnectionTest extends TestCase
         $this->connection->disconnect();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessSetReadTimeout(): void
     {
         $this->realConnection->expects(self::once())
@@ -132,9 +118,7 @@ class AmqpConnectionTest extends TestCase
         $this->connection->setReadTimeout(1.55);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGetReadTimeout(): void
     {
         $this->realConnection->expects(self::once())

@@ -85,8 +85,8 @@ class RoundRobinConsumer implements ConsumerInterface
      */
     public function run(): void
     {
-        $readTimeout = $this->configuration->getConsumerReadTimeout();
-        $stopAfterNExecutes = $this->configuration->getExecutesMessagesPerConsumer();
+        $readTimeout = $this->configuration->timeoutBetweenConsumers;
+        $stopAfterNExecutes = $this->configuration->executesMessagesPerConsumer;
 
         /** @var (ConsumerInterface & MiddlewareAwareInterface)[] $allConsumers */
         $allConsumers = \array_map(function (string $consumerKey) {
@@ -115,7 +115,7 @@ class RoundRobinConsumer implements ConsumerInterface
         }
 
         $time = \microtime(true);
-        $endOfTime = $this->configuration->getTimeout() ? $time + $this->configuration->getTimeout() : 0;
+        $endOfTime = $this->configuration->timeout ? $time + $this->configuration->timeout : 0;
 
         while (true) {
             $consumers = $allConsumers;

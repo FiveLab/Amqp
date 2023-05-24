@@ -16,30 +16,15 @@ namespace FiveLab\Component\Amqp\Consumer\Handler;
 use FiveLab\Component\Amqp\Message\DelayMessage;
 use FiveLab\Component\Amqp\Message\Headers;
 use FiveLab\Component\Amqp\Message\Message;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Publisher\PublisherInterface;
 use FiveLab\Component\Amqp\Publisher\Registry\PublisherRegistryInterface;
 
 /**
  * The message handler for handle expired messages and retry or publish to target
  */
-class HandleExpiredMessageHandler implements ThrowableMessageHandlerInterface
+readonly class HandleExpiredMessageHandler implements ThrowableMessageHandlerInterface
 {
-    /**
-     * @var PublisherRegistryInterface
-     */
-    private PublisherRegistryInterface $publisherRegistry;
-
-    /**
-     * @var PublisherInterface
-     */
-    private PublisherInterface $delayPublisher;
-
-    /**
-     * @var string
-     */
-    private string $landfillRoutingKey;
-
     /**
      * Constructor.
      *
@@ -47,19 +32,19 @@ class HandleExpiredMessageHandler implements ThrowableMessageHandlerInterface
      * @param PublisherInterface         $delayPublisher
      * @param string                     $landfillRoutingKey
      */
-    public function __construct(PublisherRegistryInterface $publisherRegistry, PublisherInterface $delayPublisher, string $landfillRoutingKey)
-    {
-        $this->publisherRegistry = $publisherRegistry;
-        $this->delayPublisher = $delayPublisher;
-        $this->landfillRoutingKey = $landfillRoutingKey;
+    public function __construct(
+        private PublisherRegistryInterface $publisherRegistry,
+        private PublisherInterface         $delayPublisher,
+        private string                     $landfillRoutingKey
+    ) {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supports(ReceivedMessageInterface $message): bool
+    public function supports(ReceivedMessage $message): bool
     {
-        $headers = $message->getHeaders();
+        $headers = $message->headers;
 
         if (!$headers->has('x-death')) {
             // No expired message
@@ -88,10 +73,10 @@ class HandleExpiredMessageHandler implements ThrowableMessageHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(ReceivedMessageInterface $message): void
+    public function handle(ReceivedMessage $message): void
     {
-        $payload = $message->getPayload();
-        $headers = $message->getHeaders();
+        $payload = $message->payload;
+        $headers = $message->headers;
 
         $publisherKey = $headers->get(DelayMessage::HEADER_PUBLISHER_KEY);
         $routingKey = $headers->get(DelayMessage::HEADER_ROUTING_KEY);
@@ -104,7 +89,7 @@ class HandleExpiredMessageHandler implements ThrowableMessageHandlerInterface
             // Retry send message to landfill
             $listHeaders[DelayMessage::HEADER_COUNTER] = $counter;
 
-            $sendMessage = new Message($payload, null, new Headers($listHeaders), $message->getIdentifier());
+            $sendMessage = new Message($payload, null, new Headers($listHeaders), $message->identifier);
             $this->delayPublisher->publish($sendMessage, $this->landfillRoutingKey);
         } else {
             // Publish message to target
@@ -114,7 +99,7 @@ class HandleExpiredMessageHandler implements ThrowableMessageHandlerInterface
                 $listHeaders[DelayMessage::HEADER_COUNTER]
             );
 
-            $sendMessage = new Message($payload, null, new Headers($listHeaders), $message->getIdentifier());
+            $sendMessage = new Message($payload, null, new Headers($listHeaders), $message->identifier);
             $publisher = $this->publisherRegistry->get($publisherKey);
 
             $publisher->publish($sendMessage, $routingKey);
@@ -124,7 +109,7 @@ class HandleExpiredMessageHandler implements ThrowableMessageHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function catchError(ReceivedMessageInterface $message, \Throwable $error): void
+    public function catchError(ReceivedMessage $message, \Throwable $error): void
     {
         // @todo: publish message to fallback
         throw $error;

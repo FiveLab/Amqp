@@ -4,6 +4,7 @@
         <exclude name="Zend.NamingConventions.ValidVariableName.MemberVarContainsNumbers"/>
 
         <exclude name="Symfony.Commenting.ClassComment.Missing"/>
+        <exclude name="Symfony.Commenting.FunctionComment.Missing"/>
         <exclude name="Symfony.Commenting.Annotations"/>
         <exclude name="Symfony.Functions.ScopeOrder"/>
         <exclude name="Symfony.NamingConventions.ValidClassName"/>

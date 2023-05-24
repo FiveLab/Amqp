@@ -14,13 +14,12 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Unit\Consumer\Tag;
 
 use FiveLab\Component\Amqp\Consumer\Tag\EmptyConsumerTagGenerator;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class EmptyConsumerTagGeneratorTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGenerate(): void
     {
         $generator = new EmptyConsumerTagGenerator();

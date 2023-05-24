@@ -19,22 +19,12 @@ use FiveLab\Component\Amqp\Consumer\Tag\EmptyConsumerTagGenerator;
 /**
  * The default configuration for consumers.
  */
-class ConsumerConfiguration
+readonly class ConsumerConfiguration
 {
-    /**
-     * @var bool
-     */
-    private bool $requeueOnError;
-
-    /**
-     * @var int
-     */
-    private int $prefetchCount;
-
     /**
      * @var ConsumerTagGeneratorInterface
      */
-    private ConsumerTagGeneratorInterface $tagGenerator;
+    public ConsumerTagGeneratorInterface $tagGenerator;
 
     /**
      * Constructor.
@@ -43,40 +33,11 @@ class ConsumerConfiguration
      * @param int                                $prefetchCount
      * @param ConsumerTagGeneratorInterface|null $tagGenerator
      */
-    public function __construct(bool $requeueOnError = true, int $prefetchCount = 3, ConsumerTagGeneratorInterface $tagGenerator = null)
-    {
-        $this->requeueOnError = $requeueOnError;
-        $this->prefetchCount = $prefetchCount;
+    public function __construct(
+        public bool                   $requeueOnError = true,
+        public int                    $prefetchCount = 3,
+        ConsumerTagGeneratorInterface $tagGenerator = null
+    ) {
         $this->tagGenerator = $tagGenerator ?: new EmptyConsumerTagGenerator();
-    }
-
-    /**
-     * We should requeue the message after catching error?
-     *
-     * @return bool
-     */
-    public function isShouldRequeueOnError(): bool
-    {
-        return $this->requeueOnError;
-    }
-
-    /**
-     * Get prefetch count
-     *
-     * @return int
-     */
-    public function getPrefetchCount():  int
-    {
-        return $this->prefetchCount;
-    }
-
-    /**
-     * Get tag generator
-     *
-     * @return ConsumerTagGeneratorInterface
-     */
-    public function getTagGenerator(): ConsumerTagGeneratorInterface
-    {
-        return $this->tagGenerator;
     }
 }

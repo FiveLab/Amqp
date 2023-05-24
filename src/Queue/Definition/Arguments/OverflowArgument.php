@@ -18,7 +18,7 @@ use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 /**
  * Definition for "x-overflow" argument.
  */
-class OverflowArgument extends ArgumentDefinition
+readonly class OverflowArgument extends ArgumentDefinition
 {
     /**
      * Constructor.

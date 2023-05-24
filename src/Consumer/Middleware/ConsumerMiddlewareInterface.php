@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Consumer\Middleware;
 
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 
 /**
  * All middleware should implement this interface.
@@ -23,8 +23,8 @@ interface ConsumerMiddlewareInterface
     /**
      * Handle on middleware layer
      *
-     * @param ReceivedMessageInterface $message
-     * @param callable                 $next
+     * @param ReceivedMessage $message
+     * @param callable        $next
      */
-    public function handle(ReceivedMessageInterface $message, callable $next): void;
+    public function handle(ReceivedMessage $message, callable $next): void;
 }

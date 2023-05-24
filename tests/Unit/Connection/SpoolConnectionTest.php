@@ -18,14 +18,14 @@ use FiveLab\Component\Amqp\Connection\ConnectionInterface;
 use FiveLab\Component\Amqp\Connection\SpoolConnection;
 use FiveLab\Component\Amqp\Exception\BadCredentialsException;
 use FiveLab\Component\Amqp\Exception\ConnectionException;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class SpoolConnectionTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldThrowExceptionIfWeTryCreateSpoolWithoutConnections(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -34,9 +34,7 @@ class SpoolConnectionTest extends TestCase
         new SpoolConnection();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessConnectToFirst(): void
     {
         $connection1 = $this->createMock(ConnectionInterface::class);
@@ -52,9 +50,7 @@ class SpoolConnectionTest extends TestCase
         $spool->connect();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessConnectToSecondIfFirstThrowException(): void
     {
         $connection1 = $this->createMock(ConnectionInterface::class);
@@ -71,9 +67,7 @@ class SpoolConnectionTest extends TestCase
         $spool->connect();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldThrowExceptionIfCannotConnectToAnyConnections(): void
     {
         $this->expectException(ConnectionException::class);
@@ -94,9 +88,7 @@ class SpoolConnectionTest extends TestCase
         $spool->connect();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldNotConnectToSecondIfThrowBadCredentialsException(): void
     {
         $this->expectException(BadCredentialsException::class);
@@ -115,9 +107,7 @@ class SpoolConnectionTest extends TestCase
         $spool->connect();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldNotConnectToSecondIfThrowAnyExceptions(): void
     {
         $this->expectException(\RuntimeException::class);
@@ -137,9 +127,7 @@ class SpoolConnectionTest extends TestCase
         $spool->connect();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGetConnection(): void
     {
         $originConnection = $this->createMock(\AMQPConnection::class);
@@ -155,9 +143,7 @@ class SpoolConnectionTest extends TestCase
         self::assertEquals($originConnection, $spool->getConnection());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldFailGetConnectionIfWeNotConnected(): void
     {
         $this->expectException(\LogicException::class);
@@ -172,13 +158,8 @@ class SpoolConnectionTest extends TestCase
         $spool->getConnection();
     }
 
-    /**
-     * @test
-     *
-     * @param bool $connected
-     *
-     * @dataProvider provideBoolValues
-     */
+    #[TestWith([true])]
+    #[TestWith([false])]
     public function shouldSuccessCheckIsConnected(bool $connected): void
     {
         $connection = $this->makeAmqpConnection();
@@ -193,9 +174,7 @@ class SpoolConnectionTest extends TestCase
         self::assertEquals($connected, $spool->isConnected());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldNotConnectedIfWeDoNotConnectToAmqp(): void
     {
         $connection = $this->makeAmqpConnection();
@@ -209,24 +188,11 @@ class SpoolConnectionTest extends TestCase
     }
 
     /**
-     * Provide bool values (0, 1)
-     *
-     * @return array
-     */
-    public function provideBoolValues(): array
-    {
-        return [
-            [true],
-            [false],
-        ];
-    }
-
-    /**
      * Make default amqp connection
      *
-     * @return AmqpConnection|MockObject
+     * @return AmqpConnection&MockObject
      */
-    private function makeAmqpConnection(): AmqpConnection
+    private function makeAmqpConnection(): AmqpConnection&MockObject
     {
         $connection = $this->createMock(AmqpConnection::class);
 

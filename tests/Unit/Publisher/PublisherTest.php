@@ -13,24 +13,25 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Unit\Publisher;
 
+use FiveLab\Component\Amqp\Connection\Driver;
 use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
 use FiveLab\Component\Amqp\Exchange\ExchangeInterface;
 use FiveLab\Component\Amqp\Message\Message;
 use FiveLab\Component\Amqp\Message\Payload;
 use FiveLab\Component\Amqp\Publisher\Middleware\PublisherMiddlewares;
 use FiveLab\Component\Amqp\Publisher\Publisher;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class PublisherTest extends TestCase
 {
     /**
-     * @var ExchangeInterface|MockObject
+     * @var ExchangeInterface
      */
     private ExchangeInterface $exchange;
 
     /**
-     * @var ExchangeFactoryInterface|MockObject
+     * @var ExchangeFactoryInterface
      */
     private ExchangeFactoryInterface $exchangeFactory;
 
@@ -60,9 +61,7 @@ class PublisherTest extends TestCase
         $this->publisher = new Publisher($this->exchangeFactory, $this->middlewares);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessPublish(): void
     {
         $message = new Message(new Payload('some'));
@@ -72,5 +71,17 @@ class PublisherTest extends TestCase
             ->with($message, 'foo.bar');
 
         $this->publisher->publish($message, 'foo.bar');
+    }
+
+    #[Test]
+    public function shouldSuccessPublishWithBackendEnum(): void
+    {
+        $message = new Message(new Payload('some'));
+
+        $this->exchange->expects(self::once())
+            ->method('publish')
+            ->with($message, 'amqp-lib');
+
+        $this->publisher->publish($message, Driver::AmqpLib);
     }
 }

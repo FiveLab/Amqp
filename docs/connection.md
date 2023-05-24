@@ -15,28 +15,33 @@ If we can't connect, we try to connect to third node.
 <?php
 
 use FiveLab\Component\Amqp\Adapter\Amqp\Connection\AmqpConnectionFactory;
-use FiveLab\Component\Amqp\Connection\SpoolConnectionFactory;
+use FiveLab\Component\Amqp\Connection\Dsn;use FiveLab\Component\Amqp\Connection\SpoolConnectionFactory;
 
-$primaryConnectionFactory = new AmqpConnectionFactory([
-    'host'            => 'host-1',
-    'port'            => 5672,
-    'vhost'           => '/',
-    'login'           => 'guest',
-    'password'        => 'guest',
-    'connect_timeout' => 2,
-]);
+$dsn1 = Dsn::fromDsn('amqp://host-1:5672/?connect_timeout=2');
+$dsn2 = Dsn::fromDsn('amqp://host-2:5672/?connect_timeout=2');
 
-$reserveConnectionFactory = new AmqpConnectionFactory([
-    'host'            => 'host-2',
-    'port'            => 5672,
-    'vhost'           => '/',
-    'login'           => 'guest',
-    'password'        => 'guest',
-    'connect_timeout' => 2,
-]);
+$primaryConnectionFactory = new AmqpConnectionFactory($dsn1);
+$reserveConnectionFactory = new AmqpConnectionFactory($dsn2);
 
 $connectionFactory = new SpoolConnectionFactory($primaryConnectionFactory, $reserveConnectionFactory);
 
 $connection = $connectionFactory->create();
 
 ```
+
+Also use you can use `SpoolConnectionFactory::fromDsn` and pass all parameters by string:
+
+```php
+<?php
+
+use FiveLab\Component\Amqp\Connection\SpoolConnectionFactory;
+
+$dsn = 'amqp://username:password@host1,host2,host3:5672/%2f?connect_timeout=2&read_timeout=60';
+$connection = SpoolConnectionFactory::fromDsn($dsn);
+```
+
+Possible schemes are:
+
+* `amqp` - use PECL AMQP extension
+* `amqp-lib` - use PHP AMQP library
+* `amqp-sockets` - use sockets based on PHP AMQP library

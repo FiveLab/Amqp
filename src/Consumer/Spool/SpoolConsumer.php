@@ -16,13 +16,13 @@ namespace FiveLab\Component\Amqp\Consumer\Spool;
 use FiveLab\Component\Amqp\Channel\ChannelInterface;
 use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
 use FiveLab\Component\Amqp\Consumer\Handler\FlushableMessageHandlerInterface;
-use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareInterface;
+use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
 use FiveLab\Component\Amqp\Consumer\MiddlewareAwareInterface;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Exception\StopAfterNExecutesException;
 use FiveLab\Component\Amqp\Message\MutableReceivedMessages;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
 
@@ -105,7 +105,7 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
      */
     public function run(): void
     {
-        $executable = $this->middlewares->createExecutable(function (ReceivedMessageInterface $message) {
+        $executable = $this->middlewares->createExecutable(function (ReceivedMessage $message) {
             $this->messageHandler->handle($message);
         });
 
@@ -115,12 +115,12 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
             $this->configureBeforeConsume($channel);
 
             $receivedMessages = new MutableReceivedMessages();
-            $endTime = \microtime(true) + $this->configuration->getTimeout();
+            $endTime = \microtime(true) + $this->configuration->timeout;
 
             try {
                 $countOfProcessedMessages = 0;
 
-                $this->queueFactory->create()->consume(function (ReceivedMessageInterface $message) use ($executable, $receivedMessages, &$endTime, &$countOfProcessedMessages) {
+                $this->queueFactory->create()->consume(function (ReceivedMessage $message) use ($executable, $receivedMessages, &$endTime, &$countOfProcessedMessages) {
                     try {
                         $executable($message);
                     } catch (ConsumerTimeoutExceedException $error) {
@@ -138,10 +138,10 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
                         throw $error;
                     } catch (\Throwable $e) {
                         // We catch error on processing messages. We should nack for all received messages.
-                        $message->nack($this->configuration->isShouldRequeueOnError());
+                        $message->nack($this->configuration->requeueOnError);
 
                         foreach ($receivedMessages as $receivedMessage) {
-                            $receivedMessage->nack($this->configuration->isShouldRequeueOnError());
+                            $receivedMessage->nack($this->configuration->requeueOnError);
                         }
 
                         $receivedMessages->clear();
@@ -159,7 +159,7 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
                     $receivedMessages->push($message);
                     $countOfProcessedMessages++;
 
-                    if ($countOfProcessedMessages >= $this->configuration->getPrefetchCount()) {
+                    if ($countOfProcessedMessages >= $this->configuration->prefetchCount) {
                         // Flush by count messages
                         $this->flushMessages($receivedMessages);
                         $countOfProcessedMessages = 0;
@@ -169,9 +169,9 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
                         // We must flush by timeout. In some cases we can use many messages in bucket, and wait to max
                         // process many time.
                         $this->flushMessages($receivedMessages);
-                        $endTime = \microtime(true) + $this->configuration->getTimeout();
+                        $endTime = \microtime(true) + $this->configuration->timeout;
                     }
-                }, $this->configuration->getTagGenerator()->generate());
+                }, $this->configuration->tagGenerator->generate());
             } catch (ConsumerTimeoutExceedException $e) {
                 $this->flushMessages($receivedMessages);
 
@@ -219,7 +219,7 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
         } catch (\Throwable $e) {
             foreach ($messages as $message) {
                 if (!$message->isAnswered()) {
-                    $message->nack($this->configuration->isShouldRequeueOnError());
+                    $message->nack($this->configuration->requeueOnError);
                 }
             }
 
@@ -246,7 +246,7 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
         $connection = $channel->getConnection();
 
         $connectionOriginalReadTimeout = $connection->getReadTimeout();
-        $spoolReadTimeout = $this->configuration->getReadTimeout();
+        $spoolReadTimeout = $this->configuration->readTimeout;
 
         if ($spoolReadTimeout && (0 === (int) $connectionOriginalReadTimeout || $connectionOriginalReadTimeout > $spoolReadTimeout)) {
             // Change the read timeout.
@@ -254,7 +254,7 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
         }
 
         $originalPrefetchCount = $channel->getPrefetchCount();
-        $expectedPrefetchCount = $this->configuration->getPrefetchCount();
+        $expectedPrefetchCount = $this->configuration->prefetchCount;
 
         if ($originalPrefetchCount < $expectedPrefetchCount) {
             $channel->setPrefetchCount($expectedPrefetchCount);

@@ -16,21 +16,21 @@ namespace FiveLab\Component\Amqp\Message;
 /**
  * The collection for store all received messages.
  *
- * @implements \IteratorAggregate<ReceivedMessageInterface>
+ * @implements \IteratorAggregate<ReceivedMessage>
  */
 class ReceivedMessages implements \IteratorAggregate, \Countable
 {
     /**
-     * @var ReceivedMessageInterface[]
+     * @var ReceivedMessage[]
      */
     protected array $messages = [];
 
     /**
      * Constructor.
      *
-     * @param ReceivedMessageInterface ...$messages
+     * @param ReceivedMessage ...$messages
      */
-    public function __construct(ReceivedMessageInterface ...$messages)
+    public function __construct(ReceivedMessage ...$messages)
     {
         $this->messages = $messages;
     }
@@ -38,7 +38,7 @@ class ReceivedMessages implements \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      *
-     * @return \ArrayIterator<int, ReceivedMessageInterface>
+     * @return \ArrayIterator<int, ReceivedMessage>
      */
     public function getIterator(): \ArrayIterator
     {

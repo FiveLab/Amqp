@@ -15,13 +15,13 @@ namespace FiveLab\Component\Amqp\Tests\Unit\Transactional;
 
 use FiveLab\Component\Amqp\Publisher\SavepointPublisherInterface;
 use FiveLab\Component\Amqp\Transactional\FlushSavepointPublisherTransactional;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class FlushSavepointPublisherTransactionalTest extends TestCase
 {
     /**
-     * @var SavepointPublisherInterface|MockObject
+     * @var SavepointPublisherInterface
      */
     private SavepointPublisherInterface $publisher;
 
@@ -39,9 +39,7 @@ class FlushSavepointPublisherTransactionalTest extends TestCase
         $this->transactional = new FlushSavepointPublisherTransactional($this->publisher);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessBegin(): void
     {
         $this->publisher->expects(self::once())
@@ -51,9 +49,7 @@ class FlushSavepointPublisherTransactionalTest extends TestCase
         $this->transactional->begin();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCommit(): void
     {
         $this->publisher->expects(self::once())
@@ -63,9 +59,7 @@ class FlushSavepointPublisherTransactionalTest extends TestCase
         $this->transactional->commit();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessRollback(): void
     {
         $this->publisher->expects(self::once())
@@ -76,9 +70,7 @@ class FlushSavepointPublisherTransactionalTest extends TestCase
         $this->transactional->rollback();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessExecute(): void
     {
         $this->publisher->expects(self::once())
@@ -95,9 +87,7 @@ class FlushSavepointPublisherTransactionalTest extends TestCase
         self::assertEquals('some foo', $result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessExecuteWithException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -116,17 +106,23 @@ class FlushSavepointPublisherTransactionalTest extends TestCase
         });
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessExecuteWithControlNestingLevel(): void
     {
-        $this->publisher->expects(self::exactly(2))
+        $startMatcher = self::exactly(2);
+
+        $this->publisher->expects($startMatcher)
             ->method('start')
-            ->withConsecutive(
-                ['savepoint_0'],
-                ['savepoint_1']
-            );
+            ->with(self::callback(static function (string $point) use ($startMatcher) {
+                $expected = match ($startMatcher->numberOfInvocations()) {
+                    1 => 'savepoint_0',
+                    2 => 'savepoint_1'
+                };
+
+                self::assertEquals($expected, $point);
+
+                return true;
+            }));
 
         $this->publisher->expects(self::once())
             ->method('rollback')

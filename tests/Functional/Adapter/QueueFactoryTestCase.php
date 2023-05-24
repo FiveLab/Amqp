@@ -14,16 +14,17 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Functional\Adapter;
 
 use FiveLab\Component\Amqp\Argument\ArgumentDefinitions;
-use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Message\Payload;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Queue\Definition\Arguments\QueueMasterLocatorArgument;
 use FiveLab\Component\Amqp\Queue\Definition\Arguments\QueueModeArgument;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Tests\Functional\RabbitMqTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 abstract class QueueFactoryTestCase extends RabbitMqTestCase
 {
@@ -36,9 +37,7 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
      */
     abstract protected function createQueueFactory(QueueDefinition $definition): QueueFactoryInterface;
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateWithDefaults(): void
     {
         $definition = new QueueDefinition('some');
@@ -52,9 +51,7 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
         self::assertFalse($queueInfo['exclusive']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateWithoutDurable(): void
     {
         $definition = new QueueDefinition(
@@ -72,9 +69,7 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
         self::assertFalse($queueInfo['durable']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateWithPassiveFlag(): void
     {
         $this->management->createQueue('foo');
@@ -97,9 +92,8 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
 
     /**
      * Note: test must override this method for correct set throw error.
-     *
-     * @test
      */
+    #[Test]
     public function shouldThrowExceptionWithCreatePassiveQueueAndQueueWasNotFound(): void
     {
         $definition = new QueueDefinition(
@@ -114,9 +108,7 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
         $factory->create();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateExclusiveQueue(): void
     {
         $queueName = 'test_queue_exclusive_'.\uniqid();
@@ -138,9 +130,7 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
         self::assertTrue($queueInfo['exclusive']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateAutoDeleteQueue(): void
     {
         $definition = new QueueDefinition(
@@ -161,9 +151,7 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
         self::assertTrue($queueInfo['auto_delete']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateWithBindings(): void
     {
         $this->management->createExchange(AMQP_EX_TYPE_DIRECT, 'test.direct1');
@@ -188,9 +176,7 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
         self::assertQueueBindingExists($bindings, 'test.direct2', 'key2');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateWithoutBindings(): void
     {
         $this->management->createExchange(AMQP_EX_TYPE_DIRECT, 'test.direct1');
@@ -220,9 +206,7 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
         self::assertCount(1, $bindings);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateWithArguments(): void
     {
         $definition = new QueueDefinition(
@@ -251,9 +235,7 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
         ], $arguments);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessConsumeMessage(): void
     {
         $this->management->createExchange(AMQP_EX_TYPE_DIRECT, 'test.direct');
@@ -275,24 +257,22 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
         $consumed = false;
 
         try {
-            $queue->consume(static function (ReceivedMessageInterface $receivedMessage) use (&$consumed) {
+            $queue->consume(static function (ReceivedMessage $receivedMessage) use (&$consumed) {
                 $consumed = true;
 
-                self::assertEquals(new Payload('some foo bar'), $receivedMessage->getPayload());
-                self::assertFalse($receivedMessage->getOptions()->isPersistent());
-                self::assertNotNull($receivedMessage->getDeliveryTag());
-                self::assertEquals('test', $receivedMessage->getRoutingKey());
+                self::assertEquals(new Payload('some foo bar'), $receivedMessage->payload);
+                self::assertFalse($receivedMessage->options->persistent);
+                self::assertNotNull($receivedMessage->deliveryTag);
+                self::assertEquals('test', $receivedMessage->routingKey);
             });
-        } catch (ConsumerTimeoutExceedException $e) {
+        } catch (ConsumerTimeoutExceedException) {
             // Timeout. Normal flow.
         }
 
         self::assertTrue($consumed, 'The queue not receive message.');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGetCountMessages(): void
     {
         $this->management->createExchange(AMQP_EX_TYPE_DIRECT, 'test.direct');

@@ -16,28 +16,12 @@ namespace FiveLab\Component\Amqp\Publisher\Middleware;
 use FiveLab\Component\Amqp\Message\Generator\MessageIdGeneratorInterface;
 use FiveLab\Component\Amqp\Message\Identifier;
 use FiveLab\Component\Amqp\Message\Message;
-use FiveLab\Component\Amqp\Message\MessageInterface;
 
 /**
  * The middleware for add identifier to message.
  */
-class AddIdentifierToMessageMiddleware implements PublisherMiddlewareInterface
+readonly class AddIdentifierToMessageMiddleware implements PublisherMiddlewareInterface
 {
-    /**
-     * @var MessageIdGeneratorInterface|null
-     */
-    private ?MessageIdGeneratorInterface $messageIdGenerator;
-
-    /**
-     * @var string|null
-     */
-    private ?string $appId;
-
-    /**
-     * @var string|null
-     */
-    private ?string $userId;
-
     /**
      * Constructor.
      *
@@ -45,23 +29,23 @@ class AddIdentifierToMessageMiddleware implements PublisherMiddlewareInterface
      * @param string|null                      $appId
      * @param string|null                      $userId
      */
-    public function __construct(MessageIdGeneratorInterface $messageIdGenerator = null, string $appId = null, string $userId = null)
-    {
-        $this->messageIdGenerator = $messageIdGenerator;
-        $this->appId = $appId;
-        $this->userId = $userId;
+    public function __construct(
+        private ?MessageIdGeneratorInterface $messageIdGenerator = null,
+        private ?string                      $appId = null,
+        private ?string                      $userId = null
+    ) {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function handle(MessageInterface $message, callable $next, string $routingKey = ''): void
+    public function handle(Message $message, callable $next, string $routingKey = ''): void
     {
-        $identifier = $message->getIdentifier();
+        $identifier = $message->identifier;
 
-        $messageId = $identifier->getId();
-        $appId = $identifier->getAppId();
-        $userId = $identifier->getUserId();
+        $messageId = $identifier->id;
+        $appId = $identifier->appId;
+        $userId = $identifier->userId;
 
         if (!$messageId && $this->messageIdGenerator) {
             $messageId = $this->messageIdGenerator->generate();
@@ -76,9 +60,9 @@ class AddIdentifierToMessageMiddleware implements PublisherMiddlewareInterface
         }
 
         $messageWithIdentifier = new Message(
-            $message->getPayload(),
-            $message->getOptions(),
-            $message->getHeaders(),
+            $message->payload,
+            $message->options,
+            $message->headers,
             new Identifier($messageId, $appId, $userId)
         );
 

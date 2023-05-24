@@ -15,7 +15,7 @@ namespace FiveLab\Component\Amqp\Tests\Unit\Command;
 
 use FiveLab\Component\Amqp\Command\RunRoundRobinConsumerCommand;
 use FiveLab\Component\Amqp\Consumer\RoundRobin\RoundRobinConsumer;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -23,9 +23,9 @@ use Symfony\Component\Console\Output\BufferedOutput;
 class RunRoundRobinConsumerCommandTest extends TestCase
 {
     /**
-     * @var RoundRobinConsumer|MockObject
+     * @var RoundRobinConsumer
      */
-    private $consumer;
+    private RoundRobinConsumer $consumer;
 
     /**
      * {@inheritdoc}
@@ -35,9 +35,7 @@ class RunRoundRobinConsumerCommandTest extends TestCase
         $this->consumer = $this->createMock(RoundRobinConsumer::class);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateWithDefaultName(): void
     {
         $command = new RunRoundRobinConsumerCommand($this->consumer);
@@ -45,9 +43,7 @@ class RunRoundRobinConsumerCommandTest extends TestCase
         self::assertEquals('event-broker:consumer:round-robin', $command->getName());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessRun(): void
     {
         $command = new RunRoundRobinConsumerCommand($this->consumer);

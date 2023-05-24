@@ -17,24 +17,25 @@ use FiveLab\Component\Amqp\Consumer\Middleware\ProxyMessageToAnotherExchangeMidd
 use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
 use FiveLab\Component\Amqp\Exchange\ExchangeInterface;
 use FiveLab\Component\Amqp\Exchange\Registry\ExchangeFactoryRegistryInterface;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
-use PHPUnit\Framework\MockObject\MockObject;
+use FiveLab\Component\Amqp\Message\Payload;
+use FiveLab\Component\Amqp\Tests\Unit\Message\ReceivedMessageStub;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class ProxyMessageToAnotherExchangeMiddlewareTest extends TestCase
 {
     /**
-     * @var ExchangeFactoryRegistryInterface|MockObject
+     * @var ExchangeFactoryRegistryInterface
      */
     private ExchangeFactoryRegistryInterface $exchangeFactoryRegistry;
 
     /**
-     * @var ExchangeFactoryInterface|MockObject
+     * @var ExchangeFactoryInterface
      */
     private ExchangeFactoryInterface $exchangeFactory;
 
     /**
-     * @var ExchangeInterface|MockObject
+     * @var ExchangeInterface
      */
     private ExchangeInterface $exchange;
 
@@ -64,20 +65,10 @@ class ProxyMessageToAnotherExchangeMiddlewareTest extends TestCase
         $this->middleware = new ProxyMessageToAnotherExchangeMiddleware($this->exchangeFactoryRegistry, 'to-another');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessProxy(): void
     {
-        $message = $this->createMock(ReceivedMessageInterface::class);
-
-        $message->expects(self::any())
-            ->method('getExchangeName')
-            ->willReturn('some');
-
-        $message->expects(self::any())
-            ->method('getRoutingKey')
-            ->willReturn('some');
+        $message = new ReceivedMessageStub(new Payload('data'), 0, 'some', 'some');
 
         $this->exchange->expects(self::once())
             ->method('publish')
@@ -92,22 +83,13 @@ class ProxyMessageToAnotherExchangeMiddlewareTest extends TestCase
         self::assertTrue($called, 'The next callable don\'t executed.');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldThrowExceptionIfWeTryToProxyToSameExchange(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Loop detection. You try to proxy message from "to-another" exchange to "to-another" exchange by same routing key.');
 
-        $message = $this->createMock(ReceivedMessageInterface::class);
-
-        $message->expects(self::any())
-            ->method('getExchangeName')
-            ->willReturn('to-another');
-
-        $message->expects(self::never())
-            ->method('getRoutingKey');
+        $message = new ReceivedMessageStub(new Payload('data'), 0, 'foo', 'to-another');
 
         $this->exchange->expects(self::never())
             ->method('publish');

@@ -17,35 +17,25 @@ use FiveLab\Component\Amqp\Adapter\AmqpLib\Channel\AmqpChannel;
 use FiveLab\Component\Amqp\Channel\ChannelInterface;
 use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
 use FiveLab\Component\Amqp\Exchange\ExchangeInterface;
-use FiveLab\Component\Amqp\Message\MessageInterface;
+use FiveLab\Component\Amqp\Message\Message;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 
 /**
  * The exchanged provided via php-amqplib library.
  */
-class AmqpExchange implements ExchangeInterface
+readonly class AmqpExchange implements ExchangeInterface
 {
-    /**
-     * @var AmqpChannel
-     */
-    private AmqpChannel $channel;
-
-    /**
-     * @var ExchangeDefinition
-     */
-    private ExchangeDefinition $definition;
-
     /**
      * Constructor.
      *
      * @param AmqpChannel        $channel
      * @param ExchangeDefinition $definition
      */
-    public function __construct(AmqpChannel $channel, ExchangeDefinition $definition)
-    {
-        $this->channel = $channel;
-        $this->definition = $definition;
+    public function __construct(
+        private AmqpChannel        $channel,
+        private ExchangeDefinition $definition
+    ) {
     }
 
     /**
@@ -61,51 +51,51 @@ class AmqpExchange implements ExchangeInterface
      */
     public function getName(): string
     {
-        return $this->definition->getName();
+        return $this->definition->name;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function publish(MessageInterface $message, string $routingKey = ''): void
+    public function publish(Message $message, string $routingKey = ''): void
     {
-        $headers = $message->getHeaders()->all();
-        $identifier = $message->getIdentifier();
+        $headers = $message->headers->all();
+        $identifier = $message->identifier;
 
         $options = [
-            'content_type'  => $message->getPayload()->getContentType(),
-            'delivery_mode' => $message->getOptions()->isPersistent() ? 2 : 1,
+            'content_type'  => $message->payload->contentType,
+            'delivery_mode' => $message->options->persistent ? 2 : 1,
         ];
 
-        if ($message->getOptions()->getExpiration()) {
-            $options['expiration'] = $message->getOptions()->getExpiration();
+        if ($message->options->expiration) {
+            $options['expiration'] = $message->options->expiration;
         }
 
-        if (null !== $message->getOptions()->getPriority()) {
-            $options['priority'] = $message->getOptions()->getPriority();
+        if (null !== $message->options->priority) {
+            $options['priority'] = $message->options->priority;
         }
 
-        if ($message->getPayload()->getContentEncoding()) {
-            $options['content_encoding'] = $message->getPayload()->getContentEncoding();
+        if ($message->payload->contentEncoding) {
+            $options['content_encoding'] = $message->payload->contentEncoding;
         }
 
-        if ($identifier->getId()) {
-            $options['message_id'] = $identifier->getId();
+        if ($identifier->id) {
+            $options['message_id'] = $identifier->id;
         }
 
-        if ($identifier->getUserId()) {
-            $options['user_id'] = $identifier->getUserId();
+        if ($identifier->userId) {
+            $options['user_id'] = $identifier->userId;
         }
 
-        if ($identifier->getAppId()) {
-            $options['app_id'] = $identifier->getAppId();
+        if ($identifier->appId) {
+            $options['app_id'] = $identifier->appId;
         }
 
         if (\count($headers)) {
             $options['application_headers'] = new AMQPTable($headers);
         }
 
-        $amqplibMessage = new AMQPMessage($message->getPayload()->getData(), $options);
+        $amqplibMessage = new AMQPMessage($message->payload->data, $options);
         $this->channel->getChannel()->basic_publish($amqplibMessage, $this->getName(), $routingKey);
     }
 }

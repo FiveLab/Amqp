@@ -18,7 +18,7 @@ use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 /**
  * Definition for "x-max-priority" argument.
  */
-class MaxPriorityArgument extends ArgumentDefinition
+readonly class MaxPriorityArgument extends ArgumentDefinition
 {
     /**
      * Constructor.

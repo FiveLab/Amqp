@@ -14,18 +14,17 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Unit\Queue\Definition\Arguments;
 
 use FiveLab\Component\Amqp\Queue\Definition\Arguments\MaxPriorityArgument;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class MaxPriorityArgumentTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreate(): void
     {
         $argument = new MaxPriorityArgument(10);
 
-        self::assertEquals('x-max-priority', $argument->getName());
-        self::assertEquals(10, $argument->getValue());
+        self::assertEquals('x-max-priority', $argument->name);
+        self::assertEquals(10, $argument->value);
     }
 }

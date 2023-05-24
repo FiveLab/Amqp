@@ -16,13 +16,12 @@ namespace FiveLab\Component\Amqp\Tests\Unit\Consumer\Registry;
 use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
 use FiveLab\Component\Amqp\Consumer\Registry\ConsumerRegistry;
 use FiveLab\Component\Amqp\Exception\ConsumerNotFoundException;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class ConsumerRegistryTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGet(): void
     {
         $consumer1 = $this->createUniqueConsumer();
@@ -40,9 +39,7 @@ class ConsumerRegistryTest extends TestCase
         self::assertEquals($consumer2, $result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldThrowExceptionIfConsumerWasNotFound(): void
     {
         $this->expectException(ConsumerNotFoundException::class);
@@ -57,9 +54,7 @@ class ConsumerRegistryTest extends TestCase
         $registry->get('some');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldThrowExceptionIfRegistryEmpty(): void
     {
         $this->expectException(ConsumerNotFoundException::class);

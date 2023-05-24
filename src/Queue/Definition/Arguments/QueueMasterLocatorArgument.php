@@ -18,7 +18,7 @@ use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 /**
  * Definition for "x-queue-master-locator" argument.
  */
-class QueueMasterLocatorArgument extends ArgumentDefinition
+readonly class QueueMasterLocatorArgument extends ArgumentDefinition
 {
     /**
      * Constructor.

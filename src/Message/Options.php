@@ -16,23 +16,8 @@ namespace FiveLab\Component\Amqp\Message;
 /**
  * The value object for store options of message.
  */
-class Options
+readonly class Options
 {
-    /**
-     * @var bool
-     */
-    private bool $persistent;
-
-    /**
-     * @var int
-     */
-    private int $expiration;
-
-    /**
-     * @var int|null
-     */
-    private ?int $priority;
-
     /**
      * Constructor.
      *
@@ -40,40 +25,10 @@ class Options
      * @param int      $expiration
      * @param int|null $priority
      */
-    public function __construct(bool $persistent = true, int $expiration = 0, int $priority = null)
-    {
-        $this->persistent = $persistent;
-        $this->expiration = $expiration;
-        $this->priority = $priority;
-    }
-
-    /**
-     * Is durable?
-     *
-     * @return bool
-     */
-    public function isPersistent(): bool
-    {
-        return $this->persistent;
-    }
-
-    /**
-     * Get expiration
-     *
-     * @return int
-     */
-    public function getExpiration(): int
-    {
-        return $this->expiration;
-    }
-
-    /**
-     * Get priority
-     *
-     * @return int|null
-     */
-    public function getPriority(): ?int
-    {
-        return $this->priority;
+    public function __construct(
+        public bool $persistent = true,
+        public int  $expiration = 0,
+        public ?int $priority = null
+    ) {
     }
 }

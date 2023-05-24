@@ -15,18 +15,18 @@ namespace FiveLab\Component\Amqp\Tests\Unit\Adapter\Amqp\Channel;
 
 use FiveLab\Component\Amqp\Adapter\Amqp\Channel\AmqpChannel;
 use FiveLab\Component\Amqp\Adapter\Amqp\Connection\AmqpConnection;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class AmqpChannelTest extends TestCase
 {
     /**
-     * @var AmqpConnection|MockObject
+     * @var AmqpConnection
      */
     private AmqpConnection $connection;
 
     /**
-     * @var \AMQPChannel|MockObject
+     * @var \AMQPChannel
      */
     private \AMQPChannel $amqpChannel;
 
@@ -45,9 +45,7 @@ class AmqpChannelTest extends TestCase
         $this->channel = new AmqpChannel($this->connection, $this->amqpChannel);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGetConnection(): void
     {
         $connection = $this->channel->getConnection();
@@ -55,9 +53,7 @@ class AmqpChannelTest extends TestCase
         self::assertEquals($this->connection, $connection);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGetPrefetchCount(): void
     {
         $this->amqpChannel->expects(self::once())
@@ -69,9 +65,7 @@ class AmqpChannelTest extends TestCase
         self::assertEquals(123, $prefetchCount);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessSetPrefetchCount(): void
     {
         $this->amqpChannel->expects(self::once())
@@ -81,9 +75,7 @@ class AmqpChannelTest extends TestCase
         $this->channel->setPrefetchCount(321);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessStartTransaction(): void
     {
         $this->amqpChannel->expects(self::once())
@@ -92,9 +84,7 @@ class AmqpChannelTest extends TestCase
         $this->channel->startTransaction();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCommitTransaction(): void
     {
         $this->amqpChannel->expects(self::once())
@@ -103,9 +93,7 @@ class AmqpChannelTest extends TestCase
         $this->channel->commitTransaction();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessRollbackTransaction(): void
     {
         $this->amqpChannel->expects(self::once())

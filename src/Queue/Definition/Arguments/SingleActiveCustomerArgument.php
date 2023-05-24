@@ -18,7 +18,7 @@ use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 /**
  * Definition for "x-single-active-consumer" argument.
  */
-class SingleActiveCustomerArgument extends ArgumentDefinition
+readonly class SingleActiveCustomerArgument extends ArgumentDefinition
 {
     /**
      * Constructor.

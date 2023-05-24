@@ -19,21 +19,14 @@ use FiveLab\Component\Amqp\Consumer\Tag\ConsumerTagGeneratorInterface;
 /**
  * The configuration for spool consumer.
  */
-class SpoolConsumerConfiguration extends ConsumerConfiguration
+readonly class SpoolConsumerConfiguration extends ConsumerConfiguration
 {
-    /**
-     * The timeout for flush messages
-     *
-     * @var float
-     */
-    private float $timeout;
-
     /**
      * The timeout for receive next messages
      *
      * @var float
      */
-    private float $readTimeout;
+    public float $readTimeout;
 
     /**
      * Constructor.
@@ -44,8 +37,13 @@ class SpoolConsumerConfiguration extends ConsumerConfiguration
      * @param bool                               $requeueOnError
      * @param ConsumerTagGeneratorInterface|null $tagGenerator
      */
-    public function __construct(int $countMessages, float $timeout, float $readTimeout = 0.0, bool $requeueOnError = true, ConsumerTagGeneratorInterface $tagGenerator = null)
-    {
+    public function __construct(
+        int                           $countMessages,
+        public float                  $timeout,
+        float                         $readTimeout = 0.0,
+        bool                          $requeueOnError = true,
+        ConsumerTagGeneratorInterface $tagGenerator = null
+    ) {
         parent::__construct($requeueOnError, $countMessages, $tagGenerator);
 
         if ($timeout <= 0) {
@@ -59,27 +57,6 @@ class SpoolConsumerConfiguration extends ConsumerConfiguration
             $readTimeout = $timeout;
         }
 
-        $this->timeout = $timeout;
         $this->readTimeout = $readTimeout;
-    }
-
-    /**
-     * Get timeout for flush
-     *
-     * @return float
-     */
-    public function getTimeout(): float
-    {
-        return $this->timeout;
-    }
-
-    /**
-     * Get read timeout
-     *
-     * @return float
-     */
-    public function getReadTimeout(): float
-    {
-        return $this->readTimeout;
     }
 }

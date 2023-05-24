@@ -13,8 +13,12 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Connection;
 
+use FiveLab\Component\Amqp\Adapter\Amqp\Connection\AmqpConnectionFactory as AmqpExtConnectionFactory;
+use FiveLab\Component\Amqp\Adapter\AmqpLib\Connection\AmqpConnectionFactory as AmqpLibConnectionFactory;
+use FiveLab\Component\Amqp\Adapter\AmqpLib\Connection\AmqpSocketsConnectionFactory;
+
 /**
- * The factory for make a SpoolConnection via "ext-amqp".
+ * The factory for make a SpoolConnection.
  */
 class SpoolConnectionFactory implements ConnectionFactoryInterface
 {
@@ -40,6 +44,36 @@ class SpoolConnectionFactory implements ConnectionFactoryInterface
         }
 
         $this->factories = $factories;
+    }
+
+    /**
+     * Make spool connection factory based on dns.
+     *
+     * @param Dsn $dsn
+     *
+     * @return self
+     */
+    public static function fromDsn(Dsn $dsn): self
+    {
+        $hosts = \explode(',', $dsn->host);
+        $hosts = \array_map('trim', $hosts);
+        $hosts = \array_filter($hosts);
+
+        $connectionFactoryClass = match ($dsn->driver) {
+            Driver::AmqpExt     => AmqpExtConnectionFactory::class,
+            Driver::AmqpLib     => AmqpLibConnectionFactory::class,
+            Driver::AmqpSockets => AmqpSocketsConnectionFactory::class,
+        };
+
+        $connectionFactories = [];
+
+        foreach ($hosts as $host) {
+            $connectionDsn = new Dsn($dsn->driver, $host, $dsn->port, $dsn->vhost, $dsn->username, $dsn->password, $dsn->options);
+
+            $connectionFactories[] = new $connectionFactoryClass($connectionDsn);
+        }
+
+        return new self(...$connectionFactories);
     }
 
     /**

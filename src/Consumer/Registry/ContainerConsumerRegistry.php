@@ -20,21 +20,15 @@ use Psr\Container\ContainerInterface;
 /**
  * Consumer registry based on PSR container.
  */
-class ContainerConsumerRegistry implements ConsumerRegistryInterface
+readonly class ContainerConsumerRegistry implements ConsumerRegistryInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private ContainerInterface $container;
-
     /**
      * Constructor.
      *
      * @param ContainerInterface $container
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(private ContainerInterface $container)
     {
-        $this->container = $container;
     }
 
     /**

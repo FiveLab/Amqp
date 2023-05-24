@@ -13,19 +13,20 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Functional\Adapter;
 
-use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Consumer\Loop\LoopConsumer;
 use FiveLab\Component\Amqp\Consumer\Loop\LoopConsumerConfiguration;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
 use FiveLab\Component\Amqp\Consumer\Middleware\StopAfterNExecutesMiddleware;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Tests\Functional\Consumer\Handler\MessageHandlerMock;
 use FiveLab\Component\Amqp\Tests\Functional\Consumer\Handler\ThrowableMessageHandlerMock;
 use FiveLab\Component\Amqp\Tests\Functional\RabbitMqTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 abstract class LoopConsumerTestCase extends RabbitMqTestCase
 {
@@ -74,9 +75,7 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
      */
     abstract protected function createQueueFactory(QueueDefinition $definition): QueueFactoryInterface;
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessConsume(): void
     {
         $this->publishMessages(50);
@@ -94,9 +93,7 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
         self::assertQueueEmpty($this->queueFactory);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessAutomaticallyAckMessageOnCatchError(): void
     {
         $this->publishMessages(1);
@@ -115,9 +112,7 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
         self::assertQueueEmpty($this->queueFactory);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessManuallyAckMessageOnCatchError(): void
     {
         $this->publishMessages(1);
@@ -130,7 +125,7 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
         );
 
         $this->throwableMessageHandler->shouldThrowException(new \RuntimeException('some'));
-        $this->throwableMessageHandler->onCatchError(static function (ReceivedMessageInterface $message) {
+        $this->throwableMessageHandler->onCatchError(static function (ReceivedMessage $message) {
             $message->ack();
         });
 
@@ -139,9 +134,7 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
         self::assertQueueEmpty($this->queueFactory);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessManuallyNackMessageOnCatchError(): void
     {
         $this->publishMessages(1);
@@ -154,7 +147,7 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
         );
 
         $this->throwableMessageHandler->shouldThrowException(new \RuntimeException('some'));
-        $this->throwableMessageHandler->onCatchError(static function (ReceivedMessageInterface $message) {
+        $this->throwableMessageHandler->onCatchError(static function (ReceivedMessage $message) {
             $message->nack(false);
         });
 
@@ -163,9 +156,7 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
         self::assertQueueEmpty($this->queueFactory);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessRequeueMessageIfCatchErrorHandlerThrowException(): void
     {
         $this->publishMessage('some');
@@ -178,7 +169,7 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
         );
 
         $this->throwableMessageHandler->shouldThrowException(new \RuntimeException('some'));
-        $this->throwableMessageHandler->onCatchError(static function (ReceivedMessageInterface $message, \Throwable $error) {
+        $this->throwableMessageHandler->onCatchError(static function (ReceivedMessage $message, \Throwable $error) {
             throw $error;
         });
 
@@ -190,15 +181,14 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
             self::assertEquals('some', $e->getMessage(), 'exception message nor equals');
 
             $message = $this->getLastMessageFromQueue($this->queueFactory);
-            self::assertEquals('some', $message->getPayload()->getData());
+            self::assertEquals('some', $message->payload->data);
         }
     }
 
     /**
-     * @test
-     *
      * @see https://github.com/php-amqp/php-amqp/issues/327
      */
+    #[Test]
     public function shouldNotThrowOrphanedEnvelope(): void
     {
         $this->publishMessage('message #1');
@@ -228,9 +218,9 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
             $consumer->run();
 
             self::fail('must throw exception');
-        } catch (ConsumerTimeoutExceedException $error) {
-            $receivedMessages = \array_map(static function (ReceivedMessageInterface $receivedMessage) {
-                return $receivedMessage->getPayload()->getData();
+        } catch (ConsumerTimeoutExceedException) {
+            $receivedMessages = \array_map(static function (ReceivedMessage $receivedMessage) {
+                return $receivedMessage->payload->data;
             }, $this->messageHandler->getReceivedMessages());
 
             self::assertEquals([
@@ -243,9 +233,7 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSaveConnectionConfigurationAfterConsumerTimeout(): void
     {
         $this->publishMessages(3);
@@ -279,15 +267,13 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
             $consumer->run();
 
             self::fail('must throw exception');
-        } catch (ConsumerTimeoutExceedException $e) {
+        } catch (ConsumerTimeoutExceedException) {
             self::assertCount(3, $this->messageHandler->getReceivedMessages());
             self::assertQueueEmpty($this->queueFactory);
         }
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessProcessOnStopAfterNExecutes(): void
     {
         $this->publishMessages(12);
@@ -319,7 +305,7 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
 
         try {
             $consumer->run();
-        } catch (ConsumerTimeoutExceedException $e) {
+        } catch (ConsumerTimeoutExceedException) {
             // Normal flow
         }
     }

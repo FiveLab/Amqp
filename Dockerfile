@@ -17,7 +17,7 @@ RUN \
 RUN \
     apt-get install -y --no-install-recommends \
         librabbitmq-dev && \
-    printf '\n' | pecl install amqp-1.11.0beta && \
+    printf '\n' | pecl install amqp && \
     yes | pecl install xdebug && \
     docker-php-ext-install sockets && \
     docker-php-ext-enable amqp xdebug

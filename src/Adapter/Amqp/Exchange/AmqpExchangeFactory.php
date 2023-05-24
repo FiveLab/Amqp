@@ -26,16 +26,6 @@ use FiveLab\Component\Amqp\Exchange\ExchangeInterface;
 class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
 {
     /**
-     * @var ChannelFactoryInterface
-     */
-    private ChannelFactoryInterface $channelFactory;
-
-    /**
-     * @var ExchangeDefinition
-     */
-    private ExchangeDefinition $definition;
-
-    /**
      * @var AmqpExchange|null
      */
     private ?AmqpExchange $exchange = null;
@@ -46,10 +36,10 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
      * @param ChannelFactoryInterface $channelFactory
      * @param ExchangeDefinition      $definition
      */
-    public function __construct(ChannelFactoryInterface $channelFactory, ExchangeDefinition $definition)
-    {
-        $this->channelFactory = $channelFactory;
-        $this->definition = $definition;
+    public function __construct(
+        private readonly ChannelFactoryInterface $channelFactory,
+        private readonly ExchangeDefinition      $definition
+    ) {
     }
 
     /**
@@ -78,22 +68,22 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
         $exchange = new \AMQPExchange($channel->getChannel());
         $flags = $this->calculateFlagsForExchange();
 
-        $exchange->setName($this->definition->getName());
-        $exchange->setType($this->definition->getType());
+        $exchange->setName($this->definition->name);
+        $exchange->setType($this->definition->type);
         $exchange->setFlags($flags);
-        $exchange->setArguments($this->definition->getArguments()->toArray());
+        $exchange->setArguments($this->definition->arguments->toArray());
 
-        if ('' !== $this->definition->getName()) {
+        if ('' !== $this->definition->name) {
             // We must declare only non-default exchanges.
             $exchange->declareExchange();
         }
 
-        foreach ($this->definition->getBindings() as $binding) {
-            $exchange->bind($binding->getExchangeName(), $binding->getRoutingKey());
+        foreach ($this->definition->bindings as $binding) {
+            $exchange->bind($binding->exchangeName, $binding->routingKey);
         }
 
-        foreach ($this->definition->getUnBindings() as $unbinding) {
-            $exchange->unbind($unbinding->getExchangeName(), $unbinding->getRoutingKey());
+        foreach ($this->definition->unbindings as $unbinding) {
+            $exchange->unbind($unbinding->exchangeName, $unbinding->routingKey);
         }
 
         $this->exchange = new AmqpExchange($channel, $exchange);
@@ -118,11 +108,11 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
     {
         $flags = AMQP_NOPARAM;
 
-        if ($this->definition->isPassive()) {
+        if ($this->definition->passive) {
             $flags |= AMQP_PASSIVE;
         }
 
-        if ($this->definition->isDurable()) {
+        if ($this->definition->durable) {
             $flags |= AMQP_DURABLE;
         }
 

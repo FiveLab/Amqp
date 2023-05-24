@@ -22,6 +22,7 @@ use FiveLab\Component\Amqp\Message\Message;
 use FiveLab\Component\Amqp\Message\Options;
 use FiveLab\Component\Amqp\Message\Payload;
 use FiveLab\Component\Amqp\Tests\Functional\RabbitMqTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 abstract class ExchangeTestCase extends RabbitMqTestCase
 {
@@ -53,9 +54,7 @@ abstract class ExchangeTestCase extends RabbitMqTestCase
         $this->management->queueBind('test', 'test', 'some');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessPublishViaDefaultExchange(): void
     {
         $this->management->createQueue('default_test');
@@ -69,9 +68,7 @@ abstract class ExchangeTestCase extends RabbitMqTestCase
         self::assertCount(1, $retrieveMessages, 'The default_test queue is empty. Messages not published to queue via default exchange.');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessPublishWithDefaults(): void
     {
         $message = new Message(new Payload('some foo bar'));
@@ -84,9 +81,7 @@ abstract class ExchangeTestCase extends RabbitMqTestCase
         self::assertEquals('some foo bar', $retrieveMessage['payload']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessPublishWithCustomContentType(): void
     {
         $message = new Message(new Payload('{"a":"b"}', 'application/json'));
@@ -97,9 +92,7 @@ abstract class ExchangeTestCase extends RabbitMqTestCase
         self::assertEquals('{"a":"b"}', $retrieveMessage['payload']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessPublishWithCustomContentEncoding(): void
     {
         $message = new Message(new Payload('foo', 'text/plain', 'gzip'));
@@ -110,9 +103,7 @@ abstract class ExchangeTestCase extends RabbitMqTestCase
         self::assertEquals('gzip', $retrieveMessage['properties']['content_encoding']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessPublishWithoutDurableMode(): void
     {
         $message = new Message(new Payload('some foo bar'), new Options(false));
@@ -122,9 +113,7 @@ abstract class ExchangeTestCase extends RabbitMqTestCase
         self::assertEquals(1, $retrieveMessage['properties']['delivery_mode']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessPublishWithExpiration(): void
     {
         $message = new Message(new Payload('some foo bar'), new Options(true, 300000));
@@ -134,9 +123,7 @@ abstract class ExchangeTestCase extends RabbitMqTestCase
         self::assertEquals(300000, $retrieveMessage['properties']['expiration']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessPublishWithoutPriority(): void
     {
         $message = new Message(new Payload('some foo bar'));
@@ -146,9 +133,7 @@ abstract class ExchangeTestCase extends RabbitMqTestCase
         self::assertArrayNotHasKey('priority', $retrieveMessage['properties']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessPublishWithPriority(): void
     {
         $message = new Message(new Payload('some foo bar'), new Options(true, 0, 5));
@@ -158,9 +143,7 @@ abstract class ExchangeTestCase extends RabbitMqTestCase
         self::assertEquals(5, $retrieveMessage['properties']['priority']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessPublishWithHeaders(): void
     {
         $message = new Message(new Payload('some foo bar'), null, new Headers([
@@ -177,9 +160,7 @@ abstract class ExchangeTestCase extends RabbitMqTestCase
         ], $retrieveMessage['properties']['headers']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessPublishWithIdentifier(): void
     {
         $message = new Message(new Payload('some foo'), null, null, new Identifier('m-id', 'a-id', 'guest'));

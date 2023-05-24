@@ -26,18 +26,12 @@ class AmqpConnection implements ConnectionInterface
     use SplSubjectTrait;
 
     /**
-     * @var \AMQPConnection
-     */
-    private \AMQPConnection $connection;
-
-    /**
      * Constructor.
      *
      * @param \AMQPConnection $connection
      */
-    public function __construct(\AMQPConnection $connection)
+    public function __construct(private readonly \AMQPConnection $connection)
     {
-        $this->connection = $connection;
     }
 
     /**
@@ -58,7 +52,7 @@ class AmqpConnection implements ConnectionInterface
         try {
             $this->connection->connect();
         } catch (\AMQPConnectionException $e) {
-            if (false !== \strpos($e->getMessage(), 'ACCESS_REFUSED')) {
+            if (\str_contains($e->getMessage(), 'ACCESS_REFUSED')) {
                 throw new BadCredentialsException('Bad credentials for connect to RabbitMQ.', 0, $e);
             }
 

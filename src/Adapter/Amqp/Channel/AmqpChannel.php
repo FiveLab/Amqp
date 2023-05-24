@@ -24,34 +24,15 @@ use FiveLab\Component\Amqp\Connection\SpoolConnection;
 class AmqpChannel implements ChannelInterface
 {
     /**
-     * @var AmqpConnection|SpoolConnection
-     */
-    private $connection;
-
-    /**
-     * @var \AMQPChannel
-     */
-    private \AMQPChannel $channel;
-
-    /**
      * Constructor.
      *
-     * @param object|AmqpConnection|SpoolConnection $connection
-     * @param \AMQPChannel                          $channel
+     * @param AmqpConnection|SpoolConnection $connection
+     * @param \AMQPChannel                   $channel
      */
-    public function __construct(object $connection, \AMQPChannel $channel)
-    {
-        if (!$connection instanceof AmqpConnection && !$connection instanceof SpoolConnection) {
-            throw new \InvalidArgumentException(\sprintf(
-                'Invalid connection. Must be a "%s" or "%s". But "%s" given.',
-                AmqpConnection::class,
-                SpoolConnection::class,
-                \get_class($connection)
-            ));
-        }
-
-        $this->connection = $connection;
-        $this->channel = $channel;
+    public function __construct(
+        private readonly AmqpConnection|SpoolConnection $connection,
+        private readonly \AMQPChannel                   $channel
+    ) {
     }
 
     /**

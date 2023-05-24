@@ -63,7 +63,7 @@ class ArgumentDefinitions implements \IteratorAggregate, \Countable
         $arguments = [];
 
         foreach ($this->arguments as $argument) {
-            $arguments[$argument->getName()] = $argument->getValue();
+            $arguments[$argument->name] = $argument->value;
         }
 
         return $arguments;

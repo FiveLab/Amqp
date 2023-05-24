@@ -16,6 +16,7 @@ namespace FiveLab\Component\Amqp\Tests\Unit\Publisher\Registry;
 use FiveLab\Component\Amqp\Exception\PublisherNotFoundException;
 use FiveLab\Component\Amqp\Publisher\PublisherInterface;
 use FiveLab\Component\Amqp\Publisher\Registry\PublisherRegistry;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class PublisherRegistryTest extends TestCase
@@ -33,9 +34,7 @@ class PublisherRegistryTest extends TestCase
         $this->registry = new PublisherRegistry();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGet(): void
     {
         $publisher = $this->createMock(PublisherInterface::class);
@@ -44,9 +43,7 @@ class PublisherRegistryTest extends TestCase
         self::assertEquals($publisher, $this->registry->get('some'));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldThrowExceptionIfPublisherNotFound(): void
     {
         $this->expectException(PublisherNotFoundException::class);

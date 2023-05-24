@@ -14,18 +14,17 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Unit\Queue\Definition\Arguments;
 
 use FiveLab\Component\Amqp\Queue\Definition\Arguments\DeadLetterRoutingKeyArgument;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class DeadLetterRoutingKeyArgumentTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreate(): void
     {
         $argument = new DeadLetterRoutingKeyArgument('foo.bar');
 
-        self::assertEquals('x-dead-letter-routing-key', $argument->getName());
-        self::assertEquals('foo.bar', $argument->getValue());
+        self::assertEquals('x-dead-letter-routing-key', $argument->name);
+        self::assertEquals('foo.bar', $argument->value);
     }
 }

@@ -14,7 +14,7 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Exchange;
 
 use FiveLab\Component\Amqp\Channel\ChannelInterface;
-use FiveLab\Component\Amqp\Message\MessageInterface;
+use FiveLab\Component\Amqp\Message\Message;
 
 /**
  * All exchanges should implement this interface.
@@ -38,8 +38,8 @@ interface ExchangeInterface
     /**
      * Publish message to RabbitMQ
      *
-     * @param MessageInterface $message
-     * @param string           $routingKey
+     * @param Message $message
+     * @param string  $routingKey
      */
-    public function publish(MessageInterface $message, string $routingKey = ''): void;
+    public function publish(Message $message, string $routingKey = ''): void;
 }

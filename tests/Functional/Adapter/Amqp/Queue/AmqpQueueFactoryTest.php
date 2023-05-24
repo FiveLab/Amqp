@@ -19,12 +19,11 @@ use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Tests\Functional\Adapter\Amqp\Channel\StubAmqpChannelFactory;
 use FiveLab\Component\Amqp\Tests\Functional\Adapter\QueueFactoryTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class AmqpQueueFactoryTest extends QueueFactoryTestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldThrowExceptionWithCreatePassiveQueueAndQueueWasNotFound(): void
     {
         $this->expectException(\AMQPQueueException::class);

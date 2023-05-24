@@ -21,9 +21,9 @@ class MutableReceivedMessages extends ReceivedMessages
     /**
      * Push message to collection
      *
-     * @param ReceivedMessageInterface $message
+     * @param ReceivedMessage $message
      */
-    public function push(ReceivedMessageInterface $message): void
+    public function push(ReceivedMessage $message): void
     {
         $this->messages[] = $message;
     }

@@ -22,7 +22,7 @@ use FiveLab\Component\Amqp\Consumer\Middleware\StopAfterNExecutesMiddleware;
 use FiveLab\Component\Amqp\Consumer\Registry\ConsumerRegistryInterface;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -30,22 +30,22 @@ use Symfony\Component\Console\Output\BufferedOutput;
 class RunConsumerCommandTest extends TestCase
 {
     /**
-     * @var ConsumerRegistryInterface|MockObject
+     * @var ConsumerRegistryInterface
      */
     private ConsumerRegistryInterface $registry;
 
     /**
-     * @var ConnectionInterface|MockObject
+     * @var ConnectionInterface
      */
     private ConnectionInterface $connection;
 
     /**
-     * @var ChannelInterface|MockObject
+     * @var ChannelInterface
      */
     private ChannelInterface $channel;
 
     /**
-     * @var QueueInterface|MockObject
+     * @var QueueInterface
      */
     private QueueInterface $queue;
 
@@ -68,9 +68,7 @@ class RunConsumerCommandTest extends TestCase
             ->willReturn($this->connection);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldFailRunIfLoopPassedWithoutReadTimeout(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -98,9 +96,7 @@ class RunConsumerCommandTest extends TestCase
         $command->run($input, $output);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessConfigureWithDefaults(): void
     {
         $command = new RunConsumerCommand($this->registry);
@@ -109,9 +105,7 @@ class RunConsumerCommandTest extends TestCase
         self::assertEquals('Run consumer.', $command->getDescription());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessExecuteWithoutAnyParameters(): void
     {
         $consumer = $this->createMock(ConsumerInterface::class);
@@ -135,9 +129,7 @@ class RunConsumerCommandTest extends TestCase
         $command->run($input, $output);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessExecuteWithReadTimeout(): void
     {
         $consumer = $this->createMock(ConsumerInterface::class);
@@ -168,9 +160,7 @@ class RunConsumerCommandTest extends TestCase
         $command->run($input, new BufferedOutput());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessExecuteWithCountMessages(): void
     {
         $consumer = $this->createMock(ConsumerWithMiddlewaresInterface::class);
@@ -197,9 +187,7 @@ class RunConsumerCommandTest extends TestCase
         $command->run($input, new BufferedOutput());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessExecuteInLoopWithReadTimeout(): void
     {
         $consumer = $this->createMock(ConsumerInterface::class);

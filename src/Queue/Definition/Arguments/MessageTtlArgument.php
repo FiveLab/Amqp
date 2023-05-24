@@ -18,7 +18,7 @@ use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 /**
  * Definition for "x-message-ttl" argument.
  */
-class MessageTtlArgument extends ArgumentDefinition
+readonly class MessageTtlArgument extends ArgumentDefinition
 {
     /**
      * Constructor.

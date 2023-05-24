@@ -14,46 +14,36 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Consumer\Middleware;
 
 use FiveLab\Component\Amqp\Exchange\Registry\ExchangeFactoryRegistryInterface;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 
 /**
  * The middleware for proxy message to another exchange.
  *
  * Note: please don't use this middleware in loop consumers. This issue can have difficult results.
  */
-class ProxyMessageToAnotherExchangeMiddleware implements ConsumerMiddlewareInterface
+readonly class ProxyMessageToAnotherExchangeMiddleware implements ConsumerMiddlewareInterface
 {
-    /**
-     * @var ExchangeFactoryRegistryInterface
-     */
-    private ExchangeFactoryRegistryInterface $exchangeFactoryRegistry;
-
-    /**
-     * @var string
-     */
-    private string $toExchange;
-
     /**
      * Constructor.
      *
      * @param ExchangeFactoryRegistryInterface $exchangeFactoryRegistry
      * @param string                           $toExchange
      */
-    public function __construct(ExchangeFactoryRegistryInterface $exchangeFactoryRegistry, string $toExchange)
-    {
-        $this->exchangeFactoryRegistry = $exchangeFactoryRegistry;
-        $this->toExchange = $toExchange;
+    public function __construct(
+        private ExchangeFactoryRegistryInterface $exchangeFactoryRegistry,
+        private string                           $toExchange
+    ) {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function handle(ReceivedMessageInterface $message, callable $next): void
+    public function handle(ReceivedMessage $message, callable $next): void
     {
-        if ($this->toExchange === $message->getExchangeName()) {
+        if ($this->toExchange === $message->exchangeName) {
             throw new \LogicException(\sprintf(
                 'Loop detection. You try to proxy message from "%s" exchange to "%s" exchange by same routing key.',
-                $message->getExchangeName(),
+                $message->exchangeName,
                 $this->toExchange
             ));
         }
@@ -62,6 +52,6 @@ class ProxyMessageToAnotherExchangeMiddleware implements ConsumerMiddlewareInter
 
         $proxyToExchange = $this->exchangeFactoryRegistry->get($this->toExchange)->create();
 
-        $proxyToExchange->publish($message, $message->getRoutingKey());
+        $proxyToExchange->publish($message, $message->routingKey);
     }
 }

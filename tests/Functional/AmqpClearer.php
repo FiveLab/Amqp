@@ -66,7 +66,7 @@ class AmqpClearer
         foreach ($exchanges as $exchange) {
             $name = $exchange['name'];
 
-            if (!$name || 0 === \strpos($name, 'amq.')) {
+            if (!$name || \str_starts_with($name, 'amq.')) {
                 // System exchanges. No delete.
                 continue;
             }

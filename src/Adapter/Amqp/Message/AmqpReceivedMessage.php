@@ -17,45 +17,23 @@ use FiveLab\Component\Amqp\Message\Headers;
 use FiveLab\Component\Amqp\Message\Identifier;
 use FiveLab\Component\Amqp\Message\Options;
 use FiveLab\Component\Amqp\Message\Payload;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 
 /**
  * The received message provided via php-amqp extension.
  */
-class AmqpReceivedMessage implements ReceivedMessageInterface
+class AmqpReceivedMessage extends ReceivedMessage
 {
-    /**
-     * @var \AMQPQueue
-     */
-    private \AMQPQueue $queue;
-
-    /**
-     * @var \AMQPEnvelope
-     */
-    private \AMQPEnvelope $envelope;
-
-    /**
-     * @var bool
-     */
-    private bool $answered = false;
-
     /**
      * Constructor.
      *
      * @param \AMQPQueue    $queue
      * @param \AMQPEnvelope $envelope
      */
-    public function __construct(\AMQPQueue $queue, \AMQPEnvelope $envelope)
-    {
-        $this->queue = $queue;
-        $this->envelope = $envelope;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPayload(): Payload
-    {
+    public function __construct(
+        private readonly \AMQPQueue    $queue,
+        private readonly \AMQPEnvelope $envelope
+    ) {
         $body = $this->envelope->getBody();
 
         // @phpstan-ignore-next-line
@@ -65,86 +43,44 @@ class AmqpReceivedMessage implements ReceivedMessageInterface
             $body = '';
         }
 
-        return new Payload(
+        $payload = new Payload(
             $body,
             $this->envelope->getContentType() ?: 'text/plain',
             $this->envelope->getContentEncoding() ?: null
         );
-    }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getOptions(): Options
-    {
-        return new Options(
-            $this->envelope->getDeliveryMode() === 2,
-            $this->envelope->getExpiration() ? (int) $this->envelope->getExpiration() : 0,
-            $this->envelope->getPriority()
+        parent::__construct(
+            $payload,
+            (int) $this->envelope->getDeliveryTag(),
+            $this->envelope->getRoutingKey(),
+            $this->envelope->getExchangeName(),
+            new Options(
+                $this->envelope->getDeliveryMode() === 2,
+                $this->envelope->getExpiration() ? (int) $this->envelope->getExpiration() : 0,
+                $this->envelope->getPriority()
+            ),
+            new Headers($this->envelope->getHeaders()),
+            new Identifier(
+                $this->envelope->getMessageId(),
+                $this->envelope->getAppId(),
+                $this->envelope->getUserId()
+            )
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getIdentifier(): Identifier
+    protected function doAck(): void
     {
-        return new Identifier(
-            $this->envelope->getMessageId(),
-            $this->envelope->getAppId(),
-            $this->envelope->getUserId()
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDeliveryTag(): int
-    {
-        return (int) $this->envelope->getDeliveryTag();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getRoutingKey(): string
-    {
-        return $this->envelope->getRoutingKey();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getExchangeName(): string
-    {
-        return $this->envelope->getExchangeName();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function ack(): void
-    {
-        if ($this->answered) {
-            throw new \LogicException('We already answered to broker.');
-        }
-
-        $this->answered = true;
-
         $this->queue->ack($this->envelope->getDeliveryTag());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function nack(bool $requeue = true): void
+    protected function doNack(bool $requeue = true): void
     {
-        if ($this->answered) {
-            throw new \LogicException('We already answered to broker.');
-        }
-
-        $this->answered = true;
-
         $flags = AMQP_NOPARAM;
 
         if ($requeue) {
@@ -152,21 +88,5 @@ class AmqpReceivedMessage implements ReceivedMessageInterface
         }
 
         $this->queue->nack($this->envelope->getDeliveryTag(), $flags);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isAnswered(): bool
-    {
-        return $this->answered;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getHeaders(): Headers
-    {
-        return new Headers($this->envelope->getHeaders());
     }
 }

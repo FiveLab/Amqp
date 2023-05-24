@@ -17,7 +17,7 @@ use FiveLab\Component\Amqp\Exception\ConnectionException;
 use FiveLab\Component\Amqp\SplSubjectTrait;
 
 /**
- * Spool connection for "ext-amqp".
+ * Spool connection.
  */
 class SpoolConnection implements ConnectionInterface
 {

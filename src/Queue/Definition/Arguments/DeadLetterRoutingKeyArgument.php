@@ -18,7 +18,7 @@ use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 /**
  * Definition for "x-dead-letter-routing-key" argument.
  */
-class DeadLetterRoutingKeyArgument extends ArgumentDefinition
+readonly class DeadLetterRoutingKeyArgument extends ArgumentDefinition
 {
     /**
      * Constructor.

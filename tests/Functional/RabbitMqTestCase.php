@@ -13,7 +13,9 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Functional;
 
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Connection\Driver;
+use FiveLab\Component\Amqp\Connection\Dsn;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -58,6 +60,27 @@ abstract class RabbitMqTestCase extends TestCase
 
         $this->management = null;
         $this->clearer = null;
+    }
+
+    /**
+     * Get RabbitMQ DSN
+     *
+     * @param Driver                    $driver
+     * @param array<string, mixed>|null $options
+     *
+     * @return Dsn
+     */
+    protected function getRabbitMqDsn(Driver $driver, array $options = null): Dsn
+    {
+        return new Dsn(
+            $driver,
+            $this->getRabbitMqHost(),
+            $this->getRabbitMqPort(),
+            $this->getRabbitMqVhost(),
+            $this->getRabbitMqLogin(),
+            $this->getRabbitMqPassword(),
+            $options ?: ['read_timeout' => 2]
+        );
     }
 
     /**
@@ -162,7 +185,7 @@ abstract class RabbitMqTestCase extends TestCase
      *
      * @param QueueFactoryInterface $queueFactory
      *
-     * @return array|ReceivedMessageInterface[]
+     * @return array|ReceivedMessage[]
      */
     protected function getAllMessagesFromQueue(QueueFactoryInterface $queueFactory): array
     {
@@ -182,9 +205,9 @@ abstract class RabbitMqTestCase extends TestCase
      *
      * @param QueueFactoryInterface $queueFactory
      *
-     * @return ReceivedMessageInterface
+     * @return ReceivedMessage
      */
-    public function getLastMessageFromQueue(QueueFactoryInterface $queueFactory): ReceivedMessageInterface
+    public function getLastMessageFromQueue(QueueFactoryInterface $queueFactory): ReceivedMessage
     {
         $queue = $queueFactory->create();
 

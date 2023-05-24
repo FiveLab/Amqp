@@ -18,6 +18,7 @@ use FiveLab\Component\Amqp\Consumer\LoggingConsumer;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareInterface;
 use FiveLab\Component\Amqp\Consumer\SingleConsumer;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -58,9 +59,7 @@ class LoggingConsumerTest extends TestCase
             ->willReturn($queue);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGetOriginalQueue(): void
     {
         $queue = $this->createMock(QueueInterface::class);
@@ -77,17 +76,23 @@ class LoggingConsumerTest extends TestCase
         self::assertEquals($queue, $result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessRunOnSuccess(): void
     {
-        $this->logger->expects(self::exactly(2))
+        $matcher = self::exactly(2);
+
+        $this->logger->expects($matcher)
             ->method('info')
-            ->withConsecutive(
-                ['Start consume on "foo-bar" queue.'],
-                ['End consume on "foo-bar" queue.']
-            );
+            ->with(self::callback(static function (string $message) use ($matcher) {
+                $expected = match ($matcher->numberOfInvocations()) {
+                    1 => 'Start consume on "foo-bar" queue.',
+                    2 => 'End consume on "foo-bar" queue.'
+                };
+
+                self::assertEquals($expected, $message);
+
+                return true;
+            }));
 
         $this->decoratedConsumer->expects(self::once())
             ->method('run');
@@ -95,9 +100,7 @@ class LoggingConsumerTest extends TestCase
         $this->loggingConsumer->run();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessRunOnFail(): void
     {
         $this->logger->expects(self::once())
@@ -118,9 +121,7 @@ class LoggingConsumerTest extends TestCase
         $this->loggingConsumer->run();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldPushMiddlewareToOriginalConsumer(): void
     {
         $middlewareMock = $this->createMock(ConsumerMiddlewareInterface::class);
@@ -134,9 +135,7 @@ class LoggingConsumerTest extends TestCase
         $loggingConsumer->pushMiddleware($middlewareMock);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldFailOnMiddlewarePushIfInterfaceNotImplemented(): void
     {
         $middlewareMock = $this->createMock(ConsumerMiddlewareInterface::class);

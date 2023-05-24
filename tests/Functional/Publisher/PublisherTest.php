@@ -17,12 +17,14 @@ use FiveLab\Component\Amqp\Adapter\Amqp\Channel\AmqpChannelFactory;
 use FiveLab\Component\Amqp\Adapter\Amqp\Connection\AmqpConnectionFactory;
 use FiveLab\Component\Amqp\Adapter\Amqp\Exchange\AmqpExchangeFactory;
 use FiveLab\Component\Amqp\Channel\Definition\ChannelDefinition;
+use FiveLab\Component\Amqp\Connection\Driver;
 use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
 use FiveLab\Component\Amqp\Message\Message;
 use FiveLab\Component\Amqp\Message\Payload;
 use FiveLab\Component\Amqp\Publisher\Middleware\PublisherMiddlewares;
 use FiveLab\Component\Amqp\Publisher\Publisher;
 use FiveLab\Component\Amqp\Tests\Functional\RabbitMqTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class PublisherTest extends RabbitMqTestCase
 {
@@ -38,13 +40,7 @@ class PublisherTest extends RabbitMqTestCase
     {
         parent::setUp();
 
-        $connectionFactory = new AmqpConnectionFactory([
-            'host'     => $this->getRabbitMqHost(),
-            'port'     => $this->getRabbitMqPort(),
-            'vhost'    => $this->getRabbitMqVhost(),
-            'login'    => $this->getRabbitMqLogin(),
-            'password' => $this->getRabbitMqPassword(),
-        ]);
+        $connectionFactory = new AmqpConnectionFactory($this->getRabbitMqDsn(Driver::AmqpExt));
 
         $channelFactory = new AmqpChannelFactory($connectionFactory, new ChannelDefinition());
         $exchangeFactory = new AmqpExchangeFactory($channelFactory, new ExchangeDefinition('test', 'direct'));
@@ -57,9 +53,7 @@ class PublisherTest extends RabbitMqTestCase
         $this->management->queueBind('test', 'test', 'test-routing');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessPublish(): void
     {
         $this->publisher->publish(new Message(

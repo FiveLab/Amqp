@@ -14,18 +14,27 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Unit\Binding\Definition;
 
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
+use FiveLab\Component\Amqp\Connection\Driver;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class BindingDefinitionTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreate(): void
     {
         $def = new BindingDefinition('some', 'test');
 
-        self::assertEquals('some', $def->getExchangeName());
-        self::assertEquals('test', $def->getRoutingKey());
+        self::assertEquals('some', $def->exchangeName);
+        self::assertEquals('test', $def->routingKey);
+    }
+
+    #[Test]
+    public function shouldSuccessCreateWithEnums(): void
+    {
+        $def = new BindingDefinition(Driver::AmqpExt, Driver::AmqpLib);
+
+        self::assertEquals('amqp', $def->exchangeName);
+        self::assertEquals('amqp-lib', $def->routingKey);
     }
 }

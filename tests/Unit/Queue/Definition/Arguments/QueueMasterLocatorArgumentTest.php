@@ -14,47 +14,29 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Unit\Queue\Definition\Arguments;
 
 use FiveLab\Component\Amqp\Queue\Definition\Arguments\QueueMasterLocatorArgument;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
 class QueueMasterLocatorArgumentTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @param string $locator
-     *
-     * @dataProvider providePossibleLocators
-     */
+    #[TestWith(['min-masters'])]
+    #[TestWith(['client-local'])]
+    #[TestWith(['random'])]
     public function shouldSuccessCreate(string $locator): void
     {
         $argument = new QueueMasterLocatorArgument($locator);
 
-        self::assertEquals('x-queue-master-locator', $argument->getName());
-        self::assertEquals($locator, $argument->getValue());
+        self::assertEquals('x-queue-master-locator', $argument->name);
+        self::assertEquals($locator, $argument->value);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldThrowExceptionForInvalidLocator()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid master locator "some". Possible locators: "min-masters", "client-local", "random".');
 
         new QueueMasterLocatorArgument('some');
-    }
-
-    /**
-     * Provide possible master locators
-     *
-     * @return array
-     */
-    public function providePossibleLocators(): array
-    {
-        return [
-            ['min-masters'],
-            ['client-local'],
-            ['random'],
-        ];
     }
 }

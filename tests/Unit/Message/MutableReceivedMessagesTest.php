@@ -14,19 +14,18 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Unit\Message;
 
 use FiveLab\Component\Amqp\Message\MutableReceivedMessages;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Message\ReceivedMessages;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class MutableReceivedMessagesTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessPush(): void
     {
-        $message1 = self::createMock(ReceivedMessageInterface::class);
-        $message2 = self::createMock(ReceivedMessageInterface::class);
+        $message1 = self::createMock(ReceivedMessage::class);
+        $message2 = self::createMock(ReceivedMessage::class);
 
         $receivedMessages = new MutableReceivedMessages($message1);
         $receivedMessages->push($message2);
@@ -34,13 +33,11 @@ class MutableReceivedMessagesTest extends TestCase
         self::assertEquals([$message1, $message2], \iterator_to_array($receivedMessages));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessClear(): void
     {
-        $message1 = self::createMock(ReceivedMessageInterface::class);
-        $message2 = self::createMock(ReceivedMessageInterface::class);
+        $message1 = self::createMock(ReceivedMessage::class);
+        $message2 = self::createMock(ReceivedMessage::class);
 
         $receivedMessages = new MutableReceivedMessages($message1, $message2);
         $receivedMessages->clear();
@@ -48,13 +45,11 @@ class MutableReceivedMessagesTest extends TestCase
         self::assertEquals([], \iterator_to_array($receivedMessages));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGetImmutable(): void
     {
-        $message1 = self::createMock(ReceivedMessageInterface::class);
-        $message2 = self::createMock(ReceivedMessageInterface::class);
+        $message1 = self::createMock(ReceivedMessage::class);
+        $message2 = self::createMock(ReceivedMessage::class);
 
         $receivedMessages = new MutableReceivedMessages($message1, $message2);
 

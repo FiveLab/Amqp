@@ -14,18 +14,17 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Unit\Queue\Definition\Arguments;
 
 use FiveLab\Component\Amqp\Queue\Definition\Arguments\MaxLengthBytesArgument;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class MaxLengthBytesArgumentTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreate(): void
     {
         $argument = new MaxLengthBytesArgument(111);
 
-        self::assertEquals('x-max-length-bytes', $argument->getName());
-        self::assertEquals(111, $argument->getValue());
+        self::assertEquals('x-max-length-bytes', $argument->name);
+        self::assertEquals(111, $argument->value);
     }
 }

@@ -16,84 +16,35 @@ namespace FiveLab\Component\Amqp\Message;
 /**
  * Implement delay message. It add common headers for next control in handlers.
  */
-class DelayMessage implements MessageInterface
+class DelayMessage extends Message
 {
     public const HEADER_PUBLISHER_KEY = 'x-delay-publisher';
     public const HEADER_ROUTING_KEY   = 'x-delay-routing-key';
     public const HEADER_COUNTER       = 'x-delay-counter';
 
     /**
-     * @var MessageInterface
-     */
-    private MessageInterface $message;
-
-    /**
-     * @var string
-     */
-    private string $publisherKey;
-
-    /**
-     * @var string
-     */
-    private string $routingKey;
-
-    /**
-     * @var int
-     */
-    private int $counter;
-
-    /**
      * Constructor.
      *
-     * @param MessageInterface $message
-     * @param string           $publisherKey
-     * @param string           $routingKey
-     * @param int              $counter
+     * @param Message $message
+     * @param string  $publisherKey
+     * @param string  $routingKey
+     * @param int     $counter
      */
-    public function __construct(MessageInterface $message, string $publisherKey, string $routingKey = '', int $counter = 1)
-    {
-        $this->message = $message;
-        $this->publisherKey = $publisherKey;
-        $this->routingKey = $routingKey;
-        $this->counter = $counter;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPayload(): Payload
-    {
-        return $this->message->getPayload();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getOptions(): Options
-    {
-        return $this->message->getOptions();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getHeaders(): Headers
-    {
-        $headers = $this->message->getHeaders();
+    public function __construct(
+        Message $message,
+        string  $publisherKey,
+        string  $routingKey = '',
+        int     $counter = 1
+    ) {
+        $headers = $message->headers;
         $headersList = $headers->all();
 
-        $headersList[self::HEADER_PUBLISHER_KEY] = $this->publisherKey;
-        $headersList[self::HEADER_ROUTING_KEY] = $this->routingKey;
-        $headersList[self::HEADER_COUNTER] = $this->counter;
+        $headersList[self::HEADER_PUBLISHER_KEY] = $publisherKey;
+        $headersList[self::HEADER_ROUTING_KEY] = $routingKey;
+        $headersList[self::HEADER_COUNTER] = $counter;
 
-        return new Headers($headersList);
-    }
+        $headers = new Headers($headersList);
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getIdentifier(): Identifier
-    {
-        return $this->message->getIdentifier();
+        parent::__construct($message->payload, $message->options, $headers, $message->identifier);
     }
 }

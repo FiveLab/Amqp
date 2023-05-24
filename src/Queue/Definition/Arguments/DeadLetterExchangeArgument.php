@@ -18,7 +18,7 @@ use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 /**
  * Definition for "x-dead-letter-exchange" argument.
  */
-class DeadLetterExchangeArgument extends ArgumentDefinition
+readonly class DeadLetterExchangeArgument extends ArgumentDefinition
 {
     /**
      * Constructor.

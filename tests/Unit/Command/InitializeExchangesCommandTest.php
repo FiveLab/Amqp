@@ -16,6 +16,7 @@ namespace FiveLab\Component\Amqp\Tests\Unit\Command;
 use FiveLab\Component\Amqp\Command\InitializeExchangesCommand;
 use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
 use FiveLab\Component\Amqp\Exchange\Registry\ExchangeFactoryRegistry;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -49,9 +50,7 @@ class InitializeExchangesCommandTest extends TestCase
         $this->output = new BufferedOutput();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessConfigureWithDefaults(): void
     {
         $command = new InitializeExchangesCommand($this->registry, []);
@@ -60,9 +59,7 @@ class InitializeExchangesCommandTest extends TestCase
         self::assertEquals('Initialize exchanges.', $command->getDescription());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessExecuteWithoutExchanges(): void
     {
         $this->createFactory('test_1', false);
@@ -75,9 +72,7 @@ class InitializeExchangesCommandTest extends TestCase
         self::assertEquals('', $this->output->fetch());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessExecute(): void
     {
         $this->createFactory('test_1', true);
@@ -92,9 +87,7 @@ class InitializeExchangesCommandTest extends TestCase
         self::assertEquals('', $this->output->fetch());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessExecuteWithVerbose(): void
     {
         $this->createFactory('test_1', true);

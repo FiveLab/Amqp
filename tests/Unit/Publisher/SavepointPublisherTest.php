@@ -17,6 +17,7 @@ use FiveLab\Component\Amqp\Message\Message;
 use FiveLab\Component\Amqp\Message\Payload;
 use FiveLab\Component\Amqp\Publisher\PublisherInterface;
 use FiveLab\Component\Amqp\Publisher\SavepointPublisherDecorator;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\Rule\InvocationOrder;
 use PHPUnit\Framework\TestCase;
 
@@ -42,9 +43,7 @@ class SavepointPublisherTest extends TestCase
         $this->publisher = new SavepointPublisherDecorator($this->originalPublisher);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessPublishIfNoSavepoints(): void
     {
         $this->expectPublish(self::once(), 'foo.bar', new Message(new Payload('some')));
@@ -52,9 +51,7 @@ class SavepointPublisherTest extends TestCase
         $this->publisher->publish(new Message(new Payload('some')), 'foo.bar');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessPublishInOneSavepoint(): void
     {
         $this->expectPublish(self::once(), 'foo.bar', new Message(new Payload('some')));
@@ -64,9 +61,7 @@ class SavepointPublisherTest extends TestCase
         $this->publisher->flush();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldNotPublishBeforeFlush(): void
     {
         $this->expectPublish(self::never(), 'foo.bar', new Message(new Payload('some')));
@@ -75,17 +70,32 @@ class SavepointPublisherTest extends TestCase
         $this->publisher->publish(new Message(new Payload('some')), 'foo.bar');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessPublishWithManySavepoints(): void
     {
-        $this->originalPublisher->expects(self::exactly(3))
+        $matcher = self::exactly(3);
+
+        $resolveExpected = static function () use ($matcher) {
+            return match ($matcher->numberOfInvocations()) {
+                1 => [new Message(new Payload('1')), 'foo.1'],
+                2 => [new Message(new Payload('2')), 'foo.2'],
+                3 => [new Message(new Payload('3')), 'foo.3']
+            };
+        };
+
+        $this->originalPublisher->expects($matcher)
             ->method('publish')
-            ->withConsecutive(
-                [new Message(new Payload('1')), 'foo.1'],
-                [new Message(new Payload('2')), 'foo.2'],
-                [new Message(new Payload('3')), 'foo.3']
+            ->with(
+                self::callback(static function (Message $message) use ($resolveExpected) {
+                    self::assertEquals($resolveExpected()[0], $message);
+
+                    return true;
+                }),
+                self::callback(static function (string $routingKey) use ($resolveExpected) {
+                    self::assertEquals($resolveExpected()[1], $routingKey);
+
+                    return true;
+                })
             );
 
         $this->publisher->start('savepoint_1');
@@ -100,9 +110,7 @@ class SavepointPublisherTest extends TestCase
         $this->publisher->flush();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessRollbackToSavepoint(): void
     {
         $this->expectPublish(self::once(), 'foo.1', new Message(new Payload('1')));
@@ -121,9 +129,7 @@ class SavepointPublisherTest extends TestCase
         $this->publisher->flush();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldThrowExceptionIfStartWithExistenceSavepoint(): void
     {
         $this->expectException(\RuntimeException::class);
@@ -134,9 +140,7 @@ class SavepointPublisherTest extends TestCase
         $this->publisher->start('savepoint_1');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldThrowExceptionIfRollbackToNonExistenceSavepoint(): void
     {
         $this->expectException(\RuntimeException::class);

@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Consumer\Handler;
 
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 
 /**
  * You must implement this interface if you want to catch the error in process of message handlers.
@@ -23,10 +23,10 @@ interface ThrowableMessageHandlerInterface extends MessageHandlerInterface
     /**
      * Call to this method after catch the error on message handler system.
      *
-     * @param ReceivedMessageInterface $message
-     * @param \Throwable               $error
+     * @param ReceivedMessage $message
+     * @param \Throwable      $error
      *
      * @throws \Throwable
      */
-    public function catchError(ReceivedMessageInterface $message, \Throwable $error): void;
+    public function catchError(ReceivedMessage $message, \Throwable $error): void;
 }

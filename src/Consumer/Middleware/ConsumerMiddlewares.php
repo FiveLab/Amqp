@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Consumer\Middleware;
 
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 
 /**
  * The collection for store middlewares for consumers.
@@ -69,7 +69,7 @@ class ConsumerMiddlewares implements \IteratorAggregate
         $middlewares = $this->middlewares;
 
         while ($middleware = \array_pop($middlewares)) {
-            $lastExecutable = static function (ReceivedMessageInterface $message) use ($middleware, $lastExecutable) {
+            $lastExecutable = static function (ReceivedMessage $message) use ($middleware, $lastExecutable) {
                 $middleware->handle($message, $lastExecutable);
             };
         }

@@ -20,28 +20,18 @@ use Psr\Log\LoggerInterface;
 /**
  * Decorate consumer for logging.
  */
-class LoggingConsumer implements ConsumerInterface, MiddlewareAwareInterface
+readonly class LoggingConsumer implements ConsumerInterface, MiddlewareAwareInterface
 {
-    /**
-     * @var ConsumerInterface
-     */
-    private ConsumerInterface $decoratedConsumer;
-
-    /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $logger;
-
     /**
      * Constructor.
      *
      * @param ConsumerInterface $decoratedConsumer
      * @param LoggerInterface   $logger
      */
-    public function __construct(ConsumerInterface $decoratedConsumer, LoggerInterface $logger)
-    {
-        $this->decoratedConsumer = $decoratedConsumer;
-        $this->logger = $logger;
+    public function __construct(
+        private ConsumerInterface $decoratedConsumer,
+        private LoggerInterface   $logger
+    ) {
     }
 
     /**

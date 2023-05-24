@@ -15,6 +15,7 @@ namespace FiveLab\Component\Amqp\Tests\Functional\Adapter\AmqpLibSockets;
 
 use FiveLab\Component\Amqp\Adapter\AmqpLib\Connection\AmqpSocketsConnectionFactory;
 use FiveLab\Component\Amqp\Connection\ConnectionFactoryInterface;
+use FiveLab\Component\Amqp\Connection\Driver;
 use FiveLab\Component\Amqp\Tests\Functional\Adapter\AmqpLib\SpoolConnectionTest as SpoolSocketsConnectionTestCase;
 
 class SpoolConnectionTest extends SpoolSocketsConnectionTestCase
@@ -24,13 +25,6 @@ class SpoolConnectionTest extends SpoolSocketsConnectionTestCase
      */
     protected function createConnectionFactory(): ConnectionFactoryInterface
     {
-        return new AmqpSocketsConnectionFactory([
-            'host'         => $this->getRabbitMqHost(),
-            'port'         => $this->getRabbitMqPort(),
-            'vhost'        => $this->getRabbitMqVhost(),
-            'login'        => $this->getRabbitMqLogin(),
-            'password'     => $this->getRabbitMqPassword(),
-            'read_timeout' => 2,
-        ]);
+        return new AmqpSocketsConnectionFactory($this->getRabbitMqDsn(Driver::AmqpSockets));
     }
 }

@@ -16,13 +16,12 @@ namespace FiveLab\Component\Amqp\Tests\Unit\Exchange\Registry;
 use FiveLab\Component\Amqp\Exception\ExchangeFactoryNotFoundException;
 use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
 use FiveLab\Component\Amqp\Exchange\Registry\ExchangeFactoryRegistry;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class ExchangeFactoryRegistryTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGet(): void
     {
         $factory1 = $this->createUniqueFactory();
@@ -40,9 +39,7 @@ class ExchangeFactoryRegistryTest extends TestCase
         self::assertEquals($factory2, $result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldThrowExceptionIfFactoryWasNotFound(): void
     {
         self::expectException(ExchangeFactoryNotFoundException::class);
@@ -57,9 +54,7 @@ class ExchangeFactoryRegistryTest extends TestCase
         $registry->get('some');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldThrowEceptionIfRegistryEmpty(): void
     {
         self::expectException(ExchangeFactoryNotFoundException::class);

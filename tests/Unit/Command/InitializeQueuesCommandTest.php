@@ -16,6 +16,7 @@ namespace FiveLab\Component\Amqp\Tests\Unit\Command;
 use FiveLab\Component\Amqp\Command\InitializeQueuesCommand;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Queue\Registry\QueueFactoryRegistry;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -49,9 +50,7 @@ class InitializeQueuesCommandTest extends TestCase
         $this->output = new BufferedOutput();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessConfigureWithDefaults(): void
     {
         $command = new InitializeQueuesCommand($this->registry, []);
@@ -60,9 +59,7 @@ class InitializeQueuesCommandTest extends TestCase
         self::assertEquals('Initialize queues.', $command->getDescription());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessExecuteWithoutExchanges(): void
     {
         $this->createFactory('test_1', false);
@@ -75,9 +72,7 @@ class InitializeQueuesCommandTest extends TestCase
         self::assertEquals('', $this->output->fetch());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessExecute(): void
     {
         $this->createFactory('test_1', true);
@@ -92,9 +87,7 @@ class InitializeQueuesCommandTest extends TestCase
         self::assertEquals('', $this->output->fetch());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessExecuteWithVerbose(): void
     {
         $this->createFactory('test_1', true);

@@ -13,34 +13,31 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Unit\Queue\Definition;
 
-use FiveLab\Component\Amqp\Argument\ArgumentDefinitions;
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
-use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
+use FiveLab\Component\Amqp\Argument\ArgumentDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class QueueDefinitionTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateWithDefaults(): void
     {
         $def = new QueueDefinition('some');
 
-        self::assertEquals('some', $def->getName());
-        self::assertEquals(new BindingDefinitions(), $def->getBindings());
-        self::assertEquals(new BindingDefinitions(), $def->getUnBindings());
-        self::assertTrue($def->isDurable());
-        self::assertFalse($def->isPassive());
-        self::assertFalse($def->isExclusive());
-        self::assertFalse($def->isAutoDelete());
+        self::assertEquals('some', $def->name);
+        self::assertEquals(new BindingDefinitions(), $def->bindings);
+        self::assertEquals(new BindingDefinitions(), $def->unbindings);
+        self::assertTrue($def->durable);
+        self::assertFalse($def->passive);
+        self::assertFalse($def->exclusive);
+        self::assertFalse($def->autoDelete);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateWithBinding(): void
     {
         $bind1 = new BindingDefinition('ex1', 'rout1');
@@ -48,12 +45,10 @@ class QueueDefinitionTest extends TestCase
 
         $def = new QueueDefinition('some', new BindingDefinitions($bind1, $bind2));
 
-        self::assertEquals(new BindingDefinitions($bind1, $bind2), $def->getBindings());
+        self::assertEquals(new BindingDefinitions($bind1, $bind2), $def->bindings);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateWithUnBinding(): void
     {
         $bind1 = new BindingDefinition('ex1', 'rout1');
@@ -61,58 +56,48 @@ class QueueDefinitionTest extends TestCase
 
         $def = new QueueDefinition('some', new BindingDefinitions(), new BindingDefinitions($bind1, $bind2));
 
-        self::assertEquals(new BindingDefinitions($bind1, $bind2), $def->getUnBindings());
+        self::assertEquals(new BindingDefinitions($bind1, $bind2), $def->unbindings);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateWithoutDurable(): void
     {
         $def = new QueueDefinition('some', null, null, false);
 
-        self::assertFalse($def->isDurable());
+        self::assertFalse($def->durable);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateWithPassive(): void
     {
         $def = new QueueDefinition('some', null, null, true, true);
 
-        self::assertTrue($def->isPassive());
+        self::assertTrue($def->passive);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateWithExclusive(): void
     {
         $def = new QueueDefinition('some', null, null, true, true, true);
 
-        self::assertTrue($def->isExclusive());
+        self::assertTrue($def->exclusive);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateWithAutoDelete(): void
     {
         $def = new QueueDefinition('some', null, null, true, true, true, true);
 
-        self::assertTrue($def->isAutoDelete());
+        self::assertTrue($def->autoDelete);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateWithArguments(): void
     {
         $def = new QueueDefinition('some', null, null, false, false, false, false, new ArgumentDefinitions(
             new ArgumentDefinition('some', 'foo-bar')
         ));
 
-        self::assertEquals(new ArgumentDefinitions(new ArgumentDefinition('some', 'foo-bar')), $def->getArguments());
+        self::assertEquals(new ArgumentDefinitions(new ArgumentDefinition('some', 'foo-bar')), $def->arguments);
     }
 }

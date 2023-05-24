@@ -18,7 +18,7 @@ use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 /**
  * Definition for "x-queue-mode" argument.
  */
-class QueueModeArgument extends ArgumentDefinition
+readonly class QueueModeArgument extends ArgumentDefinition
 {
     /**
      * Constructor.

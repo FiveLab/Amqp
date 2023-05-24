@@ -16,47 +16,25 @@ namespace FiveLab\Component\Amqp\Argument;
 /**
  * Argument definition
  */
-class ArgumentDefinition
+readonly class ArgumentDefinition
 {
     /**
      * @var string
      */
-    private string $name;
-
-    /**
-     * @var mixed
-     */
-    private $value;
+    public string $name;
 
     /**
      * Constructor.
      *
-     * @param string $name
-     * @param mixed  $value
+     * @param string|\BackedEnum $name
+     * @param mixed              $value
      */
-    public function __construct(string $name, $value)
+    public function __construct(string|\BackedEnum $name, public mixed $value)
     {
+        if ($name instanceof \BackedEnum) {
+            $name = (string) $name->value;
+        }
+
         $this->name = $name;
-        $this->value = $value;
-    }
-
-    /**
-     * Get name
-     *
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Get value
-     *
-     * @return mixed
-     */
-    public function getValue()
-    {
-        return $this->value;
     }
 }

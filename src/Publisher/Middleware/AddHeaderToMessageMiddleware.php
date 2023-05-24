@@ -15,48 +15,35 @@ namespace FiveLab\Component\Amqp\Publisher\Middleware;
 
 use FiveLab\Component\Amqp\Message\Headers;
 use FiveLab\Component\Amqp\Message\Message;
-use FiveLab\Component\Amqp\Message\MessageInterface;
 
 /**
  * The middleware for add custom header before sending the message.
  */
-class AddHeaderToMessageMiddleware implements PublisherMiddlewareInterface
+readonly class AddHeaderToMessageMiddleware implements PublisherMiddlewareInterface
 {
-    /**
-     * @var string
-     */
-    private string $name;
-
-    /**
-     * @var string
-     */
-    private string $value;
-
     /**
      * Constructor.
      *
      * @param string $name
      * @param string $value
      */
-    public function __construct(string $name, string $value)
+    public function __construct(private string $name, private string $value)
     {
-        $this->name = $name;
-        $this->value = $value;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function handle(MessageInterface $message, callable $next, string $routingKey = ''): void
+    public function handle(Message $message, callable $next, string $routingKey = ''): void
     {
-        $headers = $message->getHeaders()->all();
+        $headers = $message->headers->all();
         $headers[$this->name] = $this->value;
 
         $messageWithHeader = new Message(
-            $message->getPayload(),
-            $message->getOptions(),
+            $message->payload,
+            $message->options,
             new Headers($headers),
-            $message->getIdentifier()
+            $message->identifier
         );
 
         $next($messageWithHeader, $routingKey);

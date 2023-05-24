@@ -19,16 +19,16 @@
     ],
 
     "require": {
-        "php": "^8.0"
+        "php": "^8.2"
     },
 
     "require-dev": {
         "ext-amqp": "*",
         "ext-sockets": "*",
-        "phpunit/phpunit": "~9.6",
+        "phpunit/phpunit": "~10.0",
         "phpmetrics/phpmetrics": "~2.7",
         "phpstan/phpstan": "~1.10.0",
-        "escapestudios/symfony2-coding-standard": "~3.5.0",
+        "escapestudios/symfony2-coding-standard": "~3.5",
         "guzzlehttp/guzzle": "~6.5.6",
         "symfony/console": "~5.4 | ~6.0",
         "ramsey/uuid": "~4.7",

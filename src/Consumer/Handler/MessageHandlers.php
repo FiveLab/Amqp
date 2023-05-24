@@ -14,8 +14,8 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Consumer\Handler;
 
 use FiveLab\Component\Amqp\Exception\MessageHandlerNotSupportedException;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Message\ReceivedMessages;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
 
 /**
  * The chain of message handlers.
@@ -25,7 +25,7 @@ class MessageHandlers implements MessageHandlerInterface, FlushableMessageHandle
     /**
      * @var array|MessageHandlerInterface[]
      */
-    private array $handlers;
+    private readonly array $handlers;
 
     /**
      * Constructor.
@@ -40,7 +40,7 @@ class MessageHandlers implements MessageHandlerInterface, FlushableMessageHandle
     /**
      * {@inheritdoc}
      */
-    public function supports(ReceivedMessageInterface $message): bool
+    public function supports(ReceivedMessage $message): bool
     {
         try {
             $this->getMessageHandlerForMessage($message);
@@ -54,7 +54,7 @@ class MessageHandlers implements MessageHandlerInterface, FlushableMessageHandle
     /**
      * {@inheritdoc}
      */
-    public function handle(ReceivedMessageInterface $message): void
+    public function handle(ReceivedMessage $message): void
     {
         $handler = $this->getMessageHandlerForMessage($message);
 
@@ -81,7 +81,7 @@ class MessageHandlers implements MessageHandlerInterface, FlushableMessageHandle
     /**
      * {@inheritdoc}
      */
-    public function catchError(ReceivedMessageInterface $message, \Throwable $error): void
+    public function catchError(ReceivedMessage $message, \Throwable $error): void
     {
         $handler = $this->getMessageHandlerForMessage($message);
 
@@ -95,13 +95,13 @@ class MessageHandlers implements MessageHandlerInterface, FlushableMessageHandle
     /**
      * Get the message handler for message
      *
-     * @param ReceivedMessageInterface $message
+     * @param ReceivedMessage $message
      *
      * @return MessageHandlerInterface
      *
      * @throws MessageHandlerNotSupportedException
      */
-    private function getMessageHandlerForMessage(ReceivedMessageInterface $message): MessageHandlerInterface
+    private function getMessageHandlerForMessage(ReceivedMessage $message): MessageHandlerInterface
     {
         foreach ($this->handlers as $handler) {
             if ($handler->supports($message)) {

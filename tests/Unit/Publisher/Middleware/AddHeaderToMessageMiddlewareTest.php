@@ -16,24 +16,22 @@ namespace FiveLab\Component\Amqp\Tests\Unit\Publisher\Middleware;
 use FiveLab\Component\Amqp\Message\Headers;
 use FiveLab\Component\Amqp\Message\Identifier;
 use FiveLab\Component\Amqp\Message\Message;
-use FiveLab\Component\Amqp\Message\MessageInterface;
 use FiveLab\Component\Amqp\Message\Options;
 use FiveLab\Component\Amqp\Message\Payload;
 use FiveLab\Component\Amqp\Publisher\Middleware\AddHeaderToMessageMiddleware;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class AddHeaderToMessageMiddlewareTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessAddHeader(): void
     {
         $middleware = new AddHeaderToMessageMiddleware('x-custom-header', 'foo-bar');
         $message = new Message(new Payload('foo'));
         $executed = false;
 
-        $next = static function (MessageInterface $message, string $routingKey) use (&$executed) {
+        $next = static function (Message $message, string $routingKey) use (&$executed) {
             $executed = true;
             self::assertEquals('foo.bar', $routingKey);
 

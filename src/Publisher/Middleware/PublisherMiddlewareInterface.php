@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Publisher\Middleware;
 
-use FiveLab\Component\Amqp\Message\MessageInterface;
+use FiveLab\Component\Amqp\Message\Message;
 
 /**
  * All publisher middleware should implement this interface.
@@ -23,9 +23,9 @@ interface PublisherMiddlewareInterface
     /**
      * Handle on middleware layer
      *
-     * @param MessageInterface $message
-     * @param callable         $next
-     * @param string           $routingKey
+     * @param Message  $message
+     * @param callable $next
+     * @param string   $routingKey
      */
-    public function handle(MessageInterface $message, callable $next, string $routingKey = ''): void;
+    public function handle(Message $message, callable $next, string $routingKey = ''): void;
 }

@@ -15,8 +15,8 @@ namespace FiveLab\Component\Amqp\Tests\Functional\Consumer\Handler;
 
 use FiveLab\Component\Amqp\Consumer\Handler\FlushableMessageHandlerInterface;
 use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlerInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Message\ReceivedMessages;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
 
 class MessageHandlerMock implements MessageHandlerInterface, FlushableMessageHandlerInterface
 {
@@ -26,12 +26,12 @@ class MessageHandlerMock implements MessageHandlerInterface, FlushableMessageHan
     private string $supportsRoutingKey;
 
     /**
-     * @var array|ReceivedMessageInterface[]
+     * @var array|ReceivedMessage[]
      */
     private array $receivedMessages = [];
 
     /**
-     * @var array|ReceivedMessageInterface[]
+     * @var array|ReceivedMessage[]
      */
     private array $flushedMessages = [];
 
@@ -60,15 +60,15 @@ class MessageHandlerMock implements MessageHandlerInterface, FlushableMessageHan
     /**
      * {@inheritdoc}
      */
-    public function supports(ReceivedMessageInterface $message): bool
+    public function supports(ReceivedMessage $message): bool
     {
-        return $message->getRoutingKey() === $this->supportsRoutingKey;
+        return $message->routingKey === $this->supportsRoutingKey;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function handle(ReceivedMessageInterface $message): void
+    public function handle(ReceivedMessage $message): void
     {
         $this->receivedMessages[] = $message;
 
@@ -112,7 +112,7 @@ class MessageHandlerMock implements MessageHandlerInterface, FlushableMessageHan
     /**
      * Get flushed messages
      *
-     * @return array|ReceivedMessageInterface[]
+     * @return array|ReceivedMessage[]
      */
     public function getFlushedMessages(): array
     {
@@ -132,7 +132,7 @@ class MessageHandlerMock implements MessageHandlerInterface, FlushableMessageHan
     /**
      * Get received messages
      *
-     * @return array|ReceivedMessageInterface[]
+     * @return array|ReceivedMessage[]
      */
     public function getReceivedMessages(): array
     {

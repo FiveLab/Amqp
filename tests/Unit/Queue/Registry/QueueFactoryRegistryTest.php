@@ -16,13 +16,12 @@ namespace FiveLab\Component\Amqp\Tests\Unit\Queue\Registry;
 use FiveLab\Component\Amqp\Exception\QueueFactoryNotFoundException;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Queue\Registry\QueueFactoryRegistry;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class QueueFactoryRegistryTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGet(): void
     {
         $factory1 = $this->createUniqueFactory();
@@ -40,9 +39,7 @@ class QueueFactoryRegistryTest extends TestCase
         self::assertEquals($factory2, $result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldThrowExceptionIfFactoryWasNotFound(): void
     {
         self::expectException(QueueFactoryNotFoundException::class);
@@ -57,9 +54,7 @@ class QueueFactoryRegistryTest extends TestCase
         $registry->get('some');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldThrowExceptionIfRegistryEmpty(): void
     {
         self::expectException(QueueFactoryNotFoundException::class);

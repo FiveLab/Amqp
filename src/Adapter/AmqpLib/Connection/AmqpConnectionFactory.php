@@ -15,18 +15,16 @@ namespace FiveLab\Component\Amqp\Adapter\AmqpLib\Connection;
 
 use FiveLab\Component\Amqp\Connection\ConnectionFactoryInterface;
 use FiveLab\Component\Amqp\Connection\ConnectionInterface;
-use PhpAmqpLib\Connection\AMQPLazyConnection;
+use FiveLab\Component\Amqp\Connection\Driver;
+use FiveLab\Component\Amqp\Connection\Dsn;
+use PhpAmqpLib\Connection\AMQPConnectionConfig;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
 
 /**
  * The factory for create connection provided via php-amqplib library.
  */
 class AmqpConnectionFactory implements ConnectionFactoryInterface
 {
-    /**
-     * @var array<string, mixed>
-     */
-    private array $connectionOptions;
-
     /**
      * @var AmqpConnection|null
      */
@@ -35,11 +33,17 @@ class AmqpConnectionFactory implements ConnectionFactoryInterface
     /**
      * Constructor.
      *
-     * @param array<string, mixed> $connectionOptions
+     * @param Dsn $dsn
      */
-    public function __construct(array $connectionOptions)
+    public function __construct(private readonly Dsn $dsn)
     {
-        $this->connectionOptions = $connectionOptions;
+        if ($this->dsn->driver !== Driver::AmqpLib) {
+            throw new \RuntimeException(\sprintf(
+                'Can\'t make %s with different driver "%s".',
+                __CLASS__,
+                $this->dsn->driver->value
+            ));
+        }
     }
 
     /**
@@ -51,25 +55,32 @@ class AmqpConnectionFactory implements ConnectionFactoryInterface
             return $this->connection;
         }
 
-        $amqpLibConnection = new AMQPLazyConnection(
-            $this->connectionOptions['host'],
-            $this->connectionOptions['port'],
-            $this->connectionOptions['login'] ?? 'guest',
-            $this->connectionOptions['password'] ?? 'guest',
-            $this->connectionOptions['vhost'] ?? '/',
-            $this->connectionOptions['insist'] ?? false,
-            $this->connectionOptions['login_method'] ?? 'AMQPLAIN',
-            $this->connectionOptions['login_response'] ?? null,
-            $this->connectionOptions['locale'] ?? 'en_US',
-            $this->connectionOptions['connection_timeout'] ?? 5.0,
-            $this->connectionOptions['read_write_timeout'] ?? $this->connectionOptions['read_timeout'] ?? 0,
+        $config = new AMQPConnectionConfig();
+        $config->setIsLazy(true);
+
+        $options = $this->dsn->options;
+
+        $amqpLibConnection = new AMQPStreamConnection(
+            $this->dsn->host,
+            $this->dsn->port,
+            $this->dsn->username,
+            $this->dsn->password,
+            $this->dsn->vhost,
+            $options['insist'] ?? false,
+            $options['login_method'] ?? 'AMQPLAIN',
+            $options['login_response'] ?? null,
+            $options['locale'] ?? 'en_US',
+            $options['connection_timeout'] ?? 5.0,
+            $options['read_write_timeout'] ?? $options['read_timeout'] ?? 0,
             null,
-            $this->connectionOptions['keepalive'] ?? false,
-            $this->connectionOptions['heartbeat'] ?? 0,
-            $this->connectionOptions['channel_rpc_timeout'] ?? $this->connectionOptions['read_timeout'] ?? 0
+            $options['keepalive'] ?? false,
+            $options['heartbeat'] ?? 0,
+            $options['channel_rpc_timeout'] ?? $options['read_timeout'] ?? 0,
+            null,
+            $config
         );
 
-        $this->connection = new AmqpConnection($amqpLibConnection, $this->connectionOptions['read_timeout'] ?? 0);
+        $this->connection = new AmqpConnection($amqpLibConnection, $options['read_timeout'] ?? 0);
 
         return $this->connection;
     }

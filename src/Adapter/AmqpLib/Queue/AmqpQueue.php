@@ -17,7 +17,7 @@ use FiveLab\Component\Amqp\Adapter\AmqpLib\Channel\AmqpChannel;
 use FiveLab\Component\Amqp\Adapter\AmqpLib\Message\AmqpReceivedMessage;
 use FiveLab\Component\Amqp\Channel\ChannelInterface;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
@@ -27,28 +27,18 @@ use PhpAmqpLib\Wire\AMQPTable;
 /**
  * The queue provided via php-amqplib library.
  */
-class AmqpQueue implements QueueInterface
+readonly class AmqpQueue implements QueueInterface
 {
-    /**
-     * @var AmqpChannel
-     */
-    private AmqpChannel $channel;
-
-    /**
-     * @var QueueDefinition
-     */
-    private QueueDefinition $definition;
-
     /**
      * Constructor.
      *
      * @param AmqpChannel     $channel
      * @param QueueDefinition $definition
      */
-    public function __construct(AmqpChannel $channel, QueueDefinition $definition)
-    {
-        $this->channel = $channel;
-        $this->definition = $definition;
+    public function __construct(
+        private AmqpChannel     $channel,
+        private QueueDefinition $definition
+    ) {
     }
 
     /**
@@ -72,10 +62,10 @@ class AmqpQueue implements QueueInterface
                 $tag,
                 false,
                 false,
-                $this->definition->isExclusive(),
+                $this->definition->exclusive,
                 false,
                 function (AMQPMessage $message) use ($handler) {
-                    $receivedMessage = new AmqpReceivedMessage($this, $message);
+                    $receivedMessage = new AmqpReceivedMessage($message);
 
                     $handler($receivedMessage);
                 }
@@ -105,12 +95,12 @@ class AmqpQueue implements QueueInterface
     /**
      * {@inheritdoc}
      */
-    public function get(): ?ReceivedMessageInterface
+    public function get(): ?ReceivedMessage
     {
         $message = $this->channel->getChannel()->basic_get($this->getName());
 
         if ($message) {
-            return new AmqpReceivedMessage($this, $message);
+            return new AmqpReceivedMessage($message);
         }
 
         return null;
@@ -139,7 +129,7 @@ class AmqpQueue implements QueueInterface
      */
     public function getName(): string
     {
-        return $this->definition->getName();
+        return $this->definition->name;
     }
 
     /**
@@ -153,16 +143,16 @@ class AmqpQueue implements QueueInterface
     {
         $arguments = new AMQPTable();
 
-        foreach ($this->definition->getArguments() as $argument) {
-            $arguments->set($argument->getName(), $argument->getValue());
+        foreach ($this->definition->arguments as $argument) {
+            $arguments->set($argument->name, $argument->value);
         }
 
         return $this->channel->getChannel()->queue_declare(
             $this->getName(),
-            $this->definition->isPassive(),
-            $this->definition->isDurable(),
-            $this->definition->isExclusive(),
-            $this->definition->isAutoDelete(),
+            $this->definition->passive,
+            $this->definition->durable,
+            $this->definition->exclusive,
+            $this->definition->autoDelete,
             false,
             $arguments
         );

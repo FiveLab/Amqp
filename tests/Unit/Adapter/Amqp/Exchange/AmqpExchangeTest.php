@@ -19,7 +19,7 @@ use FiveLab\Component\Amqp\Message\Headers;
 use FiveLab\Component\Amqp\Message\Message;
 use FiveLab\Component\Amqp\Message\Options;
 use FiveLab\Component\Amqp\Message\Payload;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class AmqpExchangeTest extends TestCase
@@ -30,7 +30,7 @@ class AmqpExchangeTest extends TestCase
     private AmqpChannel $channel;
 
     /**
-     * @var \AMQPExchange|MockObject
+     * @var \AMQPExchange
      */
     private \AMQPExchange $originalExchange;
 
@@ -50,9 +50,7 @@ class AmqpExchangeTest extends TestCase
         $this->exchange = new AmqpExchange($this->channel, $this->originalExchange);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGetChannel(): void
     {
         $channel = $this->exchange->getChannel();
@@ -60,9 +58,7 @@ class AmqpExchangeTest extends TestCase
         self::assertEquals($this->channel, $channel);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGetName(): void
     {
         $this->originalExchange->expects(self::once())
@@ -74,9 +70,7 @@ class AmqpExchangeTest extends TestCase
         self::assertEquals('some', $name);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessPublishMessageWithPersistsMode(): void
     {
         $message = new Message(
@@ -94,9 +88,7 @@ class AmqpExchangeTest extends TestCase
         $this->exchange->publish($message, 'some');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessPublishMessageWithoutPersistsMode(): void
     {
         $message = new Message(
@@ -114,9 +106,7 @@ class AmqpExchangeTest extends TestCase
         $this->exchange->publish($message, 'foo-bar');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessPublishMessageWithHeaders(): void
     {
         $message = new Message(

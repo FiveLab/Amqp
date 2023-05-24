@@ -13,19 +13,21 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Functional\Adapter;
 
-use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
 use FiveLab\Component\Amqp\Consumer\Middleware\StopAfterNExecutesMiddleware;
 use FiveLab\Component\Amqp\Consumer\Spool\SpoolConsumer;
 use FiveLab\Component\Amqp\Consumer\Spool\SpoolConsumerConfiguration;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Message\ReceivedMessages;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Tests\Functional\Consumer\Handler\MessageHandlerMock;
 use FiveLab\Component\Amqp\Tests\Functional\RabbitMqTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 
 abstract class SpoolConsumerTestCase extends RabbitMqTestCase
 {
@@ -68,9 +70,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
      */
     abstract protected function createQueueFactory(QueueDefinition $definition): QueueFactoryInterface;
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessConsume(): void
     {
         $this->publishMessages(97);
@@ -86,7 +86,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
 
         try {
             $consumer->run();
-        } catch (ConsumerTimeoutExceedException $e) {
+        } catch (ConsumerTimeoutExceedException) {
             // Normal flow.
         }
 
@@ -96,9 +96,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         self::assertQueueEmpty($this->queueFactory);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessReturnMessagesToBrokerIfSpoolFailed(): void
     {
         $this->publishMessages(10);
@@ -133,9 +131,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         self::assertQueueContainsCountMessages($this->queueFactory, 10);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldNotReturnMessagesToBrokerIfSpoolFailedIfRequeueIsFalse(): void
     {
         $this->publishMessages(10);
@@ -170,9 +166,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         self::assertQueueContainsCountMessages($this->queueFactory, 5);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldReturnMessagesToBrokerIfFlushFailed(): void
     {
         $this->publishMessages(10);
@@ -202,9 +196,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         self::assertQueueContainsCountMessages($this->queueFactory, 10);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldNotReturnMessagesToBrokerIfFlushFailedAndRequeueIsFalse(): void
     {
         $this->publishMessages(10);
@@ -234,16 +226,14 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         self::assertQueueContainsCountMessages($this->queueFactory, 5);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldReturnMessagesToBrokerOnlyNotAckedMessagesIfFlushFalied(): void
     {
         $this->publishMessages(5);
 
         $this->messageHandler->setFlushCallback(static function (ReceivedMessages $receivedMessages) {
             foreach ($receivedMessages as $receivedMessage) {
-                if ($receivedMessage->getPayload()->getData() === 'message #4') {
+                if ($receivedMessage->payload->data === 'message #4') {
                     throw new \InvalidArgumentException('some foo');
                 }
 
@@ -268,8 +258,8 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
 
             self::fail('must throw exception');
         } catch (\InvalidArgumentException $e) {
-            $nonProcessMessages = \array_map(static function (ReceivedMessageInterface $receivedMessage) {
-                return $receivedMessage->getPayload()->getData();
+            $nonProcessMessages = \array_map(static function (ReceivedMessage $receivedMessage) {
+                return $receivedMessage->payload->data;
             }, $this->getAllMessagesFromQueue($this->queueFactory));
 
             self::assertEquals([
@@ -281,16 +271,14 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldThrowExceptionIfMessageHandlerTryAnsweringToBroker(): void
     {
         $this->publishMessages(10);
 
         $processedIterations = 0;
 
-        $this->messageHandler->setHandlerCallback(static function (ReceivedMessageInterface $message) use (&$processedIterations) {
+        $this->messageHandler->setHandlerCallback(static function (ReceivedMessage $message) use (&$processedIterations) {
             if (4 === $processedIterations) {
                 $message->ack();
             }
@@ -312,17 +300,16 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
 
         try {
             $consumer->run();
-        } catch (ConsumerTimeoutExceedException $e) {
+        } catch (ConsumerTimeoutExceedException) {
             // Nothing action.
             self::fail('The consumer should throw exception if message handler trying to answering to broker.');
         }
     }
 
     /**
-     * @test
-     *
      * @see https://github.com/php-amqp/php-amqp/issues/327
      */
+    #[Test]
     public function shouldNotThrowOrphanedEnvelope(): void
     {
         $this->publishMessage('message #1');
@@ -352,9 +339,9 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
             $consumer->run();
 
             self::fail('Must throw exception');
-        } catch (ConsumerTimeoutExceedException $error) {
-            $receivedMessages = \array_map(static function (ReceivedMessageInterface $message) {
-                return $message->getPayload()->getData();
+        } catch (ConsumerTimeoutExceedException) {
+            $receivedMessages = \array_map(static function (ReceivedMessage $message) {
+                return $message->payload->data;
             }, $this->messageHandler->getReceivedMessages());
 
             self::assertEquals([
@@ -363,8 +350,8 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
                 'message #3',
             ], $receivedMessages);
 
-            $flushedMessages = \array_map(static function (ReceivedMessageInterface $message) {
-                return $message->getPayload()->getData();
+            $flushedMessages = \array_map(static function (ReceivedMessage $message) {
+                return $message->payload->data;
             }, $this->messageHandler->getFlushedMessages());
 
             self::assertEquals([
@@ -377,9 +364,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSavePrefetchConfigurationAfterConsumerTimeout(): void
     {
         $this->publishMessage('message #1');
@@ -415,14 +400,12 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
             $consumer->run();
 
             self::fail('Must throw exception');
-        } catch (ConsumerTimeoutExceedException $error) {
+        } catch (ConsumerTimeoutExceedException) {
             self::assertCount(3, $this->messageHandler->getFlushedMessages());
         }
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessProcessOnStopAfterNExecutes(): void
     {
         $this->publishMessages(12);
@@ -443,17 +426,8 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         self::assertQueueContainsCountMessages($this->queueFactory, 7);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider providePrefetchAndMessageCount
-     *
-     * @param int $prefetchCount
-     * @param int $messageCount
-     * @param int $expectedFlushCallTimes
-     *
-     * @throws \Throwable
-     */
+    #[Test]
+    #[DataProvider('providePrefetchAndMessageCount')]
     public function shouldFlushWithZeroReadTimeout(int $prefetchCount, int $messageCount, int $expectedFlushCallTimes): void
     {
         $this->publishMessages($messageCount);
@@ -481,7 +455,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
 
         try {
             $consumer->run();
-        } catch (ConsumerTimeoutExceedException $e) {
+        } catch (ConsumerTimeoutExceedException) {
             // Normal expected flow.
         }
 
@@ -501,7 +475,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
     /**
      * @return array
      */
-    public function providePrefetchAndMessageCount(): array
+    public static function providePrefetchAndMessageCount(): array
     {
         return [
             'message amount equal to prefetch count'    => [10, 10, 1],

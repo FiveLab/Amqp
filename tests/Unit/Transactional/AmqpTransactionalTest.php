@@ -16,13 +16,13 @@ namespace FiveLab\Component\Amqp\Tests\Unit\Transactional;
 use FiveLab\Component\Amqp\Channel\ChannelFactoryInterface;
 use FiveLab\Component\Amqp\Channel\ChannelInterface;
 use FiveLab\Component\Amqp\Transactional\AmqpTransactional;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class AmqpTransactionalTest extends TestCase
 {
     /**
-     * @var ChannelInterface|MockObject
+     * @var ChannelInterface
      */
     private ChannelInterface $channel;
 
@@ -38,7 +38,6 @@ class AmqpTransactionalTest extends TestCase
     {
         $this->channel = $this->createMock(ChannelInterface::class);
 
-        /** @var ChannelFactoryInterface|MockObject $channelFactory */
         $channelFactory = $this->createMock(ChannelFactoryInterface::class);
 
         $channelFactory->expects(self::any())
@@ -48,9 +47,7 @@ class AmqpTransactionalTest extends TestCase
         $this->transactional = new AmqpTransactional($channelFactory);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessBegin(): void
     {
         $this->channel->expects(self::once())
@@ -59,9 +56,7 @@ class AmqpTransactionalTest extends TestCase
         $this->transactional->begin();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCommit(): void
     {
         $this->channel->expects(self::once())
@@ -70,9 +65,7 @@ class AmqpTransactionalTest extends TestCase
         $this->transactional->commit();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessRollback(): void
     {
         $this->channel->expects(self::once())
@@ -81,9 +74,7 @@ class AmqpTransactionalTest extends TestCase
         $this->transactional->rollback();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessExecute(): void
     {
         $this->channel->expects(self::once())
@@ -99,9 +90,7 @@ class AmqpTransactionalTest extends TestCase
         self::assertEquals('some foo', $result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessExecuteWithFail(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -118,9 +107,7 @@ class AmqpTransactionalTest extends TestCase
         });
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessExecuteWithControlNestingLevel(): void
     {
         $this->channel->expects(self::once())
@@ -138,9 +125,7 @@ class AmqpTransactionalTest extends TestCase
         $this->transactional->commit();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldFailExecuteWithControlNestingLevel(): void
     {
         $this->channel->expects(self::once())

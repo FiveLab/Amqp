@@ -16,7 +16,7 @@ namespace FiveLab\Component\Amqp\Consumer\Tag;
 /**
  * Generate empty consumer tag
  */
-class EmptyConsumerTagGenerator implements ConsumerTagGeneratorInterface
+readonly class EmptyConsumerTagGenerator implements ConsumerTagGeneratorInterface
 {
     /**
      * {@inheritdoc}

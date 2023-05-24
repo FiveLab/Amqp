@@ -14,7 +14,7 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Functional\Consumer\Handler;
 
 use FiveLab\Component\Amqp\Consumer\Handler\ThrowableMessageHandlerInterface;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 
 class ThrowableMessageHandlerMock extends MessageHandlerMock implements ThrowableMessageHandlerInterface
 {
@@ -24,9 +24,9 @@ class ThrowableMessageHandlerMock extends MessageHandlerMock implements Throwabl
     private ?\Throwable $shouldThrowException = null;
 
     /**
-     * @var ReceivedMessageInterface|null
+     * @var ReceivedMessage|null
      */
-    private ?ReceivedMessageInterface $catchReceivedMessage = null;
+    private ?ReceivedMessage $catchReceivedMessage = null;
 
     /**
      * @var \Throwable|null
@@ -41,7 +41,7 @@ class ThrowableMessageHandlerMock extends MessageHandlerMock implements Throwabl
     /**
      * {@inheritdoc}
      */
-    public function handle(ReceivedMessageInterface $message): void
+    public function handle(ReceivedMessage $message): void
     {
         parent::handle($message);
 
@@ -53,7 +53,7 @@ class ThrowableMessageHandlerMock extends MessageHandlerMock implements Throwabl
     /**
      * {@inheritdoc}
      */
-    public function catchError(ReceivedMessageInterface $message, \Throwable $error): void
+    public function catchError(ReceivedMessage $message, \Throwable $error): void
     {
         $this->catchError = $error;
         $this->catchReceivedMessage = $message;
@@ -86,9 +86,9 @@ class ThrowableMessageHandlerMock extends MessageHandlerMock implements Throwabl
     /**
      * Get catch received message
      *
-     * @return ReceivedMessageInterface
+     * @return ReceivedMessage
      */
-    public function getCatchReceivedMessage(): ?ReceivedMessageInterface
+    public function getCatchReceivedMessage(): ?ReceivedMessage
     {
         return $this->catchReceivedMessage;
     }

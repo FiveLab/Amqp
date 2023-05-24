@@ -18,6 +18,7 @@ use FiveLab\Component\Amqp\Adapter\Amqp\Connection\AmqpConnectionFactory;
 use FiveLab\Component\Amqp\Adapter\Amqp\Exchange\AmqpExchangeFactory;
 use FiveLab\Component\Amqp\Adapter\Amqp\Queue\AmqpQueueFactory;
 use FiveLab\Component\Amqp\Channel\Definition\ChannelDefinition;
+use FiveLab\Component\Amqp\Connection\Driver;
 use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
 use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
@@ -31,14 +32,7 @@ class AmqpSingleSingleConsumerTest extends SingleConsumerTestCase
      */
     protected function createQueueFactory(QueueDefinition $definition): QueueFactoryInterface
     {
-        $connectionFactory = new AmqpConnectionFactory([
-            'host'         => $this->getRabbitMqHost(),
-            'port'         => $this->getRabbitMqPort(),
-            'vhost'        => $this->getRabbitMqVhost(),
-            'login'        => $this->getRabbitMqLogin(),
-            'password'     => $this->getRabbitMqPassword(),
-            'read_timeout' => 1,
-        ]);
+        $connectionFactory = new AmqpConnectionFactory($this->getRabbitMqDsn(Driver::AmqpExt, ['read_timeout' => 1]));
 
         $channelFactory = new AmqpChannelFactory($connectionFactory, new ChannelDefinition());
 
@@ -50,14 +44,7 @@ class AmqpSingleSingleConsumerTest extends SingleConsumerTestCase
      */
     protected function createProxyExchangeFactory(ExchangeDefinition $definition): ExchangeFactoryInterface
     {
-        $connectionFactory = new AmqpConnectionFactory([
-            'host'         => $this->getRabbitMqHost(),
-            'port'         => $this->getRabbitMqPort(),
-            'vhost'        => $this->getRabbitMqVhost(),
-            'login'        => $this->getRabbitMqLogin(),
-            'password'     => $this->getRabbitMqPassword(),
-            'read_timeout' => 1,
-        ]);
+        $connectionFactory = new AmqpConnectionFactory($this->getRabbitMqDsn(Driver::AmqpExt, ['read_timeout' => 1]));
 
         $channelFactory = new AmqpChannelFactory($connectionFactory, new ChannelDefinition());
 

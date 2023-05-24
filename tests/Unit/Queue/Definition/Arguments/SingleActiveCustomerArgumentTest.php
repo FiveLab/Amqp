@@ -14,18 +14,17 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Unit\Queue\Definition\Arguments;
 
 use FiveLab\Component\Amqp\Queue\Definition\Arguments\SingleActiveCustomerArgument;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class SingleActiveCustomerArgumentTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreate(): void
     {
         $argument = new SingleActiveCustomerArgument();
 
-        self::assertEquals('x-single-active-consumer', $argument->getName());
-        self::assertEquals(true, $argument->getValue());
+        self::assertEquals('x-single-active-consumer', $argument->name);
+        self::assertEquals(true, $argument->value);
     }
 }

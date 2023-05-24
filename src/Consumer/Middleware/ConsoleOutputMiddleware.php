@@ -13,27 +13,21 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Consumer\Middleware;
 
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * The middleware for debug received messages in console output.
  */
-class ConsoleOutputMiddleware implements ConsumerMiddlewareInterface
+readonly class ConsoleOutputMiddleware implements ConsumerMiddlewareInterface
 {
-    /**
-     * @var OutputInterface
-     */
-    private OutputInterface $output;
-
     /**
      * Constructor.
      *
      * @param OutputInterface $output
      */
-    public function __construct(OutputInterface $output)
+    public function __construct(private OutputInterface $output)
     {
-        $this->output = $output;
     }
 
     /**
@@ -41,7 +35,7 @@ class ConsoleOutputMiddleware implements ConsumerMiddlewareInterface
      *
      * @throws \Throwable
      */
-    public function handle(ReceivedMessageInterface $message, callable $next): void
+    public function handle(ReceivedMessage $message, callable $next): void
     {
         if ($this->output->isDebug()) {
             $this->fullDebugReceivedMessage($message, $next);
@@ -55,12 +49,12 @@ class ConsoleOutputMiddleware implements ConsumerMiddlewareInterface
     /**
      * Verbose received message
      *
-     * @param ReceivedMessageInterface $message
-     * @param callable                 $next
+     * @param ReceivedMessage $message
+     * @param callable        $next
      *
      * @throws \Throwable
      */
-    private function verboseReceivedMessage(ReceivedMessageInterface $message, callable $next): void
+    private function verboseReceivedMessage(ReceivedMessage $message, callable $next): void
     {
         try {
             $next($message);
@@ -78,29 +72,29 @@ class ConsoleOutputMiddleware implements ConsumerMiddlewareInterface
 
         $this->output->writeln(\sprintf(
             'Success process message from routing key <comment>%s</comment> with delivery tag <info>%s</info>.',
-            $message->getRoutingKey(),
-            $message->getDeliveryTag()
+            $message->routingKey,
+            $message->deliveryTag
         ));
     }
 
     /**
      * Full debug received message
      *
-     * @param ReceivedMessageInterface $message
-     * @param callable                 $next
+     * @param ReceivedMessage $message
+     * @param callable        $next
      *
      * @throws \Throwable
      */
-    private function fullDebugReceivedMessage(ReceivedMessageInterface $message, callable $next): void
+    private function fullDebugReceivedMessage(ReceivedMessage $message, callable $next): void
     {
         $this->output->writeln([
             \str_repeat('--', 16),
             \sprintf('Memory usage: <comment>%s</comment>', $this->formatMemory(\memory_get_usage(true))),
-            \sprintf('Routing key: <comment>%s</comment>', $message->getRoutingKey()),
-            \sprintf('Persistent: <comment>%s</comment>', $message->getOptions()->isPersistent() ? 'yes' : 'no'),
-            \sprintf('Delivery tag: <comment>%s</comment>', $message->getDeliveryTag()),
-            \sprintf('Payload content type: <comment>%s</comment>', $message->getPayload()->getContentType()),
-            \sprintf('Payload data: %s', $message->getPayload()->getData()),
+            \sprintf('Routing key: <comment>%s</comment>', $message->routingKey),
+            \sprintf('Persistent: <comment>%s</comment>', $message->options->persistent ? 'yes' : 'no'),
+            \sprintf('Delivery tag: <comment>%s</comment>', $message->deliveryTag),
+            \sprintf('Payload content type: <comment>%s</comment>', $message->payload->contentType),
+            \sprintf('Payload data: %s', $message->payload->data),
             '',
         ]);
 

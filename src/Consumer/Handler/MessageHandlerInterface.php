@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Consumer\Handler;
 
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 
 /**
  * All message handlers should implement this interface.
@@ -23,16 +23,16 @@ interface MessageHandlerInterface
     /**
      * If the message is supported?
      *
-     * @param ReceivedMessageInterface $message
+     * @param ReceivedMessage $message
      *
      * @return bool
      */
-    public function supports(ReceivedMessageInterface $message): bool;
+    public function supports(ReceivedMessage $message): bool;
 
     /**
      * Handle on receive message
      *
-     * @param ReceivedMessageInterface $message
+     * @param ReceivedMessage $message
      */
-    public function handle(ReceivedMessageInterface $message): void;
+    public function handle(ReceivedMessage $message): void;
 }

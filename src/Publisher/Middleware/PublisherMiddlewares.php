@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Publisher\Middleware;
 
-use FiveLab\Component\Amqp\Message\MessageInterface;
+use FiveLab\Component\Amqp\Message\Message;
 
 /**
  * The collection for store middlewares for consumers.
@@ -59,7 +59,7 @@ class PublisherMiddlewares implements \IteratorAggregate
         $middlewares = $this->middlewares;
 
         while ($middleware = \array_pop($middlewares)) {
-            $lastExecutable = static function (MessageInterface $message, string $routingKey) use ($middleware, $lastExecutable) {
+            $lastExecutable = static function (Message $message, string $routingKey) use ($middleware, $lastExecutable) {
                 $middleware->handle($message, $lastExecutable, $routingKey);
             };
         }

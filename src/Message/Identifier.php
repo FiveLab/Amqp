@@ -16,23 +16,8 @@ namespace FiveLab\Component\Amqp\Message;
 /**
  * The message identifier
  */
-class Identifier
+readonly class Identifier
 {
-    /**
-     * @var string|null
-     */
-    private ?string $id;
-
-    /**
-     * @var string|null
-     */
-    private ?string $appId;
-
-    /**
-     * @var string|null
-     */
-    private ?string $userId;
-
     /**
      * Constructor.
      *
@@ -40,40 +25,10 @@ class Identifier
      * @param string|null $appId
      * @param string|null $userId
      */
-    public function __construct(string $id = null, string $appId = null, string $userId = null)
-    {
-        $this->id = $id;
-        $this->appId = $appId;
-        $this->userId = $userId;
-    }
-
-    /**
-     * Get message identifier
-     *
-     * @return string
-     */
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
-
-    /**
-     * Get application identifier
-     *
-     * @return string
-     */
-    public function getAppId(): ?string
-    {
-        return $this->appId;
-    }
-
-    /**
-     * Get user identifier
-     *
-     * @return string
-     */
-    public function getUserId(): ?string
-    {
-        return $this->userId;
+    public function __construct(
+        public ?string $id = null,
+        public ?string $appId = null,
+        public ?string $userId = null
+    ) {
     }
 }

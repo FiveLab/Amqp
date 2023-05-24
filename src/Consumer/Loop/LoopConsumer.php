@@ -17,12 +17,12 @@ use FiveLab\Component\Amqp\Channel\ChannelInterface;
 use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
 use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlerInterface;
 use FiveLab\Component\Amqp\Consumer\Handler\ThrowableMessageHandlerInterface;
-use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareInterface;
+use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
 use FiveLab\Component\Amqp\Consumer\MiddlewareAwareInterface;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Exception\StopAfterNExecutesException;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
 
@@ -31,26 +31,6 @@ use FiveLab\Component\Amqp\Queue\QueueInterface;
  */
 class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
 {
-    /**
-     * @var QueueFactoryInterface
-     */
-    private QueueFactoryInterface $queueFactory;
-
-    /**
-     * @var MessageHandlerInterface
-     */
-    private MessageHandlerInterface $messageHandler;
-
-    /**
-     * @var ConsumerMiddlewares
-     */
-    private ConsumerMiddlewares $middlewares;
-
-    /**
-     * @var LoopConsumerConfiguration
-     */
-    private LoopConsumerConfiguration $configuration;
-
     /**
      * Indicate what we should throw exception if consumer timeout exceed.
      *
@@ -66,12 +46,12 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
      * @param ConsumerMiddlewares       $middlewares
      * @param LoopConsumerConfiguration $configuration
      */
-    public function __construct(QueueFactoryInterface $queueFactory, MessageHandlerInterface $messageHandler, ConsumerMiddlewares $middlewares, LoopConsumerConfiguration $configuration)
-    {
-        $this->queueFactory = $queueFactory;
-        $this->messageHandler = $messageHandler;
-        $this->middlewares = $middlewares;
-        $this->configuration = $configuration;
+    public function __construct(
+        private readonly QueueFactoryInterface     $queueFactory,
+        private readonly MessageHandlerInterface   $messageHandler,
+        private readonly ConsumerMiddlewares       $middlewares,
+        private readonly LoopConsumerConfiguration $configuration
+    ) {
     }
 
     /**
@@ -103,7 +83,7 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
      */
     public function run(): void
     {
-        $executable = $this->middlewares->createExecutable(function (ReceivedMessageInterface $message) {
+        $executable = $this->middlewares->createExecutable(function (ReceivedMessage $message) {
             $this->messageHandler->handle($message);
         });
 
@@ -113,7 +93,7 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
             $this->configureBeforeConsume($channel);
 
             try {
-                $this->queueFactory->create()->consume(function (ReceivedMessageInterface $message) use ($executable) {
+                $this->queueFactory->create()->consume(function (ReceivedMessage $message) use ($executable) {
                     try {
                         $executable($message);
                     } catch (ConsumerTimeoutExceedException $error) {
@@ -141,7 +121,7 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
                             return;
                         }
 
-                        $message->nack($this->configuration->isShouldRequeueOnError());
+                        $message->nack($this->configuration->requeueOnError);
 
                         throw $e;
                     }
@@ -149,7 +129,7 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
                     if (!$message->isAnswered()) {
                         $message->ack();
                     }
-                }, $this->configuration->getTagGenerator()->generate());
+                }, $this->configuration->tagGenerator->generate());
             } catch (ConsumerTimeoutExceedException $e) {
                 // Note: we can't cancel consumer, because rabbitmq can send next message to client
                 // and client attach to existence consumer. As result we can receive error: orphaned envelope.
@@ -186,13 +166,13 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
         $connection = $channel->getConnection();
 
         $originalReadTimeout = $connection->getReadTimeout();
-        $expectedReadTimeout = $this->configuration->getReadTimeout();
+        $expectedReadTimeout = $this->configuration->readTimeout;
 
         if (!$originalReadTimeout || $originalReadTimeout > $expectedReadTimeout) {
             // Change the read timeout.
             $connection->setReadTimeout($expectedReadTimeout);
         }
 
-        $channel->setPrefetchCount($this->configuration->getPrefetchCount());
+        $channel->setPrefetchCount($this->configuration->prefetchCount);
     }
 }

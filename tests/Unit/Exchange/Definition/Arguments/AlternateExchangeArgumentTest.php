@@ -14,18 +14,17 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Unit\Exchange\Definition\Arguments;
 
 use FiveLab\Component\Amqp\Exchange\Definition\Arguments\AlternateExchangeArgument;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class AlternateExchangeArgumentTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreate(): void
     {
         $argument = new AlternateExchangeArgument('foo');
 
-        self::assertEquals('alternate-exchange', $argument->getName());
-        self::assertEquals('foo', $argument->getValue());
+        self::assertEquals('alternate-exchange', $argument->name);
+        self::assertEquals('foo', $argument->value);
     }
 }

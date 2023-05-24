@@ -18,7 +18,7 @@ use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 /**
  * Definition for "x-max-length-bytes" argument.
  */
-class MaxLengthBytesArgument extends ArgumentDefinition
+readonly class MaxLengthBytesArgument extends ArgumentDefinition
 {
     /**
      * Constructor.

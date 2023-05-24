@@ -15,16 +15,16 @@ namespace FiveLab\Component\Amqp\Tests\Unit\Consumer\Middleware;
 
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsoleOutputMiddleware;
 use FiveLab\Component\Amqp\Message\Payload;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
+use FiveLab\Component\Amqp\Tests\Unit\Message\ReceivedMessageStub;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class ConsoleOutputMiddlewareTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessHandleWithNormalVerbosity(): void
     {
         $message = $this->createMessage();
@@ -32,7 +32,7 @@ class ConsoleOutputMiddlewareTest extends TestCase
         $output = new BufferedOutput(OutputInterface::VERBOSITY_NORMAL);
         $calledToNext = false;
 
-        $next = static function (ReceivedMessageInterface $receivedMessage) use (&$calledToNext, $message) {
+        $next = static function (ReceivedMessage $receivedMessage) use (&$calledToNext, $message) {
             $calledToNext = true;
             self::assertEquals($message, $receivedMessage);
         };
@@ -45,9 +45,7 @@ class ConsoleOutputMiddlewareTest extends TestCase
         self::assertEmpty($output->fetch());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessHandleWithVerboseVerbosity(): void
     {
         $message = $this->createMessage('some', 1);
@@ -55,7 +53,7 @@ class ConsoleOutputMiddlewareTest extends TestCase
         $output = new BufferedOutput(OutputInterface::VERBOSITY_VERBOSE);
         $calledToNext = false;
 
-        $next = static function (ReceivedMessageInterface $receivedMessage) use (&$calledToNext, $message) {
+        $next = static function (ReceivedMessage $receivedMessage) use (&$calledToNext, $message) {
             $calledToNext = true;
             self::assertEquals($message, $receivedMessage);
         };
@@ -73,9 +71,7 @@ EXPECTED;
         self::assertEquals($expectedOutput, $output->fetch());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessHandleWithVerboseVerbosityWithThrowExceptionInHandle(): void
     {
         $message = $this->createMessage('some', 1);
@@ -83,7 +79,7 @@ EXPECTED;
         $output = new BufferedOutput(OutputInterface::VERBOSITY_VERBOSE);
         $calledToNext = false;
 
-        $next = static function (ReceivedMessageInterface $receivedMessage) use (&$calledToNext, $message) {
+        $next = static function (ReceivedMessage $receivedMessage) use (&$calledToNext, $message) {
             $calledToNext = true;
             self::assertEquals($message, $receivedMessage);
 
@@ -96,7 +92,7 @@ EXPECTED;
             $middleware->handle($message, $next);
 
             self::fail('Should throw exception');
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException) {
             // Normal flow.
         }
 
@@ -108,9 +104,7 @@ EXPECTED;
         self::assertStringContainsString($expectedOutput, $output->fetch());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessHandleWithDebug(): void
     {
         $message = $this->createMessage('some', 1, new Payload('<root><some/></root>', 'application/xml'));
@@ -118,7 +112,7 @@ EXPECTED;
         $output = new BufferedOutput(OutputInterface::VERBOSITY_DEBUG);
         $calledToNext = false;
 
-        $next = static function (ReceivedMessageInterface $receivedMessage) use (&$calledToNext, $message) {
+        $next = static function (ReceivedMessage $receivedMessage) use (&$calledToNext, $message) {
             $calledToNext = true;
             self::assertEquals($message, $receivedMessage);
         };
@@ -148,9 +142,7 @@ EXPECTED;
         self::assertEquals($expectedOutput, $actualOutput);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessHandleWithDebugIfThrowException(): void
     {
         $message = $this->createMessage('some', 1, new Payload('<root><some/></root>', 'application/xml'));
@@ -158,7 +150,7 @@ EXPECTED;
         $output = new BufferedOutput(OutputInterface::VERBOSITY_DEBUG);
         $calledToNext = false;
 
-        $next = static function (ReceivedMessageInterface $receivedMessage) use (&$calledToNext, $message) {
+        $next = static function (ReceivedMessage $receivedMessage) use (&$calledToNext, $message) {
             $calledToNext = true;
             self::assertEquals($message, $receivedMessage);
 
@@ -171,7 +163,7 @@ EXPECTED;
             $middleware->handle($message, $next);
 
             self::fail('Should throw exception.');
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             // Normal flow.
         }
 
@@ -202,30 +194,15 @@ EXPECTED;
      * @param int|null     $deliveryTag
      * @param Payload|null $payload
      *
-     * @return ReceivedMessageInterface
+     * @return ReceivedMessage
      */
-    private function createMessage(string $routingKey = null, int $deliveryTag = null, Payload $payload = null): ReceivedMessageInterface
+    private function createMessage(string $routingKey = null, int $deliveryTag = null, Payload $payload = null): ReceivedMessage
     {
-        $message = $this->createMock(ReceivedMessageInterface::class);
-
-        if ($routingKey) {
-            $message->expects(self::any())
-                ->method('getRoutingKey')
-                ->willReturn($routingKey);
-        }
-
-        if ($deliveryTag) {
-            $message->expects(self::any())
-                ->method('getDeliveryTag')
-                ->willReturn($deliveryTag);
-        }
-
-        if ($payload) {
-            $message->expects(self::any())
-                ->method('getPayload')
-                ->willReturn($payload);
-        }
-
-        return $message;
+        return new ReceivedMessageStub(
+            $payload ?: new Payload(''),
+            $deliveryTag,
+            $routingKey,
+            'exchange-name'
+        );
     }
 }

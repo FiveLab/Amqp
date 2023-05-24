@@ -16,21 +16,15 @@ namespace FiveLab\Component\Amqp\Consumer\Tag;
 /**
  * Generate static consume tag
  */
-class StaticConsumerTagGenerator implements ConsumerTagGeneratorInterface
+readonly class StaticConsumerTagGenerator implements ConsumerTagGeneratorInterface
 {
-    /**
-     * @var string
-     */
-    private string $consumerTag;
-
     /**
      * Constructor.
      *
      * @param string $consumerTag
      */
-    public function __construct(string $consumerTag)
+    public function __construct(private string $consumerTag)
     {
-        $this->consumerTag = $consumerTag;
     }
 
     /**

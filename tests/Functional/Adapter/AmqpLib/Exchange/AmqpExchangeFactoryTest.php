@@ -17,10 +17,12 @@ use FiveLab\Component\Amqp\Adapter\AmqpLib\Channel\AmqpChannelFactory;
 use FiveLab\Component\Amqp\Adapter\AmqpLib\Connection\AmqpConnectionFactory;
 use FiveLab\Component\Amqp\Adapter\AmqpLib\Exchange\AmqpExchangeFactory;
 use FiveLab\Component\Amqp\Channel\Definition\ChannelDefinition;
+use FiveLab\Component\Amqp\Connection\Driver;
 use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
 use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
 use FiveLab\Component\Amqp\Tests\Functional\Adapter\ExchangeFactoryTestCase;
 use PhpAmqpLib\Exception\AMQPProtocolChannelException;
+use PHPUnit\Framework\Attributes\Test;
 
 class AmqpExchangeFactoryTest extends ExchangeFactoryTestCase
 {
@@ -29,23 +31,14 @@ class AmqpExchangeFactoryTest extends ExchangeFactoryTestCase
      */
     protected function createExchangeFactory(ExchangeDefinition $definition): ExchangeFactoryInterface
     {
-        $connectionFactory = new AmqpConnectionFactory([
-            'host'         => $this->getRabbitMqHost(),
-            'port'         => $this->getRabbitMqPort(),
-            'vhost'        => $this->getRabbitMqVhost(),
-            'login'        => $this->getRabbitMqLogin(),
-            'password'     => $this->getRabbitMqPassword(),
-            'read_timeout' => 2,
-        ]);
+        $connectionFactory = new AmqpConnectionFactory($this->getRabbitMqDsn(Driver::AmqpLib));
 
         $channelFactory = new AmqpChannelFactory($connectionFactory, new ChannelDefinition());
 
         return new AmqpExchangeFactory($channelFactory, $definition);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldThrowExceptionOnCreatePassiveIfExchangeNotFound(): void
     {
         $this->expectException(AMQPProtocolChannelException::class);

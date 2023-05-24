@@ -22,11 +22,6 @@ use FiveLab\Component\Transactional\AbstractTransactional;
 class AmqpTransactional extends AbstractTransactional
 {
     /**
-     * @var ChannelFactoryInterface
-     */
-    private ChannelFactoryInterface $channelFactory;
-
-    /**
      * @var int
      */
     private int $nestingLevel = 0;
@@ -36,9 +31,8 @@ class AmqpTransactional extends AbstractTransactional
      *
      * @param ChannelFactoryInterface $channelFactory
      */
-    public function __construct(ChannelFactoryInterface $channelFactory)
+    public function __construct(private readonly ChannelFactoryInterface $channelFactory)
     {
-        $this->channelFactory = $channelFactory;
     }
 
     /**

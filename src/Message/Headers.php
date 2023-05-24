@@ -18,21 +18,15 @@ use FiveLab\Component\Amqp\Exception\HeaderNotFoundException;
 /**
  * Header collection.
  */
-class Headers
+readonly class Headers
 {
-    /**
-     * @var array<string, mixed>
-     */
-    private array $headers;
-
     /**
      * Constructor.
      *
      * @param array<string, mixed> $headers
      */
-    public function __construct(array $headers)
+    public function __construct(private array $headers)
     {
-        $this->headers = $headers;
     }
 
     /**
@@ -56,7 +50,7 @@ class Headers
      *
      * @throws HeaderNotFoundException
      */
-    public function get(string $key)
+    public function get(string $key): mixed
     {
         if (!\array_key_exists($key, $this->headers)) {
             throw new HeaderNotFoundException(\sprintf(

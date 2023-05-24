@@ -14,20 +14,19 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Unit\Consumer\Handler;
 
 use FiveLab\Component\Amqp\Consumer\Handler\FlushableMessageHandlerInterface;
-use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlers;
 use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlerInterface;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlers;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Message\ReceivedMessages;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class MessageHandlersTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessSupports(): void
     {
-        $message = self::createMock(ReceivedMessageInterface::class);
+        $message = self::createMock(ReceivedMessage::class);
 
         $handler1 = self::createMock(MessageHandlerInterface::class);
         $handler2 = self::createMock(MessageHandlerInterface::class);
@@ -52,12 +51,10 @@ class MessageHandlersTest extends TestCase
         self::assertTrue($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessNotSupports(): void
     {
-        $message = self::createMock(ReceivedMessageInterface::class);
+        $message = self::createMock(ReceivedMessage::class);
 
         $handler1 = self::createMock(MessageHandlerInterface::class);
         $handler2 = self::createMock(MessageHandlerInterface::class);
@@ -78,9 +75,7 @@ class MessageHandlersTest extends TestCase
         self::assertFalse($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessFlush(): void
     {
         $messages = self::createMock(ReceivedMessages::class);
@@ -101,9 +96,7 @@ class MessageHandlersTest extends TestCase
         $handlers->flush($messages);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldThrowExceptionOnFlushIfHandlerNotFlushable(): void
     {
         $messages = self::createMock(ReceivedMessages::class);
@@ -123,12 +116,10 @@ class MessageHandlersTest extends TestCase
         $handlers->flush($messages);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldExecuteMultipleHandlers(): void
     {
-        $message = self::createMock(ReceivedMessageInterface::class);
+        $message = self::createMock(ReceivedMessage::class);
 
         $handlers = [];
         $handlersCount = 1;
@@ -144,15 +135,13 @@ class MessageHandlersTest extends TestCase
         $chainHandler->handle($message);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldThrowExceptionOnCatchErrorIfHandlerDoesNotSupportCatching(): void
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('some');
 
-        $message = self::createMock(ReceivedMessageInterface::class);
+        $message = self::createMock(ReceivedMessage::class);
 
         $handler1 = self::createMock(MessageHandlerInterface::class);
         $handler2 = self::createMock(MessageHandlerInterface::class);
@@ -171,14 +160,12 @@ class MessageHandlersTest extends TestCase
         $chainHandler->catchError($message, new \Exception('some'));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCatchErrorIfHandlerSupportCatching(): void
     {
         $error = new \RuntimeException('some');
 
-        $message = self::createMock(ReceivedMessageInterface::class);
+        $message = self::createMock(ReceivedMessage::class);
 
         $handler = self::createMock(MessageHandlers::class);
 

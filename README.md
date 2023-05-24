@@ -56,7 +56,7 @@ For easy development you can use the `Docker`.
 
 ```bash
 docker network create --driver bridge amqp
-docker run -d \
+docker run -d --rm \
     --network amqp \
     --name amqp-rabbitmq \
     rabbitmq:management

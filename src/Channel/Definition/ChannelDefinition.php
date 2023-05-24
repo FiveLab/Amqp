@@ -16,6 +16,6 @@ namespace FiveLab\Component\Amqp\Channel\Definition;
 /**
  * The definition for describe channel.
  */
-class ChannelDefinition
+readonly class ChannelDefinition
 {
 }

@@ -15,17 +15,14 @@ namespace FiveLab\Component\Amqp\Adapter\Amqp\Connection;
 
 use FiveLab\Component\Amqp\Connection\ConnectionFactoryInterface;
 use FiveLab\Component\Amqp\Connection\ConnectionInterface;
+use FiveLab\Component\Amqp\Connection\Driver;
+use FiveLab\Component\Amqp\Connection\Dsn;
 
 /**
  * The factory for create connection provided via php-amqp extension.
  */
 class AmqpConnectionFactory implements ConnectionFactoryInterface
 {
-    /**
-     * @var array<string, mixed>
-     */
-    private array $connectionOptions;
-
     /**
      * @var AmqpConnection|null
      */
@@ -34,11 +31,17 @@ class AmqpConnectionFactory implements ConnectionFactoryInterface
     /**
      * Constructor.
      *
-     * @param array<string, mixed> $connectionOptions
+     * @param Dsn $dsn
      */
-    public function __construct(array $connectionOptions)
+    public function __construct(private readonly Dsn $dsn)
     {
-        $this->connectionOptions = $connectionOptions;
+        if ($this->dsn->driver !== Driver::AmqpExt) {
+            throw new \RuntimeException(\sprintf(
+                'Can\'t make %s with different driver "%s".',
+                __CLASS__,
+                $this->dsn->driver->value
+            ));
+        }
     }
 
     /**
@@ -50,7 +53,15 @@ class AmqpConnectionFactory implements ConnectionFactoryInterface
             return $this->connection;
         }
 
-        $this->connection = new AmqpConnection(new \AMQPConnection($this->connectionOptions));
+        $options = \array_merge($this->dsn->options, [
+            'host'     => $this->dsn->host,
+            'port'     => $this->dsn->port,
+            'vhost'    => $this->dsn->vhost,
+            'login'    => $this->dsn->username,
+            'password' => $this->dsn->password,
+        ]);
+
+        $this->connection = new AmqpConnection(new \AMQPConnection($options));
 
         return $this->connection;
     }

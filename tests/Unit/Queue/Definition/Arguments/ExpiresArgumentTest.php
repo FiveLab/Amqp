@@ -14,18 +14,17 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Unit\Queue\Definition\Arguments;
 
 use FiveLab\Component\Amqp\Queue\Definition\Arguments\ExpiresArgument;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class ExpiresArgumentTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreate(): void
     {
         $argument = new ExpiresArgument(123);
 
-        self::assertEquals('x-expires', $argument->getName());
-        self::assertEquals(123, $argument->getValue());
+        self::assertEquals('x-expires', $argument->name);
+        self::assertEquals(123, $argument->value);
     }
 }

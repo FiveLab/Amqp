@@ -14,13 +14,12 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Unit\Consumer\Spool;
 
 use FiveLab\Component\Amqp\Consumer\Spool\SpoolConsumerConfiguration;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class SpoolConsumerConfigurationTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldFailConstructionWhenTimeoutIsUnlimited(): void
     {
         $this->expectException(\InvalidArgumentException::class);

@@ -1,10 +1,15 @@
 CHANGELOG
 =========
 
-v1.7.0
-------
+Next release
+------------
 
-* Nothing changes. This version required for increase minor version of `amqp-bundle`.
+* Require PHP 8.2 and higher.
+* Message & ReceivedMessage classes - remove interfaces, remove getters. Please use classes and public properties for retrieve info.
+* Add `FiveLab\Component\Amqp\Connection\Dsn` for collect all connection parameters.
+* Change connection factories for work with `Dsn` instead of array parameters.
+* Add `FiveLab\Component\Amqp\Connection\SpoolConnectionFactory::fromDsn` for possible create spool connection from DSN.
+* Add possible use `BackendEnum` as routing key for publish, bindings and arguments.
 
 v1.6.0
 ------

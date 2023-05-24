@@ -17,17 +17,19 @@ use FiveLab\Component\Amqp\Consumer\Handler\HandleExpiredMessageHandler;
 use FiveLab\Component\Amqp\Message\Headers;
 use FiveLab\Component\Amqp\Message\Identifier;
 use FiveLab\Component\Amqp\Message\Message;
+use FiveLab\Component\Amqp\Message\Options;
 use FiveLab\Component\Amqp\Message\Payload;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
 use FiveLab\Component\Amqp\Publisher\PublisherInterface;
 use FiveLab\Component\Amqp\Publisher\Registry\PublisherRegistryInterface;
-use PHPUnit\Framework\MockObject\MockObject;
+use FiveLab\Component\Amqp\Tests\Unit\Message\ReceivedMessageStub;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
 class HandleExpiredMessageHandlerTest extends TestCase
 {
     /**
-     * @var PublisherRegistryInterface|MockObject
+     * @var PublisherRegistryInterface
      */
     private PublisherRegistryInterface $publisherRegistry;
 
@@ -51,56 +53,40 @@ class HandleExpiredMessageHandlerTest extends TestCase
         $this->handler = new HandleExpiredMessageHandler($this->publisherRegistry, $this->delayPublisher, 'landfill');
     }
 
-    /**
-     * @test
-     *
-     * @param string $routing
-     * @param bool   $supports
-     *
-     * @dataProvider provideDataForSupports
-     */
+    #[TestWith(['landfill', true])]
+    #[TestWith(['foo', false])]
     public function shouldSuccessSupports(string $routing, bool $supports): void
     {
-        $message = $this->createMock(ReceivedMessageInterface::class);
-
-        $message->expects(self::once())
-            ->method('getHeaders')
-            ->willReturn(new Headers([
-                'x-death' => [
-                    [
-                        'routing-keys' => [$routing],
-                    ],
+        $message = new ReceivedMessageStub(new Payload(''), 0, '', '', null, new Headers([
+            'x-death' => [
+                [
+                    'routing-keys' => [$routing],
                 ],
-            ]));
+            ],
+        ]));
 
         $result = $this->handler->supports($message);
 
         self::assertEquals($supports, $result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessPublishToTarget(): void
     {
-        $message = $this->createMock(ReceivedMessageInterface::class);
-
-        $message->expects(self::once())
-            ->method('getPayload')
-            ->willReturn(new Payload('foo bar'));
-
-        $message->expects(self::once())
-            ->method('getHeaders')
-            ->willReturn(new Headers([
+        $message = new ReceivedMessageStub(
+            new Payload('foo bar'),
+            0,
+            '',
+            '',
+            new Options(false),
+            new Headers([
                 'x-delay-publisher'   => 'processing',
                 'x-delay-routing-key' => 'some.process',
                 'x-delay-counter'     => 1,
                 'some-header'         => 'some-value',
-            ]));
-
-        $message->expects(self::once())
-            ->method('getIdentifier')
-            ->willReturn(new Identifier('qq'));
+            ]),
+            new Identifier('qq')
+        );
 
         $publisher = $this->createMock(PublisherInterface::class);
 
@@ -124,29 +110,23 @@ class HandleExpiredMessageHandlerTest extends TestCase
         $this->handler->handle($message);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessRetryPublishToDelay(): void
     {
-        $message = $this->createMock(ReceivedMessageInterface::class);
-
-        $message->expects(self::once())
-            ->method('getPayload')
-            ->willReturn(new Payload('foo bar'));
-
-        $message->expects(self::once())
-            ->method('getHeaders')
-            ->willReturn(new Headers([
+        $message = new ReceivedMessageStub(
+            new Payload('foo bar'),
+            0,
+            '',
+            '',
+            null,
+            new Headers([
                 'x-delay-publisher'   => 'processing',
                 'x-delay-routing-key' => 'some.process',
                 'x-delay-counter'     => 5,
                 'some-header'         => 'some-value',
-            ]));
-
-        $message->expects(self::once())
-            ->method('getIdentifier')
-            ->willReturn(new Identifier('qq'));
+            ]),
+            new Identifier('qq')
+        );
 
         $this->delayPublisher->expects(self::once())
             ->method('publish')
@@ -163,18 +143,5 @@ class HandleExpiredMessageHandlerTest extends TestCase
             ), 'landfill');
 
         $this->handler->handle($message);
-    }
-
-    /**
-     * Provide data for test supports
-     *
-     * @return array[]
-     */
-    public function provideDataForSupports(): array
-    {
-        return [
-            ['landfill', true],
-            ['foo', false],
-        ];
     }
 }

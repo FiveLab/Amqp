@@ -18,7 +18,7 @@ use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 /**
  * Definition for "x-alternate-exchange" argument.
  */
-class AlternateExchangeArgument extends ArgumentDefinition
+readonly class AlternateExchangeArgument extends ArgumentDefinition
 {
     /**
      * Constructor.

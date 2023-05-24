@@ -16,27 +16,22 @@ namespace FiveLab\Component\Amqp\Message;
 /**
  * The default message for communicate in broker system.
  */
-class Message implements MessageInterface
+class Message
 {
-    /**
-     * @var Payload
-     */
-    private Payload $payload;
-
     /**
      * @var Options
      */
-    private Options $options;
+    public readonly Options $options;
 
     /**
      * @var Headers
      */
-    private Headers $headers;
+    public readonly Headers $headers;
 
     /**
      * @var Identifier
      */
-    private Identifier $identifier;
+    public readonly Identifier $identifier;
 
     /**
      * Constructor.
@@ -46,43 +41,14 @@ class Message implements MessageInterface
      * @param Headers|null    $headers
      * @param Identifier|null $identifier
      */
-    public function __construct(Payload $payload, Options $options = null, Headers $headers = null, Identifier $identifier = null)
-    {
-        $this->payload = $payload;
+    public function __construct(
+        public readonly Payload $payload,
+        Options                 $options = null,
+        Headers                 $headers = null,
+        Identifier              $identifier = null
+    ) {
         $this->options = $options ?: new Options(true);
         $this->headers = $headers ?: new Headers([]);
         $this->identifier = $identifier ?: new Identifier();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPayload(): Payload
-    {
-        return $this->payload;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getOptions(): Options
-    {
-        return $this->options;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getHeaders(): Headers
-    {
-        return $this->headers;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getIdentifier(): Identifier
-    {
-        return $this->identifier;
     }
 }

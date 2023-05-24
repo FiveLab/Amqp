@@ -19,6 +19,7 @@ use FiveLab\Component\Amqp\Connection\SpoolConnectionFactory;
 use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Tests\Functional\RabbitMqTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 abstract class SpoolConnectionTestCase extends RabbitMqTestCase
 {
@@ -40,9 +41,7 @@ abstract class SpoolConnectionTestCase extends RabbitMqTestCase
      */
     abstract protected function getClasses(): array;
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessConnect(): void
     {
         $factory = $this->makeSpoolConnectionFactory();
@@ -51,9 +50,7 @@ abstract class SpoolConnectionTestCase extends RabbitMqTestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGetChannel(): void
     {
         $connectionFactory = $this->makeSpoolConnectionFactory();
@@ -66,9 +63,7 @@ abstract class SpoolConnectionTestCase extends RabbitMqTestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateExchange(): void
     {
         $connectionFactory = $this->makeSpoolConnectionFactory();
@@ -86,9 +81,7 @@ abstract class SpoolConnectionTestCase extends RabbitMqTestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateQueue(): void
     {
         $connectionFactory = $this->makeSpoolConnectionFactory();

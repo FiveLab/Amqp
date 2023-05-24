@@ -26,16 +26,6 @@ use FiveLab\Component\Amqp\Queue\QueueInterface;
 class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
 {
     /**
-     * @var ChannelFactoryInterface
-     */
-    private ChannelFactoryInterface $channelFactory;
-
-    /**
-     * @var QueueDefinition
-     */
-    private QueueDefinition $definition;
-
-    /**
      * @var AmqpQueue|null
      */
     private ?AmqpQueue $queue = null;
@@ -46,10 +36,10 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
      * @param ChannelFactoryInterface $channelFactory
      * @param QueueDefinition         $definition
      */
-    public function __construct(ChannelFactoryInterface $channelFactory, QueueDefinition $definition)
-    {
-        $this->channelFactory = $channelFactory;
-        $this->definition = $definition;
+    public function __construct(
+        private readonly ChannelFactoryInterface $channelFactory,
+        private readonly QueueDefinition         $definition
+    ) {
     }
 
     /**
@@ -77,12 +67,12 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
         $queue = new AmqpQueue($channel, $this->definition);
         $queue->declare();
 
-        foreach ($this->definition->getBindings() as $binding) {
-            $this->bind($binding->getExchangeName(), $binding->getRoutingKey());
+        foreach ($this->definition->bindings as $binding) {
+            $this->bind($binding->exchangeName, $binding->routingKey);
         }
 
-        foreach ($this->definition->getUnBindings() as $unBinding) {
-            $this->unbind($unBinding->getExchangeName(), $unBinding->getRoutingKey());
+        foreach ($this->definition->unbindings as $unBinding) {
+            $this->unbind($unBinding->exchangeName, $unBinding->routingKey);
         }
 
         $this->queue = $queue;
@@ -109,7 +99,7 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
         /** @var AmqpChannel $channel */
         $channel = $this->channelFactory->create();
 
-        $channel->getChannel()->queue_bind($this->definition->getName(), $exchangeName, $routingKey);
+        $channel->getChannel()->queue_bind($this->definition->name, $exchangeName, $routingKey);
     }
 
     /**
@@ -123,6 +113,6 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
         /** @var AmqpChannel $channel */
         $channel = $this->channelFactory->create();
 
-        $channel->getChannel()->queue_unbind($this->definition->getName(), $exchangeName, $routingKey);
+        $channel->getChannel()->queue_unbind($this->definition->name, $exchangeName, $routingKey);
     }
 }

@@ -23,11 +23,6 @@ use FiveLab\Component\Transactional\AbstractTransactional;
 class FlushSavepointPublisherTransactional extends AbstractTransactional
 {
     /**
-     * @var SavepointPublisherInterface
-     */
-    private SavepointPublisherInterface $publisher;
-
-    /**
      * @var array<string>
      */
     private array $keys = [];
@@ -42,9 +37,8 @@ class FlushSavepointPublisherTransactional extends AbstractTransactional
      *
      * @param SavepointPublisherInterface $publisher
      */
-    public function __construct(SavepointPublisherInterface $publisher)
+    public function __construct(private readonly SavepointPublisherInterface $publisher)
     {
-        $this->publisher = $publisher;
     }
 
     /**

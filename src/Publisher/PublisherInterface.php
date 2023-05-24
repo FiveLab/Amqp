@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Publisher;
 
-use FiveLab\Component\Amqp\Message\MessageInterface;
+use FiveLab\Component\Amqp\Message\Message;
 
 /**
  * All publishers should implement this interface.
@@ -23,8 +23,8 @@ interface PublisherInterface
     /**
      * Publish message
      *
-     * @param MessageInterface $message
-     * @param string           $routingKey
+     * @param Message            $message
+     * @param string|\BackedEnum $routingKey
      */
-    public function publish(MessageInterface $message, string $routingKey = ''): void;
+    public function publish(Message $message, string|\BackedEnum $routingKey = ''): void;
 }

@@ -13,153 +13,70 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Adapter\AmqpLib\Message;
 
-use FiveLab\Component\Amqp\Adapter\AmqpLib\Queue\AmqpQueue;
 use FiveLab\Component\Amqp\Message\Headers;
 use FiveLab\Component\Amqp\Message\Identifier;
 use FiveLab\Component\Amqp\Message\Options;
 use FiveLab\Component\Amqp\Message\Payload;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use PhpAmqpLib\Message\AMQPMessage;
 
 /**
  * The received message provided via php-amqplib library.
  */
-class AmqpReceivedMessage implements ReceivedMessageInterface
+class AmqpReceivedMessage extends ReceivedMessage
 {
-    /**
-     * @var AmqpQueue
-     */
-    private AmqpQueue $queue; // @phpstan-ignore-line
-
-    /**
-     * @var AMQPMessage
-     */
-    private AMQPMessage $message;
-
-    /**
-     * @var bool
-     */
-    private bool $answered = false;
-
     /**
      * Constructor.
      *
-     * @param AmqpQueue   $queue
      * @param AMQPMessage $message
      */
-    public function __construct(AmqpQueue $queue, AMQPMessage $message)
+    public function __construct(private readonly AMQPMessage $message)
     {
-        $this->queue = $queue;
-        $this->message = $message;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPayload(): Payload
-    {
-        $body = $this->message->getBody();
-
-        return new Payload(
-            $body,
+        $payload = new Payload(
+            $this->message->getBody(),
             $this->message->get_properties()['content_type'] ?? 'text/plain',
             $this->message->getContentEncoding() ?: null
         );
-    }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getOptions(): Options
-    {
-        return new Options(
-            ($this->message->get_properties()['delivery_mode'] ?? 0) === 2,
-            $this->message->get_properties()['expiration'] ?? 0
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getIdentifier(): Identifier
-    {
-        return new Identifier(
-            $this->message->get_properties()['message_id'] ?? '',
-            $this->message->get_properties()['app_id'] ?? '',
-            $this->message->get_properties()['user_id'] ?? ''
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDeliveryTag(): int
-    {
-        return (int) $this->message->getDeliveryTag();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getRoutingKey(): string
-    {
-        return (string) $this->message->getRoutingKey();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getExchangeName(): string
-    {
-        return $this->message->getExchange() ?: '';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function ack(): void
-    {
-        if ($this->answered) {
-            throw new \LogicException('We already answered to broker.');
-        }
-
-        $this->answered = true;
-
-        $this->message->ack();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function nack(bool $requeue = true): void
-    {
-        if ($this->answered) {
-            throw new \LogicException('We already answered to broker.');
-        }
-
-        $this->answered = true;
-        $this->message->nack($requeue);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isAnswered(): bool
-    {
-        return $this->answered;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getHeaders(): Headers
-    {
         $headers = $this->message->get_properties()['application_headers'] ?? [];
 
         if ($headers instanceof \Traversable) {
             $headers = \iterator_to_array($headers);
         }
 
-        return new Headers($headers);
+        $headers = new Headers($headers);
+
+        parent::__construct(
+            $payload,
+            $this->message->getDeliveryTag(),
+            (string) $this->message->getRoutingKey(),
+            (string) $this->message->getExchange(),
+            new Options(
+                ($this->message->get_properties()['delivery_mode'] ?? 0) === 2,
+                $this->message->get_properties()['expiration'] ?? 0
+            ),
+            $headers,
+            new Identifier(
+                $this->message->get_properties()['message_id'] ?? '',
+                $this->message->get_properties()['app_id'] ?? '',
+                $this->message->get_properties()['user_id'] ?? ''
+            )
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doAck(): void
+    {
+        $this->message->ack();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doNack(bool $requeue = true): void
+    {
+        $this->message->nack($requeue);
     }
 }

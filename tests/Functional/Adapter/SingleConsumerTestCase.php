@@ -13,27 +13,28 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Functional\Adapter;
 
-use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Consumer\ConsumerConfiguration;
+use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlers;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
 use FiveLab\Component\Amqp\Consumer\Middleware\ProxyMessageToAnotherExchangeMiddleware;
 use FiveLab\Component\Amqp\Consumer\Middleware\StopAfterNExecutesMiddleware;
 use FiveLab\Component\Amqp\Consumer\SingleConsumer;
-use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlers;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Exception\MessageHandlerNotSupportedException;
 use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
 use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
 use FiveLab\Component\Amqp\Exchange\Registry\ExchangeFactoryRegistry;
 use FiveLab\Component\Amqp\Exchange\Registry\ExchangeFactoryRegistryInterface;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Tests\Functional\Consumer\Handler\MessageHandlerMock;
 use FiveLab\Component\Amqp\Tests\Functional\Consumer\Handler\ThrowableMessageHandlerMock;
 use FiveLab\Component\Amqp\Tests\Functional\Consumer\Middleware\MiddlewareMock;
 use FiveLab\Component\Amqp\Tests\Functional\RabbitMqTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 abstract class SingleConsumerTestCase extends RabbitMqTestCase
 {
@@ -108,9 +109,7 @@ abstract class SingleConsumerTestCase extends RabbitMqTestCase
         $this->exchangeRegistry->add('proxy.direct', $proxyExchange);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessConsume(): void
     {
         $handler = new MessageHandlerMock('test');
@@ -123,14 +122,12 @@ abstract class SingleConsumerTestCase extends RabbitMqTestCase
         self::assertQueueEmpty($this->queueFactory);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessConsumeIfMessageHandleAckMessage(): void
     {
         $handler = new MessageHandlerMock('test');
 
-        $handler->setHandlerCallback(function (ReceivedMessageInterface $receivedMessage) {
+        $handler->setHandlerCallback(function (ReceivedMessage $receivedMessage) {
             $receivedMessage->ack();
         });
 
@@ -143,14 +140,12 @@ abstract class SingleConsumerTestCase extends RabbitMqTestCase
         self::assertQueueEmpty($this->queueFactory);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessConsumeIfMessageHandlerNackWithoutRequeueMessage(): void
     {
         $handler = new MessageHandlerMock('test');
 
-        $handler->setHandlerCallback(function (ReceivedMessageInterface $receivedMessage) {
+        $handler->setHandlerCallback(function (ReceivedMessage $receivedMessage) {
             $receivedMessage->nack(false);
         });
 
@@ -163,14 +158,12 @@ abstract class SingleConsumerTestCase extends RabbitMqTestCase
         self::assertQueueEmpty($this->queueFactory);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessConsumeIfMessageHandlerNackWithRequeueMessage(): void
     {
         $handler = new MessageHandlerMock('test');
 
-        $handler->setHandlerCallback(static function (ReceivedMessageInterface $receivedMessage) {
+        $handler->setHandlerCallback(static function (ReceivedMessage $receivedMessage) {
             $receivedMessage->nack(true);
         });
 
@@ -189,9 +182,7 @@ abstract class SingleConsumerTestCase extends RabbitMqTestCase
         self::assertNotNull($lastMessage, 'The queue should contain one message.');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCatchErrorOnMessageHandler(): void
     {
         $handler = new ThrowableMessageHandlerMock('test');
@@ -211,18 +202,16 @@ abstract class SingleConsumerTestCase extends RabbitMqTestCase
         self::assertEquals($receivedMessages[0], $handler->getCatchReceivedMessage());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldRequeueMessageIfCatchErrorHandleThrowException(): void
     {
-        /** @var ReceivedMessageInterface $receivedMessage */
+        /** @var ReceivedMessage $receivedMessage */
         $receivedMessage = null;
 
         $handler = new ThrowableMessageHandlerMock('test');
         $handler->shouldThrowException(new \RuntimeException('some'));
 
-        $handler->onCatchError(static function (ReceivedMessageInterface $message, \Throwable $e) use (&$receivedMessage) {
+        $handler->onCatchError(static function (ReceivedMessage $message, \Throwable $e) use (&$receivedMessage) {
             $receivedMessage = $message;
 
             throw $e;
@@ -239,13 +228,11 @@ abstract class SingleConsumerTestCase extends RabbitMqTestCase
 
             $lastMessage = $this->getLastMessageFromQueue($this->queueFactory);
 
-            self::assertEquals($receivedMessage->getPayload(), $lastMessage->getPayload());
+            self::assertEquals($receivedMessage->payload, $lastMessage->payload);
         }
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCallToMiddleware(): void
     {
         $handler = new MessageHandlerMock('test');
@@ -263,9 +250,7 @@ abstract class SingleConsumerTestCase extends RabbitMqTestCase
         self::assertEquals($receivedMessagesOnMiddleware, $receivedMessagesOnHandler);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessProxyMessageToAnotherExchange(): void
     {
         $handler = new MessageHandlerMock('test');
@@ -280,14 +265,12 @@ abstract class SingleConsumerTestCase extends RabbitMqTestCase
 
         $message = $messages[0];
 
-        self::assertEquals('some payload', $message->getPayload()->getData());
-        self::assertEquals('proxy.direct', $message->getExchangeName());
-        self::assertEquals('test', $message->getRoutingKey());
+        self::assertEquals('some payload', $message->payload->data);
+        self::assertEquals('proxy.direct', $message->exchangeName);
+        self::assertEquals('test', $message->routingKey);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldThrowExceptionIfMessageHandlerNotSupported(): void
     {
         $this->expectException(MessageHandlerNotSupportedException::class);
@@ -312,7 +295,7 @@ abstract class SingleConsumerTestCase extends RabbitMqTestCase
 
         try {
             $consumer->run();
-        } catch (ConsumerTimeoutExceedException $e) {
+        } catch (ConsumerTimeoutExceedException) {
             // Timeout or max executes. Normal flow.
         }
     }

@@ -14,9 +14,11 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Unit\Publisher;
 
 use FiveLab\Component\Amqp\Message\DelayMessage;
-use FiveLab\Component\Amqp\Message\MessageInterface;
+use FiveLab\Component\Amqp\Message\Message;
+use FiveLab\Component\Amqp\Message\Payload;
 use FiveLab\Component\Amqp\Publisher\DelayPublisher;
 use FiveLab\Component\Amqp\Publisher\PublisherInterface;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class DelayPublisherTest extends TestCase
@@ -40,9 +42,7 @@ class DelayPublisherTest extends TestCase
         $this->delayPublisher = new DelayPublisher($this->originalPublisher, 'foo.bar');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessPublish(): void
     {
         $message = $this->createMock(DelayMessage::class);
@@ -54,12 +54,10 @@ class DelayPublisherTest extends TestCase
         $this->delayPublisher->publish($message);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldThrowExceptionIfPassRoutingKey(): void
     {
-        $message = $this->createMock(DelayMessage::class);
+        $message = new DelayMessage(new Message(new Payload('')), '');
 
         $this->originalPublisher->expects(self::never())
             ->method('publish');
@@ -70,12 +68,10 @@ class DelayPublisherTest extends TestCase
         $this->delayPublisher->publish($message, '');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldThrowExceptionForNonDelayMessage(): void
     {
-        $message = $this->createMock(MessageInterface::class);
+        $message = new Message(new Payload(''));
 
         $this->originalPublisher->expects(self::never())
             ->method('publish');

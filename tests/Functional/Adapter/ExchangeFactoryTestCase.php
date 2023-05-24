@@ -14,12 +14,13 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Functional\Adapter;
 
 use FiveLab\Component\Amqp\Argument\ArgumentDefinitions;
-use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Exchange\Definition\Arguments\AlternateExchangeArgument;
 use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
 use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
 use FiveLab\Component\Amqp\Tests\Functional\RabbitMqTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 abstract class ExchangeFactoryTestCase extends RabbitMqTestCase
 {
@@ -32,9 +33,7 @@ abstract class ExchangeFactoryTestCase extends RabbitMqTestCase
      */
     abstract protected function createExchangeFactory(ExchangeDefinition $definition): ExchangeFactoryInterface;
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateDefaultExchange(): void
     {
         $definition = new ExchangeDefinition('', AMQP_EX_TYPE_DIRECT);
@@ -44,9 +43,7 @@ abstract class ExchangeFactoryTestCase extends RabbitMqTestCase
         self::assertEquals('', $exchange->getName());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateWithDefaults(): void
     {
         $definition = new ExchangeDefinition('some', AMQP_EX_TYPE_DIRECT);
@@ -61,9 +58,7 @@ abstract class ExchangeFactoryTestCase extends RabbitMqTestCase
         self::assertEquals('direct', $exchangeInfo['type']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateWithOtherType(): void
     {
         $definition = new ExchangeDefinition('some', AMQP_EX_TYPE_FANOUT);
@@ -76,9 +71,7 @@ abstract class ExchangeFactoryTestCase extends RabbitMqTestCase
         self::assertEquals('fanout', $exchangeInfo['type']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateWithoutDurableFlag(): void
     {
         $definition = new ExchangeDefinition('some', AMQP_EX_TYPE_DIRECT, false);
@@ -91,9 +84,7 @@ abstract class ExchangeFactoryTestCase extends RabbitMqTestCase
         self::assertFalse($exchangeInfo['durable']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreatePassive(): void
     {
         $this->management->createExchange(AMQP_EX_TYPE_DIRECT, 'some');
@@ -108,9 +99,7 @@ abstract class ExchangeFactoryTestCase extends RabbitMqTestCase
         $this->expectNotToPerformAssertions();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateWithArguments(): void
     {
         $definition = new ExchangeDefinition(
@@ -134,9 +123,7 @@ abstract class ExchangeFactoryTestCase extends RabbitMqTestCase
         ], $arguments);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateWithBindings(): void
     {
         $this->management->createExchange('direct', 'foo.bar');
@@ -168,9 +155,7 @@ abstract class ExchangeFactoryTestCase extends RabbitMqTestCase
         ], $bindings);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldThrowExceptionOnCreatePassiveIfExchangeNotFound(): void
     {
         $this->expectException(\AMQPExchangeException::class);

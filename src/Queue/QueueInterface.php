@@ -15,7 +15,7 @@ namespace FiveLab\Component\Amqp\Queue;
 
 use FiveLab\Component\Amqp\Channel\ChannelInterface;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 
 /**
  * All queues should implement this interface.
@@ -56,9 +56,9 @@ interface QueueInterface
     /**
      * Get next message from queue
      *
-     * @return ReceivedMessageInterface
+     * @return ReceivedMessage|null
      */
-    public function get(): ?ReceivedMessageInterface;
+    public function get(): ?ReceivedMessage;
 
     /**
      * Purge a queue

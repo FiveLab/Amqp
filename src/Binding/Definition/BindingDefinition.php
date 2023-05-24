@@ -16,47 +16,35 @@ namespace FiveLab\Component\Amqp\Binding\Definition;
 /**
  * The definition for describe queue bindings.
  */
-class BindingDefinition
+readonly class BindingDefinition
 {
     /**
      * @var string
      */
-    private string $exchangeName;
+    public string $exchangeName;
 
     /**
      * @var string
      */
-    private string $routingKey;
+    public string $routingKey;
 
     /**
      * Constructor.
      *
-     * @param string $exchangeName
-     * @param string $routingKey
+     * @param string|\BackedEnum $exchangeName
+     * @param string|\BackedEnum $routingKey
      */
-    public function __construct(string $exchangeName, string $routingKey)
+    public function __construct(string|\BackedEnum $exchangeName, string|\BackedEnum $routingKey)
     {
+        if ($exchangeName instanceof \BackedEnum) {
+            $exchangeName = (string) $exchangeName->value;
+        }
+
+        if ($routingKey instanceof \BackedEnum) {
+            $routingKey = (string) $routingKey->value;
+        }
+
         $this->exchangeName = $exchangeName;
         $this->routingKey = $routingKey;
-    }
-
-    /**
-     * Get the name of exchange
-     *
-     * @return string
-     */
-    public function getExchangeName(): string
-    {
-        return $this->exchangeName;
-    }
-
-    /**
-     * Get routing key
-     *
-     * @return string
-     */
-    public function getRoutingKey(): string
-    {
-        return $this->routingKey;
     }
 }

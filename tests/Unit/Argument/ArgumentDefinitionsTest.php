@@ -13,15 +13,14 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Unit\Argument;
 
-use FiveLab\Component\Amqp\Argument\ArgumentDefinitions;
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
+use FiveLab\Component\Amqp\Argument\ArgumentDefinitions;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class ArgumentDefinitionsTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGetIterator(): void
     {
         $argument1 = new ArgumentDefinition('foo', 'bar');
@@ -32,9 +31,7 @@ class ArgumentDefinitionsTest extends TestCase
         self::assertEquals([$argument1, $argument2], \iterator_to_array($arguments));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGetCount(): void
     {
         $arguments = new ArgumentDefinitions(
@@ -45,9 +42,7 @@ class ArgumentDefinitionsTest extends TestCase
         self::assertCount(2, $arguments);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessConvertToArray(): void
     {
         $arguments = new ArgumentDefinitions(

@@ -26,16 +26,6 @@ use FiveLab\Component\Amqp\Connection\SpoolConnection;
 class AmqpChannelFactory implements ChannelFactoryInterface, \SplObserver
 {
     /**
-     * @var ConnectionFactoryInterface
-     */
-    private ConnectionFactoryInterface $connectionFactory;
-
-    /**
-     * @var ChannelDefinition
-     */
-    private ChannelDefinition $definition; // @phpstan-ignore-line
-
-    /**
      * @var AmqpChannel|null
      */
     private ?AmqpChannel $channel = null;
@@ -46,10 +36,10 @@ class AmqpChannelFactory implements ChannelFactoryInterface, \SplObserver
      * @param ConnectionFactoryInterface $connectionFactory
      * @param ChannelDefinition          $definition
      */
-    public function __construct(ConnectionFactoryInterface $connectionFactory, ChannelDefinition $definition)
-    {
-        $this->connectionFactory = $connectionFactory;
-        $this->definition = $definition;
+    public function __construct(
+        private readonly ConnectionFactoryInterface $connectionFactory,
+        private readonly ChannelDefinition          $definition // @phpstan-ignore-line
+    ) {
     }
 
     /**

@@ -13,18 +13,13 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Publisher;
 
-use FiveLab\Component\Amqp\Message\MessageInterface;
+use FiveLab\Component\Amqp\Message\Message;
 
 /**
  * The publisher with support savepoint functionality.
  */
 class SavepointPublisherDecorator implements SavepointPublisherInterface
 {
-    /**
-     * @var PublisherInterface
-     */
-    private PublisherInterface $publisher;
-
     /**
      * @var array<string, array<int, mixed>>
      */
@@ -40,16 +35,19 @@ class SavepointPublisherDecorator implements SavepointPublisherInterface
      *
      * @param PublisherInterface $publisher
      */
-    public function __construct(PublisherInterface $publisher)
+    public function __construct(private readonly PublisherInterface $publisher)
     {
-        $this->publisher = $publisher;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function publish(MessageInterface $message, string $routingKey = ''): void
+    public function publish(Message $message, string|\BackedEnum $routingKey = ''): void
     {
+        if ($routingKey instanceof \BackedEnum) {
+            $routingKey = (string) $routingKey->value;
+        }
+
         if ($this->activeSavepoint) {
             $this->savepoints[$this->activeSavepoint][] = [$message, $routingKey];
         } else {

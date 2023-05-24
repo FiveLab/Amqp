@@ -25,25 +25,15 @@ class AmqpConnection implements ConnectionInterface
     use SplSubjectTrait;
 
     /**
-     * @var AbstractConnection
-     */
-    private AbstractConnection $connection;
-
-    /**
-     * @var float
-     */
-    private float $readTimeout;
-
-    /**
      * Constructor.
      *
      * @param AbstractConnection $connection
      * @param float              $readTimeout
      */
-    public function __construct(AbstractConnection $connection, float $readTimeout)
-    {
-        $this->connection = $connection;
-        $this->readTimeout = $readTimeout;
+    public function __construct(
+        private readonly AbstractConnection $connection,
+        private float                       $readTimeout
+    ) {
     }
 
     /**

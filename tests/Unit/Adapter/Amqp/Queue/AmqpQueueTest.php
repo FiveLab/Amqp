@@ -16,18 +16,19 @@ namespace FiveLab\Component\Amqp\Tests\Unit\Adapter\Amqp\Queue;
 use FiveLab\Component\Amqp\Adapter\Amqp\Channel\AmqpChannel;
 use FiveLab\Component\Amqp\Adapter\Amqp\Message\AmqpReceivedMessage;
 use FiveLab\Component\Amqp\Adapter\Amqp\Queue\AmqpQueue;
-use PHPUnit\Framework\MockObject\MockObject;
+use FiveLab\Component\Amqp\Tests\Unit\Adapter\Amqp\AmqpAdapterHelper;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class AmqpQueueTest extends TestCase
 {
     /**
-     * @var \AMQPQueue|MockObject
+     * @var \AMQPQueue
      */
-    private $originQueue;
+    private \AMQPQueue $originQueue;
 
     /**
-     * @var AmqpChannel|MockObject
+     * @var AmqpChannel
      */
     private AmqpChannel $originChannel;
 
@@ -47,9 +48,7 @@ class AmqpQueueTest extends TestCase
         $this->queue = new AmqpQueue($this->originChannel, $this->originQueue);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGetName(): void
     {
         $this->originQueue->expects(self::once())
@@ -59,9 +58,7 @@ class AmqpQueueTest extends TestCase
         self::assertEquals('some', $this->queue->getName());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessPurge(): void
     {
         $this->originQueue->expects(self::once())
@@ -70,9 +67,7 @@ class AmqpQueueTest extends TestCase
         $this->queue->purge();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGetChannel(): void
     {
         $channel = $this->queue->getChannel();
@@ -80,9 +75,7 @@ class AmqpQueueTest extends TestCase
         self::assertEquals($this->originChannel, $channel);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessConsume(): void
     {
         $closure = static function () {
@@ -95,9 +88,7 @@ class AmqpQueueTest extends TestCase
         $this->queue->consume($closure);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessConsumeWithConsumerTag(): void
     {
         $closure = static function () {
@@ -110,9 +101,7 @@ class AmqpQueueTest extends TestCase
         $this->queue->consume($closure, 'some.foo.bar');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCancelConsumer(): void
     {
         $this->originQueue->expects(self::once())
@@ -122,12 +111,10 @@ class AmqpQueueTest extends TestCase
         $this->queue->cancelConsumer('some-foo');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGetMessage(): void
     {
-        $envelope = $this->createMock(\AMQPEnvelope::class);
+        $envelope = AmqpAdapterHelper::makeEnvelope($this);
 
         $this->originQueue->expects(self::once())
             ->method('get')
@@ -138,9 +125,7 @@ class AmqpQueueTest extends TestCase
         self::assertEquals(new AmqpReceivedMessage($this->originQueue, $envelope), $message);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGetMessageWithNull(): void
     {
         $this->originQueue->expects(self::once())
@@ -152,9 +137,7 @@ class AmqpQueueTest extends TestCase
         self::assertNull($message);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGetCountMessages(): void
     {
         $this->originQueue->expects(self::once())

@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Unit\Command;
 
 use FiveLab\Component\Amqp\Command\ListConsumersCommand;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -39,9 +40,7 @@ class ListConsumersCommandTest extends TestCase
         $this->output = new BufferedOutput();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessListConsumers(): void
     {
         $command = new ListConsumersCommand(['foo', 'bar', 'some']);

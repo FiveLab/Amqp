@@ -20,15 +20,15 @@ use FiveLab\Component\Amqp\Message\Message;
 use FiveLab\Component\Amqp\Message\Options;
 use FiveLab\Component\Amqp\Message\Payload;
 use FiveLab\Component\Amqp\Publisher\Middleware\AddIdentifierToMessageMiddleware;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class AddIdentifierToMessageMiddlewareTest extends TestCase
 {
     /**
-     * @var MessageIdGeneratorInterface|MockObject
+     * @var MessageIdGeneratorInterface
      */
-    private $messageIdGenerator;
+    private MessageIdGeneratorInterface $messageIdGenerator;
 
     /**
      * {@inheritdoc}
@@ -38,9 +38,7 @@ class AddIdentifierToMessageMiddlewareTest extends TestCase
         $this->messageIdGenerator = $this->createMock(MessageIdGeneratorInterface::class);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessInvokeIfParametersNotSet(): void
     {
         $middleware = new AddIdentifierToMessageMiddleware();
@@ -53,9 +51,7 @@ class AddIdentifierToMessageMiddlewareTest extends TestCase
         self::assertTrue($executed, 'The next callable don\'t called.');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldAddMessageId(): void
     {
         $this->messageIdGenerator->expects(self::once())
@@ -72,9 +68,7 @@ class AddIdentifierToMessageMiddlewareTest extends TestCase
         self::assertTrue($executed, 'The next callable don\'t called.');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldNotAddMessageIdIfExist(): void
     {
         $this->messageIdGenerator->expects(self::never())
@@ -90,9 +84,7 @@ class AddIdentifierToMessageMiddlewareTest extends TestCase
         self::assertTrue($executed, 'The next callable don\'t called.');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldAddAppId(): void
     {
         $middleware = new AddIdentifierToMessageMiddleware(null, 'app-id');
@@ -105,9 +97,7 @@ class AddIdentifierToMessageMiddlewareTest extends TestCase
         self::assertTrue($executed, 'The next callable don\'t called.');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldNotAddAppIdIfExist(): void
     {
         $middleware = new AddIdentifierToMessageMiddleware(null, 'app-id');
@@ -120,9 +110,7 @@ class AddIdentifierToMessageMiddlewareTest extends TestCase
         self::assertTrue($executed, 'The next callable don\'t called.');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldAddUserId(): void
     {
         $middleware = new AddIdentifierToMessageMiddleware(null, null, 'user-id');
@@ -135,9 +123,7 @@ class AddIdentifierToMessageMiddlewareTest extends TestCase
         self::assertTrue($executed, 'The next callable don\'t called.');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldNotAddUserIdIfExist(): void
     {
         $middleware = new AddIdentifierToMessageMiddleware(null, null, 'user-id');

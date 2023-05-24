@@ -14,7 +14,7 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Functional\Consumer\Middleware;
 
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareInterface;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 
 class MiddlewareMock implements ConsumerMiddlewareInterface
 {
@@ -26,7 +26,7 @@ class MiddlewareMock implements ConsumerMiddlewareInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(ReceivedMessageInterface $message, callable $next): void
+    public function handle(ReceivedMessage $message, callable $next): void
     {
         $this->receivedMessages[] = $message;
 

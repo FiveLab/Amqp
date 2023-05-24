@@ -17,34 +17,24 @@ use FiveLab\Component\Amqp\Adapter\Amqp\Channel\AmqpChannel;
 use FiveLab\Component\Amqp\Adapter\Amqp\Message\AmqpReceivedMessage;
 use FiveLab\Component\Amqp\Channel\ChannelInterface;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
 
 /**
  * The queue provided via php-amqp extension.
  */
-class AmqpQueue implements QueueInterface
+readonly class AmqpQueue implements QueueInterface
 {
-    /**
-     * @var AmqpChannel
-     */
-    private AmqpChannel $channel;
-
-    /**
-     * @var \AMQPQueue
-     */
-    private \AMQPQueue $queue;
-
     /**
      * Constructor.
      *
      * @param AmqpChannel $channel
      * @param \AMQPQueue  $queue
      */
-    public function __construct(AmqpChannel $channel, \AMQPQueue $queue)
-    {
-        $this->channel = $channel;
-        $this->queue = $queue;
+    public function __construct(
+        private AmqpChannel $channel,
+        private \AMQPQueue  $queue
+    ) {
     }
 
     /**
@@ -94,7 +84,7 @@ class AmqpQueue implements QueueInterface
     /**
      * {@inheritdoc}
      */
-    public function get(): ?ReceivedMessageInterface
+    public function get(): ?ReceivedMessage
     {
         $envelope = $this->queue->get();
 

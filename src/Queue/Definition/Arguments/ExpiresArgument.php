@@ -18,7 +18,7 @@ use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 /**
  * Definition for "x-expires" argument.
  */
-class ExpiresArgument extends ArgumentDefinition
+readonly class ExpiresArgument extends ArgumentDefinition
 {
     /**
      * Constructor.

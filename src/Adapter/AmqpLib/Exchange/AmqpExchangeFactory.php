@@ -27,16 +27,6 @@ use PhpAmqpLib\Wire\AMQPTable;
 class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
 {
     /**
-     * @var ChannelFactoryInterface
-     */
-    private ChannelFactoryInterface $channelFactory;
-
-    /**
-     * @var ExchangeDefinition
-     */
-    private ExchangeDefinition $definition;
-
-    /**
      * @var AmqpExchange|null
      */
     private ?AmqpExchange $exchange = null;
@@ -47,10 +37,10 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
      * @param ChannelFactoryInterface $channelFactory
      * @param ExchangeDefinition      $definition
      */
-    public function __construct(ChannelFactoryInterface $channelFactory, ExchangeDefinition $definition)
-    {
-        $this->channelFactory = $channelFactory;
-        $this->definition = $definition;
+    public function __construct(
+        private readonly ChannelFactoryInterface $channelFactory,
+        private readonly ExchangeDefinition      $definition
+    ) {
     }
 
     /**
@@ -79,12 +69,12 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
         $exchange = new AmqpExchange($channel, $this->definition);
         $this->declare();
 
-        foreach ($this->definition->getBindings() as $binding) {
-            $this->bind($binding->getExchangeName(), $binding->getRoutingKey());
+        foreach ($this->definition->bindings as $binding) {
+            $this->bind($binding->exchangeName, $binding->routingKey);
         }
 
-        foreach ($this->definition->getUnBindings() as $unbinding) {
-            $this->unbind($unbinding->getExchangeName(), $unbinding->getRoutingKey());
+        foreach ($this->definition->unbindings as $unbinding) {
+            $this->unbind($unbinding->exchangeName, $unbinding->routingKey);
         }
 
         $this->exchange = $exchange;
@@ -105,7 +95,7 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
      */
     private function declare(): void
     {
-        $name = $this->definition->getName();
+        $name = $this->definition->name;
 
         // Default exchange always exists and "declare" call is not permitted
         if (!$name) {
@@ -114,8 +104,8 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
 
         $arguments = new AMQPTable();
 
-        foreach ($this->definition->getArguments() as $argument) {
-            $arguments->set($argument->getName(), $argument->getValue());
+        foreach ($this->definition->arguments as $argument) {
+            $arguments->set($argument->name, $argument->value);
         }
 
         /** @var AmqpChannel $channel */
@@ -123,9 +113,9 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
 
         $channel->getChannel()->exchange_declare(
             $name,
-            $this->definition->getType(),
-            $this->definition->isPassive(),
-            $this->definition->isDurable(),
+            $this->definition->type,
+            $this->definition->passive,
+            $this->definition->durable,
             false,
             false,
             false,
@@ -144,7 +134,7 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
         /** @var AmqpChannel $channel */
         $channel = $this->channelFactory->create();
 
-        $channel->getChannel()->exchange_bind($this->definition->getName(), $exchangeName, $routingKey);
+        $channel->getChannel()->exchange_bind($this->definition->name, $exchangeName, $routingKey);
     }
 
     /**
@@ -158,6 +148,6 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
         /** @var AmqpChannel $channel */
         $channel = $this->channelFactory->create();
 
-        $channel->getChannel()->exchange_unbind($this->definition->getName(), $exchangeName, $routingKey);
+        $channel->getChannel()->exchange_unbind($this->definition->name, $exchangeName, $routingKey);
     }
 }

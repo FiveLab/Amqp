@@ -15,13 +15,12 @@ namespace FiveLab\Component\Amqp\Tests\Unit\Message;
 
 use FiveLab\Component\Amqp\Exception\HeaderNotFoundException;
 use FiveLab\Component\Amqp\Message\Headers;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class HeadersTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateWithoutHeaders(): void
     {
         $headers = new Headers([]);
@@ -29,9 +28,7 @@ class HeadersTest extends TestCase
         self::assertEquals([], $headers->all());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGetAndCheckHeader(): void
     {
         $headers = new Headers([
@@ -44,9 +41,7 @@ class HeadersTest extends TestCase
         self::assertEquals('bar', $headers->get('foo'));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldThrowExceptionIfHeaderNotFound(): void
     {
         $this->expectException(HeaderNotFoundException::class);
@@ -59,9 +54,7 @@ class HeadersTest extends TestCase
         $headers->get('bar');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldReturnArrayHeader(): void
     {
         $xDeathHeaderValue = [

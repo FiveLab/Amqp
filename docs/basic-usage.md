@@ -14,18 +14,13 @@ use FiveLab\Component\Amqp\Adapter\Amqp\Connection\AmqpConnectionFactory;
 use FiveLab\Component\Amqp\Adapter\Amqp\Exchange\AmqpExchangeFactory;
 use FiveLab\Component\Amqp\Adapter\Amqp\Queue\AmqpQueueFactory;
 use FiveLab\Component\Amqp\Channel\Definition\ChannelDefinition;
-use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
+use FiveLab\Component\Amqp\Connection\Dsn;use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 
-$connectionFactory = new AmqpConnectionFactory([
-    'host' => 'host-to-connect',
-    'port' => 5672,
-    'vhost' => '/',
-    'login' => 'guest',
-    'password' => 'guest'
-]);
+$dsn = Dsn::fromDsn('amqp://user:pass@host-to-connect')
+$connectionFactory = new AmqpConnectionFactory($dsn);
 
 $channelFactory = new AmqpChannelFactory($connectionFactory, new ChannelDefinition());
 
@@ -51,20 +46,20 @@ After this, you can publish messages to receive messages.
 
 use FiveLab\Component\Amqp\Message\Message;
 use FiveLab\Component\Amqp\Message\Payload;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 
 // Publish message
 $exchange->publish('route-1', new Message(new Payload('message 1')));
 $exchange->publish('route-2', new Message(new Payload('message 2')));
 
 // Receive messages
-$queue->consume(function (ReceivedMessageInterface $message) {
+$queue->consume(function (ReceivedMessage $message) {
     print \sprintf(
         'Receive message with tag %s from exchange %s by route %s. Payload: %s%s',
-        $message->getDeliveryTag(),
-        $message->getExchangeName(),
-        $message->getRoutingKey(),
-        $message->getPayload()->getData(),
+        $message->deliveryTag,
+        $message->exchangeName,
+        $message->routingKey,
+        $message->payload->data,
         PHP_EOL
     );
 });
@@ -83,14 +78,14 @@ In this case we have a middleware layer and you can write any logic before and a
 <?php
 
 use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlerInterface;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 
 class MyMessageHandler implements MessageHandlerInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function supports(ReceivedMessageInterface $message): bool
+    public function supports(ReceivedMessage $message): bool
     {
         return true;
     }
@@ -98,7 +93,7 @@ class MyMessageHandler implements MessageHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(ReceivedMessageInterface $message): void
+    public function handle(ReceivedMessage $message): void
     {
         // You logic here.
     }

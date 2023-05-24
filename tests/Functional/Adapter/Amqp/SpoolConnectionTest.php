@@ -18,6 +18,7 @@ use FiveLab\Component\Amqp\Adapter\Amqp\Connection\AmqpConnectionFactory;
 use FiveLab\Component\Amqp\Adapter\Amqp\Exchange\AmqpExchangeFactory;
 use FiveLab\Component\Amqp\Adapter\Amqp\Queue\AmqpQueueFactory;
 use FiveLab\Component\Amqp\Connection\ConnectionFactoryInterface;
+use FiveLab\Component\Amqp\Connection\Driver;
 use FiveLab\Component\Amqp\Tests\Functional\Adapter\SpoolConnectionTestCase;
 
 class SpoolConnectionTest extends SpoolConnectionTestCase
@@ -27,14 +28,7 @@ class SpoolConnectionTest extends SpoolConnectionTestCase
      */
     protected function createConnectionFactory(): ConnectionFactoryInterface
     {
-        return new AmqpConnectionFactory([
-            'host'         => $this->getRabbitMqHost(),
-            'port'         => $this->getRabbitMqPort(),
-            'vhost'        => $this->getRabbitMqVhost(),
-            'login'        => $this->getRabbitMqLogin(),
-            'password'     => $this->getRabbitMqPassword(),
-            'read_timeout' => 2,
-        ]);
+        return new AmqpConnectionFactory($this->getRabbitMqDsn(Driver::AmqpExt));
     }
 
     /**

@@ -13,47 +13,40 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Unit\Exchange\Definition;
 
-use FiveLab\Component\Amqp\Argument\ArgumentDefinitions;
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
-use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
+use FiveLab\Component\Amqp\Argument\ArgumentDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class ExchangeDefinitionTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateWithDefaults(): void
     {
         $def = new ExchangeDefinition('some', AMQP_EX_TYPE_DIRECT);
 
-        self::assertEquals('some', $def->getName());
-        self::assertEquals(AMQP_EX_TYPE_DIRECT, $def->getType());
-        self::assertTrue($def->isDurable());
-        self::assertFalse($def->isPassive());
-        self::assertEquals(new BindingDefinitions(), $def->getBindings());
-        self::assertEquals(new BindingDefinitions(), $def->getUnBindings());
+        self::assertEquals('some', $def->name);
+        self::assertEquals(AMQP_EX_TYPE_DIRECT, $def->type);
+        self::assertTrue($def->durable);
+        self::assertFalse($def->passive);
+        self::assertEquals(new BindingDefinitions(), $def->bindings);
+        self::assertEquals(new BindingDefinitions(), $def->unbindings);
     }
 
-    /**
-     * @test
-     *
-     * @param string $type
-     *
-     * @dataProvider provideExchangeTypes
-     */
+    #[Test]
+    #[DataProvider('provideExchangeTypes')]
     public function shouldSuccessCreateWithCustomType(string $type): void
     {
         $def = new ExchangeDefinition('some', $type);
 
-        self::assertEquals($type, $def->getType());
+        self::assertEquals($type, $def->type);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldThrowExceptionOnInvalidType(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -62,29 +55,23 @@ class ExchangeDefinitionTest extends TestCase
         new ExchangeDefinition('some', 'foo');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateWithoutDurable(): void
     {
         $def = new ExchangeDefinition('some', AMQP_EX_TYPE_DIRECT, false);
 
-        self::assertFalse($def->isDurable());
+        self::assertFalse($def->durable);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateWithPassive(): void
     {
         $def = new ExchangeDefinition('some', AMQP_EX_TYPE_DIRECT, true, true);
 
-        self::assertTrue($def->isPassive());
+        self::assertTrue($def->passive);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessCreateDefaultExchange(): void
     {
         $def = new ExchangeDefinition(
@@ -97,27 +84,16 @@ class ExchangeDefinitionTest extends TestCase
             new BindingDefinitions()
         );
 
-        self::assertEquals('', $def->getName());
-        self::assertTrue($def->isDurable());
-        self::assertFalse($def->isPassive());
-        self::assertEquals(new ArgumentDefinitions(), $def->getArguments());
-        self::assertEquals(new BindingDefinitions(), $def->getBindings());
-        self::assertEquals(new BindingDefinitions(), $def->getUnBindings());
+        self::assertEquals('', $def->name);
+        self::assertTrue($def->durable);
+        self::assertFalse($def->passive);
+        self::assertEquals(new ArgumentDefinitions(), $def->arguments);
+        self::assertEquals(new BindingDefinitions(), $def->bindings);
+        self::assertEquals(new BindingDefinitions(), $def->unbindings);
     }
 
-    /**
-     * @test
-     *
-     * @param \Throwable               $expectedException
-     * @param string                   $type
-     * @param bool                     $durable
-     * @param bool                     $passive
-     * @param ArgumentDefinitions|null $arguments
-     * @param BindingDefinitions|null  $bindings
-     * @param BindingDefinitions|null  $unbindings
-     *
-     * @dataProvider provideInvalidParametersForDefaultExchange
-     */
+    #[Test]
+    #[DataProvider('provideInvalidParametersForDefaultExchange')]
     public function shouldFailCreateDefaultExchange(\Throwable $expectedException, string $type, bool $durable, bool $passive, ArgumentDefinitions $arguments = null, BindingDefinitions $bindings = null, BindingDefinitions $unbindings = null): void
     {
         $this->expectException(\get_class($expectedException));
@@ -131,7 +107,7 @@ class ExchangeDefinitionTest extends TestCase
      *
      * @return array
      */
-    public function provideExchangeTypes(): array
+    public static function provideExchangeTypes(): array
     {
         $exchanges = [
             AMQP_EX_TYPE_DIRECT,
@@ -150,7 +126,7 @@ class ExchangeDefinitionTest extends TestCase
      *
      * @return array
      */
-    public function provideInvalidParametersForDefaultExchange(): array
+    public static function provideInvalidParametersForDefaultExchange(): array
     {
         return [
             'invalid type' => [

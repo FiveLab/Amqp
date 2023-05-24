@@ -16,19 +16,21 @@ namespace FiveLab\Component\Amqp\Tests\Functional\Consumer\RoundRobin;
 use FiveLab\Component\Amqp\Adapter\Amqp\Channel\AmqpChannelFactory;
 use FiveLab\Component\Amqp\Adapter\Amqp\Connection\AmqpConnectionFactory;
 use FiveLab\Component\Amqp\Adapter\Amqp\Queue\AmqpQueueFactory;
-use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
+use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Channel\Definition\ChannelDefinition;
+use FiveLab\Component\Amqp\Connection\Driver;
 use FiveLab\Component\Amqp\Consumer\ConsumerConfiguration;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
 use FiveLab\Component\Amqp\Consumer\Registry\ConsumerRegistry;
-use FiveLab\Component\Amqp\Consumer\SingleConsumer;
 use FiveLab\Component\Amqp\Consumer\RoundRobin\RoundRobinConsumer;
 use FiveLab\Component\Amqp\Consumer\RoundRobin\RoundRobinConsumerConfiguration;
+use FiveLab\Component\Amqp\Consumer\SingleConsumer;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Tests\Functional\Consumer\Handler\MessageHandlerMock;
 use FiveLab\Component\Amqp\Tests\Functional\RabbitMqTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class RoundRobinConsumerTest extends RabbitMqTestCase
 {
@@ -70,13 +72,7 @@ class RoundRobinConsumerTest extends RabbitMqTestCase
         $this->handler1 = new MessageHandlerMock('foo1');
         $this->handler2 = new MessageHandlerMock('foo2');
 
-        $connectionFactory = new AmqpConnectionFactory([
-            'host'     => $this->getRabbitMqHost(),
-            'port'     => $this->getRabbitMqPort(),
-            'vhost'    => $this->getRabbitMqVhost(),
-            'login'    => $this->getRabbitMqLogin(),
-            'password' => $this->getRabbitMqPassword(),
-        ]);
+        $connectionFactory = new AmqpConnectionFactory($this->getRabbitMqDsn(Driver::AmqpExt));
 
         $channelFactory = new AmqpChannelFactory($connectionFactory, new ChannelDefinition());
 
@@ -89,9 +85,7 @@ class RoundRobinConsumerTest extends RabbitMqTestCase
         )));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessProcessInRoundRobin(): void
     {
         $this->management->publishMessage('exchange1', 'foo1', 'queue1-message-1');
@@ -122,13 +116,13 @@ class RoundRobinConsumerTest extends RabbitMqTestCase
         $messagesFromHandler1 = $this->handler1->getReceivedMessages();
 
         self::assertCount(2, $messagesFromHandler1);
-        self::assertEquals('queue1-message-1', $messagesFromHandler1[0]->getPayload()->getData());
-        self::assertEquals('queue1-message-2', $messagesFromHandler1[1]->getPayload()->getData());
+        self::assertEquals('queue1-message-1', $messagesFromHandler1[0]->payload->data);
+        self::assertEquals('queue1-message-2', $messagesFromHandler1[1]->payload->data);
 
         $messagesFromHandler2 = $this->handler2->getReceivedMessages();
 
         self::assertCount(2, $messagesFromHandler2);
-        self::assertEquals('queue2-message-1', $messagesFromHandler2[0]->getPayload()->getData());
-        self::assertEquals('queue2-message-2', $messagesFromHandler2[1]->getPayload()->getData());
+        self::assertEquals('queue2-message-1', $messagesFromHandler2[0]->payload->data);
+        self::assertEquals('queue2-message-2', $messagesFromHandler2[1]->payload->data);
     }
 }

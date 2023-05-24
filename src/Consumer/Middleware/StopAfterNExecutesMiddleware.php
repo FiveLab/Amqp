@@ -14,7 +14,7 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Consumer\Middleware;
 
 use FiveLab\Component\Amqp\Exception\StopAfterNExecutesException;
-use FiveLab\Component\Amqp\Message\ReceivedMessageInterface;
+use FiveLab\Component\Amqp\Message\ReceivedMessage;
 
 /**
  * Middleware for stop execution after N iteration.
@@ -25,11 +25,6 @@ class StopAfterNExecutesMiddleware implements ConsumerMiddlewareInterface
     /**
      * @var int
      */
-    private int $stopAfterExecutes;
-
-    /**
-     * @var int
-     */
     private int $executesCounter = 0;
 
     /**
@@ -37,15 +32,14 @@ class StopAfterNExecutesMiddleware implements ConsumerMiddlewareInterface
      *
      * @param int $stopAfterExecutes
      */
-    public function __construct(int $stopAfterExecutes)
+    public function __construct(private readonly int $stopAfterExecutes)
     {
-        $this->stopAfterExecutes = $stopAfterExecutes;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function handle(ReceivedMessageInterface $message, callable $next): void
+    public function handle(ReceivedMessage $message, callable $next): void
     {
         $next($message);
 

@@ -14,44 +14,36 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Publisher;
 
 use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
-use FiveLab\Component\Amqp\Message\MessageInterface;
+use FiveLab\Component\Amqp\Message\Message;
 use FiveLab\Component\Amqp\Publisher\Middleware\PublisherMiddlewares;
 
 /**
  * The default publisher
  */
-class Publisher implements PublisherInterface
+readonly class Publisher implements PublisherInterface
 {
-    /**
-     * @var ExchangeFactoryInterface
-     */
-    private ExchangeFactoryInterface $exchangeFactory;
-
-    /**
-     * @var PublisherMiddlewares
-     */
-    private PublisherMiddlewares $middlewares;
-
     /**
      * Constructor.
      *
      * @param ExchangeFactoryInterface $exchangeFactory
      * @param PublisherMiddlewares     $middlewares
      */
-    public function __construct(ExchangeFactoryInterface $exchangeFactory, PublisherMiddlewares $middlewares)
+    public function __construct(private ExchangeFactoryInterface $exchangeFactory, private PublisherMiddlewares $middlewares)
     {
-        $this->exchangeFactory = $exchangeFactory;
-        $this->middlewares = $middlewares;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function publish(MessageInterface $message, string $routingKey = ''): void
+    public function publish(Message $message, string|\BackedEnum $routingKey = ''): void
     {
+        if ($routingKey instanceof \BackedEnum) {
+            $routingKey = (string) $routingKey->value;
+        }
+
         $exchange = $this->exchangeFactory->create();
 
-        $callable = $this->middlewares->createExecutable(static function (MessageInterface $message, string $routingKey) use ($exchange) {
+        $callable = $this->middlewares->createExecutable(static function (Message $message, string $routingKey) use ($exchange) {
             $exchange->publish($message, $routingKey);
         });
 

@@ -15,13 +15,12 @@ namespace FiveLab\Component\Amqp\Tests\Unit\Binding\Definition;
 
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class BindingDefinitionsTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGetIterator(): void
     {
         $bindings = new BindingDefinitions(
@@ -35,9 +34,7 @@ class BindingDefinitionsTest extends TestCase
         ], \iterator_to_array($bindings));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessGetCount(): void
     {
         $bindings = new BindingDefinitions(
