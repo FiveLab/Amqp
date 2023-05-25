@@ -20,6 +20,7 @@ use PHPUnit\Framework\TestCase;
 
 class OverflowArgumentTest extends TestCase
 {
+    #[Test]
     #[TestWith(['drop-head'])]
     #[TestWith(['reject-publish'])]
     #[TestWith(['reject-publish-dlx'])]

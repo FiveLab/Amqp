@@ -53,6 +53,7 @@ class HandleExpiredMessageHandlerTest extends TestCase
         $this->handler = new HandleExpiredMessageHandler($this->publisherRegistry, $this->delayPublisher, 'landfill');
     }
 
+    #[Test]
     #[TestWith(['landfill', true])]
     #[TestWith(['foo', false])]
     public function shouldSuccessSupports(string $routing, bool $supports): void

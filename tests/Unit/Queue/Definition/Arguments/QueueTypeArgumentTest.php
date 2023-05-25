@@ -20,6 +20,7 @@ use PHPUnit\Framework\TestCase;
 
 class QueueTypeArgumentTest extends TestCase
 {
+    #[Test]
     #[TestWith(['classic'])]
     #[TestWith(['quorum'])]
     public function shouldSuccessCreate(string $type): void

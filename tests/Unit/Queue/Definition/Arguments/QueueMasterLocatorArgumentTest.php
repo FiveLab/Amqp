@@ -20,6 +20,7 @@ use PHPUnit\Framework\TestCase;
 
 class QueueMasterLocatorArgumentTest extends TestCase
 {
+    #[Test]
     #[TestWith(['min-masters'])]
     #[TestWith(['client-local'])]
     #[TestWith(['random'])]

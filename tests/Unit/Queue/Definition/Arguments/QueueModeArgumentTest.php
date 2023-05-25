@@ -20,6 +20,7 @@ use PHPUnit\Framework\TestCase;
 
 class QueueModeArgumentTest extends TestCase
 {
+    #[Test]
     #[TestWith(['lazy'])]
     #[TestWith(['default'])]
     public function shouldSuccessCreate(string $mode): void

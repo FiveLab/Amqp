@@ -158,6 +158,7 @@ class SpoolConnectionTest extends TestCase
         $spool->getConnection();
     }
 
+    #[Test]
     #[TestWith([true])]
     #[TestWith([false])]
     public function shouldSuccessCheckIsConnected(bool $connected): void
