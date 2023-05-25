@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Unit\Message;
 
+use FiveLab\Component\Amqp\Connection\Driver;
 use FiveLab\Component\Amqp\Message\DelayMessage;
 use FiveLab\Component\Amqp\Message\Headers;
 use FiveLab\Component\Amqp\Message\Identifier;
@@ -62,5 +63,14 @@ class DelayMessageTest extends TestCase
             'x-delay-routing-key' => '',
             'x-delay-counter'     => 1,
         ]), $delayMessage->headers);
+    }
+
+    #[Test]
+    public function shouldSuccessCreateWithEnums(): void
+    {
+        $message = new Message(new Payload('foo'));
+        $delayMessage = new DelayMessage($message, 'foo', Driver::AmqpExt);
+
+        self::assertEquals('amqp', $delayMessage->headers->get('x-delay-routing-key'));
     }
 }

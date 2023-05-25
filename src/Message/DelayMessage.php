@@ -25,17 +25,21 @@ class DelayMessage extends Message
     /**
      * Constructor.
      *
-     * @param Message $message
-     * @param string  $publisherKey
-     * @param string  $routingKey
-     * @param int     $counter
+     * @param Message            $message
+     * @param string             $publisherKey
+     * @param string|\BackedEnum $routingKey
+     * @param int                $counter
      */
     public function __construct(
-        Message $message,
-        string  $publisherKey,
-        string  $routingKey = '',
-        int     $counter = 1
+        Message            $message,
+        string             $publisherKey,
+        string|\BackedEnum $routingKey = '',
+        int                $counter = 1
     ) {
+        if ($routingKey instanceof \BackedEnum) {
+            $routingKey = (string) $routingKey->value;
+        }
+
         $headers = $message->headers;
         $headersList = $headers->all();
 
