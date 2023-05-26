@@ -132,6 +132,8 @@ readonly class Dsn implements \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @return \ArrayIterator<int, Dsn>
      */
     public function getIterator(): \ArrayIterator
     {
