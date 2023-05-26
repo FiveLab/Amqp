@@ -18,7 +18,7 @@ namespace FiveLab\Component\Amqp\Connection;
  *
  * @implements \IteratorAggregate<Dsn>
  */
-readonly class Dsn implements \IteratorAggregate, \Countable
+readonly class Dsn implements \IteratorAggregate, \Countable, \Stringable
 {
     /**
      * @var array<string, callable-string>
@@ -160,5 +160,36 @@ readonly class Dsn implements \IteratorAggregate, \Countable
     public function count(): int
     {
         return \count($this->hosts);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __toString(): string
+    {
+        return $this->toString();
+    }
+
+    /**
+     * Convert DSN to string
+     *
+     * @param bool $hidePassword
+     *
+     * @return string
+     */
+    public function toString(bool $hidePassword = true): string
+    {
+        $query = \count($this->options) ? '?'.\http_build_query($this->options) : '';
+
+        return \sprintf(
+            '%s://%s:%s@%s:%d/%s%s',
+            $this->driver->value,
+            $this->username,
+            $hidePassword ? '***' : $this->password,
+            \implode(',', $this->hosts),
+            $this->port,
+            \urlencode($this->vhost),
+            $query
+        );
     }
 }

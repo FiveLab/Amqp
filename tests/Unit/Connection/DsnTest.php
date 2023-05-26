@@ -17,6 +17,7 @@ use FiveLab\Component\Amqp\Connection\Driver;
 use FiveLab\Component\Amqp\Connection\Dsn;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
 class DsnTest extends TestCase
@@ -71,6 +72,17 @@ class DsnTest extends TestCase
             'bar',
             ['read_timeout' => 30, 'write_timeout' => 25]
         ), $dsns[2]);
+    }
+
+    #[Test]
+    #[TestWith(['amqp://localhost', false, 'amqp://guest:guest@localhost:5672/%2F'])]
+    #[TestWith(['amqp://foo:bar@host1,host2:5673/%2foo?read=1', false, 'amqp://foo:bar@host1,host2:5673/%2Foo?read=1'])]
+    #[TestWith(['amqp://foo:bar@host1,host2:5673/%2foo?read=1', true, 'amqp://foo:***@host1,host2:5673/%2Foo?read=1'])]
+    public function shouldSuccessConvertToString(string $dsnStr, bool $hidePassword, string $expected): void
+    {
+        $dsn = Dsn::fromDsn($dsnStr);
+
+        self::assertEquals($expected, $dsn->toString($hidePassword));
     }
 
     /**
