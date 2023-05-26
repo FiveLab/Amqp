@@ -1,8 +1,8 @@
 CHANGELOG
 =========
 
-Next release
-------------
+v2.0.0
+------
 
 * Require PHP 8.2 and higher.
 * Message & ReceivedMessage classes - remove interfaces, remove getters. Please use classes and public properties for retrieve info.
