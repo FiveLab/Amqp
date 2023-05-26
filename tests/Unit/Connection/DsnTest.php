@@ -30,6 +30,49 @@ class DsnTest extends TestCase
         self::assertEquals($expected, $actual);
     }
 
+    #[Test]
+    public function shouldSuccessIterateAllHosts(): void
+    {
+        $dsn = Dsn::fromDsn('amqp://foo:bar@host1,host2,host3:5673/%2frr?read_timeout=30&write_timeout=25');
+
+        self::assertEquals('host1', $dsn->host);
+        self::assertEquals(['host1', 'host2', 'host3'], $dsn->hosts);
+
+        self::assertCount(3, $dsn);
+
+        $dsns = \iterator_to_array($dsn);
+
+        self::assertEquals(new Dsn(
+            Driver::AmqpExt,
+            'host1',
+            5673,
+            '/rr',
+            'foo',
+            'bar',
+            ['read_timeout' => 30, 'write_timeout' => 25]
+        ), $dsns[0]);
+
+        self::assertEquals(new Dsn(
+            Driver::AmqpExt,
+            'host2',
+            5673,
+            '/rr',
+            'foo',
+            'bar',
+            ['read_timeout' => 30, 'write_timeout' => 25]
+        ), $dsns[1]);
+
+        self::assertEquals(new Dsn(
+            Driver::AmqpExt,
+            'host3',
+            5673,
+            '/rr',
+            'foo',
+            'bar',
+            ['read_timeout' => 30, 'write_timeout' => 25]
+        ), $dsns[2]);
+    }
+
     /**
      * Provide DSN for testing
      *

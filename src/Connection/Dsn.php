@@ -13,7 +13,12 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Connection;
 
-readonly class Dsn
+/**
+ * DSN for connect to RabbitMQ.
+ *
+ * @implements \IteratorAggregate<Dsn>
+ */
+readonly class Dsn implements \IteratorAggregate, \Countable
 {
     /**
      * @var array<string, callable-string>
@@ -28,6 +33,16 @@ readonly class Dsn
     ];
 
     /**
+     * @var string
+     */
+    public string $host;
+
+    /**
+     * @var array<string>
+     */
+    public array $hosts;
+
+    /**
      * Constructor.
      *
      * @param Driver                   $driver
@@ -40,13 +55,23 @@ readonly class Dsn
      */
     public function __construct(
         public Driver $driver,
-        public string $host,
+        string        $host,
         public int    $port = 5672,
         public string $vhost = '/',
         public string $username = 'guest',
         public string $password = 'guest',
         public array  $options = []
     ) {
+        $hosts = \explode(',', $host);
+        $hosts = \array_map('\trim', $hosts);
+        $hosts = \array_filter($hosts);
+
+        if (!\count($hosts)) {
+            $hosts = [''];
+        }
+
+        $this->host = $hosts[0];
+        $this->hosts = $hosts;
     }
 
     /**
@@ -103,5 +128,35 @@ readonly class Dsn
             \urldecode($urlParts['pass'] ?? 'guest'),
             $options
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIterator(): \ArrayIterator
+    {
+        $dsns = [];
+
+        foreach ($this->hosts as $host) {
+            $dsns[] = new self(
+                $this->driver,
+                $host,
+                $this->port,
+                $this->vhost,
+                $this->username,
+                $this->password,
+                $this->options
+            );
+        }
+
+        return new \ArrayIterator($dsns);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function count(): int
+    {
+        return \count($this->hosts);
     }
 }

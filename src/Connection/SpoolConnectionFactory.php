@@ -55,10 +55,6 @@ class SpoolConnectionFactory implements ConnectionFactoryInterface
      */
     public static function fromDsn(Dsn $dsn): self
     {
-        $hosts = \explode(',', $dsn->host);
-        $hosts = \array_map('trim', $hosts);
-        $hosts = \array_filter($hosts);
-
         $connectionFactoryClass = match ($dsn->driver) {
             Driver::AmqpExt     => AmqpExtConnectionFactory::class,
             Driver::AmqpLib     => AmqpLibConnectionFactory::class,
@@ -67,10 +63,8 @@ class SpoolConnectionFactory implements ConnectionFactoryInterface
 
         $connectionFactories = [];
 
-        foreach ($hosts as $host) {
-            $connectionDsn = new Dsn($dsn->driver, $host, $dsn->port, $dsn->vhost, $dsn->username, $dsn->password, $dsn->options);
-
-            $connectionFactories[] = new $connectionFactoryClass($connectionDsn);
+        foreach ($dsn as $entry) {
+            $connectionFactories[] = new $connectionFactoryClass($entry);
         }
 
         return new self(...$connectionFactories);
