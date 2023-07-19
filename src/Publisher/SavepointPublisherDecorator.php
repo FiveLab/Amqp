@@ -95,7 +95,7 @@ class SavepointPublisherDecorator implements SavepointPublisherInterface
         $parentMessages = \array_merge($this->savepoints[$parentSavepoint], $savepointMessages);
         $this->savepoints[$parentSavepoint] = $parentMessages;
 
-        unset ($this->savepoints[$savepoint]);
+        unset($this->savepoints[$savepoint]);
     }
 
     /**
