@@ -63,6 +63,11 @@ class FlushSavepointPublisherTransactional extends AbstractTransactional
 
         if (0 === $this->nestingLevel) {
             $this->publisher->flush();
+        } else {
+            $savepoint = (string) \array_pop($this->keys);
+            $parentSavepoint = $this->keys[\count($this->keys) - 1];
+
+            $this->publisher->commit($savepoint, $parentSavepoint);
         }
     }
 
@@ -73,9 +78,8 @@ class FlushSavepointPublisherTransactional extends AbstractTransactional
     {
         $this->nestingLevel--;
 
-        $key = \array_pop($this->keys);
+        $key = (string) \array_pop($this->keys);
 
-        // @phpstan-ignore-next-line
         $this->publisher->rollback($key);
     }
 }

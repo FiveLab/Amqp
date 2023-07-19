@@ -74,6 +74,33 @@ class SavepointPublisherDecorator implements SavepointPublisherInterface
     /**
      * {@inheritdoc}
      */
+    public function commit(string $savepoint, string $parentSavepoint): void
+    {
+        if (!\array_key_exists($savepoint, $this->savepoints)) {
+            throw new \RuntimeException(\sprintf(
+                'The savepoint "%s" was not found.',
+                $savepoint
+            ));
+        }
+
+        if (!\array_key_exists($parentSavepoint, $this->savepoints)) {
+            throw new \RuntimeException(\sprintf(
+                'The parent savepoint "%s" was not found.',
+                $savepoint
+            ));
+        }
+
+        $savepointMessages = $this->savepoints[$savepoint];
+
+        $parentMessages = \array_merge($this->savepoints[$parentSavepoint], $savepointMessages);
+        $this->savepoints[$parentSavepoint] = $parentMessages;
+
+        unset ($this->savepoints[$savepoint]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function rollback(string $savepoint): void
     {
         if (!\array_key_exists($savepoint, $this->savepoints)) {

@@ -26,6 +26,15 @@ interface SavepointPublisherInterface extends PublisherInterface
     public function start(string $savepoint): void;
 
     /**
+     * Commit savepoint and move messages to parent savepoint.
+     * Note: if only one savepoint active, you should call flush.
+     *
+     * @param string $savepoint
+     * @param string $parentSavepoint
+     */
+    public function commit(string $savepoint, string $parentSavepoint): void;
+
+    /**
      * Rollback to savepoint
      *
      * @param string $savepoint
