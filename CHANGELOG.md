@@ -1,8 +1,8 @@
 CHANGELOG
 =========
 
-next release
-------------
+v2.0.1
+------
 
 * Fix flush savepoint publisher for use multiple layers with commits/rollbacks.  
 
