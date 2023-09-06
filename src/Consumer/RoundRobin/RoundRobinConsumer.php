@@ -14,6 +14,9 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Consumer\RoundRobin;
 
 use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
+use FiveLab\Component\Amqp\Consumer\Event;
+use FiveLab\Component\Amqp\Consumer\EventableConsumerInterface;
+use FiveLab\Component\Amqp\Consumer\EventableConsumerTrait;
 use FiveLab\Component\Amqp\Consumer\Loop\LoopConsumer;
 use FiveLab\Component\Amqp\Consumer\Middleware\StopAfterNExecutesMiddleware;
 use FiveLab\Component\Amqp\Consumer\MiddlewareAwareInterface;
@@ -26,27 +29,9 @@ use FiveLab\Component\Amqp\Queue\QueueInterface;
 /**
  * Round robin consumer
  */
-class RoundRobinConsumer implements ConsumerInterface
+class RoundRobinConsumer implements EventableConsumerInterface
 {
-    /**
-     * @var RoundRobinConsumerConfiguration
-     */
-    private RoundRobinConsumerConfiguration $configuration;
-
-    /**
-     * @var ConsumerRegistryInterface
-     */
-    private ConsumerRegistryInterface $consumerRegistry;
-
-    /**
-     * @var array<string>
-     */
-    private array $consumers;
-
-    /**
-     * @var \Closure|null
-     */
-    private ?\Closure $changeConsumerHandler = null;
+    use EventableConsumerTrait;
 
     /**
      * Constructor.
@@ -55,21 +40,11 @@ class RoundRobinConsumer implements ConsumerInterface
      * @param ConsumerRegistryInterface       $consumerRegistry
      * @param array<string>                   $consumers
      */
-    public function __construct(RoundRobinConsumerConfiguration $configuration, ConsumerRegistryInterface $consumerRegistry, array $consumers)
-    {
-        $this->configuration = $configuration;
-        $this->consumerRegistry = $consumerRegistry;
-        $this->consumers = $consumers;
-    }
-
-    /**
-     * Set the handler for change consumer
-     *
-     * @param \Closure|null $handler
-     */
-    public function setChangeConsumerHandler(\Closure $handler = null): void
-    {
-        $this->changeConsumerHandler = $handler;
+    public function __construct(
+        private readonly RoundRobinConsumerConfiguration $configuration,
+        private readonly ConsumerRegistryInterface       $consumerRegistry,
+        private readonly array                           $consumers
+    ) {
     }
 
     /**
@@ -122,9 +97,7 @@ class RoundRobinConsumer implements ConsumerInterface
 
             /** @var ConsumerInterface $consumer */
             while ($consumer = \array_shift($consumers)) {
-                if ($this->changeConsumerHandler) {
-                    \call_user_func($this->changeConsumerHandler, $consumer);
-                }
+                $this->triggerEvent(Event::ChangeConsumer, $consumer);
 
                 try {
                     $consumer->run();

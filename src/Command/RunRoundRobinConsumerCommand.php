@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Command;
 
 use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
+use FiveLab\Component\Amqp\Consumer\Event;
 use FiveLab\Component\Amqp\Consumer\RoundRobin\RoundRobinConsumer;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -37,20 +38,13 @@ class RunRoundRobinConsumerCommand extends Command
     protected static $defaultDescription = 'Run round robin consumer.';
 
     /**
-     * @var RoundRobinConsumer
-     */
-    private RoundRobinConsumer $consumer;
-
-    /**
      * Constructor.
      *
      * @param RoundRobinConsumer $consumer
      */
-    public function __construct(RoundRobinConsumer $consumer)
+    public function __construct(private readonly RoundRobinConsumer $consumer)
     {
         parent::__construct();
-
-        $this->consumer = $consumer;
     }
 
     /**
@@ -67,12 +61,15 @@ class RunRoundRobinConsumerCommand extends Command
      */
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
-        $this->consumer->setChangeConsumerHandler(static function (ConsumerInterface $consumer) use ($output) {
-            if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
+        $this->consumer->setEventHandler(static function (Event $event, mixed ...$args) use ($output) {
+            if (Event::ChangeConsumer === $event) {
+                /** @var ConsumerInterface $consumer */
+                $consumer = $args[0];
+
                 $output->writeln(\sprintf(
                     'Select next consumer with queue <comment>%s</comment>.',
                     $consumer->getQueue()->getName()
-                ));
+                ), OutputInterface::VERBOSITY_VERBOSE);
             }
         });
     }

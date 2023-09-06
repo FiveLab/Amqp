@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+next release
+------------
+
+* Add `EventableConsumerInterface` for control specific errors (consumer timeout, stop after N executes, etc...).
+
 v2.0.1
 ------
 

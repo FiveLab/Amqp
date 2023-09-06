@@ -33,7 +33,7 @@ class QueueMasterLocatorArgumentTest extends TestCase
     }
 
     #[Test]
-    public function shouldThrowExceptionForInvalidLocator()
+    public function shouldThrowExceptionForInvalidLocator(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid master locator "some". Possible locators: "min-masters", "client-local", "random".');

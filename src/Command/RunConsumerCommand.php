@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Command;
 
 use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
+use FiveLab\Component\Amqp\Consumer\EventableConsumerInterface;
 use FiveLab\Component\Amqp\Consumer\Middleware\StopAfterNExecutesMiddleware;
 use FiveLab\Component\Amqp\Consumer\MiddlewareAwareInterface;
 use FiveLab\Component\Amqp\Consumer\Registry\ConsumerRegistryInterface;
@@ -42,20 +43,13 @@ class RunConsumerCommand extends Command
     protected static $defaultDescription = 'Run consumer.';
 
     /**
-     * @var ConsumerRegistryInterface
-     */
-    private ConsumerRegistryInterface $consumerRegistry;
-
-    /**
      * Constructor.
      *
      * @param ConsumerRegistryInterface $consumerRegistry
      */
-    public function __construct(ConsumerRegistryInterface $consumerRegistry)
+    public function __construct(private readonly ConsumerRegistryInterface $consumerRegistry)
     {
         parent::__construct();
-
-        $this->consumerRegistry = $consumerRegistry;
     }
 
     /**
@@ -77,6 +71,12 @@ class RunConsumerCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $consumer = $this->consumerRegistry->get((string) $input->getArgument('key'));
+
+        if ($consumer instanceof EventableConsumerInterface) {
+            $closure = (new OutputEventHandler($output))(...);
+
+            $consumer->setEventHandler($closure);
+        }
 
         // Verify input parameters
         if ($input->getOption('loop') && !$input->getOption('read-timeout')) {
@@ -102,7 +102,7 @@ class RunConsumerCommand extends Command
                 ->setReadTimeout($readTimeout);
 
             if ($input->getOption('loop')) {
-                $this->runInLoop($consumer);
+                $this->runInLoop($consumer, $output);
             }
         }
 
@@ -115,16 +115,22 @@ class RunConsumerCommand extends Command
      * Run consumer in loop.
      *
      * @param ConsumerInterface $consumer
+     * @param OutputInterface   $output
      */
-    private function runInLoop(ConsumerInterface $consumer): void
+    private function runInLoop(ConsumerInterface $consumer, OutputInterface $output): void
     {
         while (true) { // @phpstan-ignore-line
             try {
                 $consumer->run();
-            } catch (ConsumerTimeoutExceedException $e) {
+            } catch (ConsumerTimeoutExceedException) {
                 // Reconnect
                 $connection = $consumer->getQueue()->getChannel()->getConnection();
                 $connection->reconnect();
+
+                $output->writeln(
+                    '<error>Receive consumer timeout exceed error.</error> Run in loop mode <comment>--read-timeout --loop</comment>, reconnect...',
+                    OutputInterface::VERBOSITY_VERBOSE
+                );
             }
         }
     }

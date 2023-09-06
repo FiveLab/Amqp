@@ -18,14 +18,18 @@ use FiveLab\Component\Amqp\Command\RunConsumerCommand;
 use FiveLab\Component\Amqp\Connection\ConnectionInterface;
 use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
 use FiveLab\Component\Amqp\Consumer\ConsumerWithMiddlewaresInterface;
+use FiveLab\Component\Amqp\Consumer\Event;
+use FiveLab\Component\Amqp\Consumer\EventableConsumerInterface;
 use FiveLab\Component\Amqp\Consumer\Middleware\StopAfterNExecutesMiddleware;
 use FiveLab\Component\Amqp\Consumer\Registry\ConsumerRegistryInterface;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class RunConsumerCommandTest extends TestCase
 {
@@ -130,6 +134,52 @@ class RunConsumerCommandTest extends TestCase
     }
 
     #[Test]
+    #[TestWith([true])]
+    #[TestWith([false])]
+    public function shouldSuccessExecuteWithEventableConsumer(bool $verbose): void
+    {
+        $consumer = $this->createMock(EventableConsumerInterface::class);
+
+        $consumer->expects(self::once())
+            ->method('setEventHandler')
+            ->with(self::callback(function (mixed $arg) {
+                self::assertInstanceOf(\Closure::class, $arg);
+
+                $arg(Event::ConsumerTimeout);
+                $arg(Event::StopAfterNExecutes);
+
+                return true;
+            }));
+
+        $consumer->expects(self::once())
+            ->method('run');
+
+        $this->registry->expects(self::once())
+            ->method('get')
+            ->with('some')
+            ->willReturn($consumer);
+
+        $command = new RunConsumerCommand($this->registry);
+
+        $input = new ArrayInput([
+            'key' => 'some',
+        ]);
+
+        $output = new BufferedOutput($verbose ? OutputInterface::VERBOSITY_VERBOSE : OutputInterface::VERBOSITY_NORMAL);
+
+        $command->run($input, $output);
+
+        if ($verbose) {
+            $expectedOutput = [
+                'Receive consumer timeout exceed error.',
+                'Stop consumer after N executes.',
+            ];
+
+            self::assertEquals(\implode(PHP_EOL, $expectedOutput).PHP_EOL, $output->fetch());
+        }
+    }
+
+    #[Test]
     public function shouldSuccessExecuteWithReadTimeout(): void
     {
         $consumer = $this->createMock(ConsumerInterface::class);
@@ -188,7 +238,9 @@ class RunConsumerCommandTest extends TestCase
     }
 
     #[Test]
-    public function shouldSuccessExecuteInLoopWithReadTimeout(): void
+    #[TestWith([true])]
+    #[TestWith([false])]
+    public function shouldSuccessExecuteInLoopWithReadTimeout(bool $verbose): void
     {
         $consumer = $this->createMock(ConsumerInterface::class);
 
@@ -227,11 +279,20 @@ class RunConsumerCommandTest extends TestCase
             '--loop'         => true,
         ]);
 
-        $output = new BufferedOutput();
+        $output = new BufferedOutput($verbose ? OutputInterface::VERBOSITY_VERBOSE : OutputInterface::VERBOSITY_NORMAL);
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('some');
 
-        $command->run($input, $output);
+        try {
+            $command->run($input, $output);
+        } catch (\Throwable $error) {
+            if ($verbose) {
+                $expectedBuffer = \str_repeat('Receive consumer timeout exceed error. Run in loop mode --read-timeout --loop, reconnect...'.PHP_EOL, 2);
+                self::assertEquals($expectedBuffer, $output->fetch());
+            }
+
+            throw $error;
+        }
     }
 }

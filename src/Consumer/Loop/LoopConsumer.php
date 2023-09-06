@@ -14,7 +14,9 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Consumer\Loop;
 
 use FiveLab\Component\Amqp\Channel\ChannelInterface;
-use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
+use FiveLab\Component\Amqp\Consumer\Event;
+use FiveLab\Component\Amqp\Consumer\EventableConsumerInterface;
+use FiveLab\Component\Amqp\Consumer\EventableConsumerTrait;
 use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlerInterface;
 use FiveLab\Component\Amqp\Consumer\Handler\ThrowableMessageHandlerInterface;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareInterface;
@@ -29,8 +31,10 @@ use FiveLab\Component\Amqp\Queue\QueueInterface;
 /**
  * Loop consumer.
  */
-class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
+class LoopConsumer implements EventableConsumerInterface, MiddlewareAwareInterface
 {
+    use EventableConsumerTrait;
+
     /**
      * Indicate what we should throw exception if consumer timeout exceed.
      *
@@ -136,6 +140,8 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
                 // We full disconnect and try reconnect
                 $channel->getConnection()->disconnect();
 
+                $this->triggerEvent(Event::ConsumerTimeout);
+
                 // The application must force throw consumer timeout exception.
                 // Can be used manually for force stop consumer or in round robin consumer.
                 // In other cases it's normal flow.
@@ -145,6 +151,8 @@ class LoopConsumer implements ConsumerInterface, MiddlewareAwareInterface
             } catch (StopAfterNExecutesException $error) {
                 // Disconnect, because inner system can has buffer for sending to amqp service.
                 $channel->getConnection()->disconnect();
+
+                $this->triggerEvent(Event::StopAfterNExecutes);
 
                 return;
             } catch (\Throwable $e) {

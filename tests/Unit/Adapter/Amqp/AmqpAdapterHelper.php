@@ -39,19 +39,19 @@ class AmqpAdapterHelper
      * @return \AMQPEnvelope
      */
     public static function makeEnvelope(
-        TestCase     $testCase,
-        string|false $body = '',
-        array        $headers = [],
-        string       $routingKey = '',
-        string       $exchangeName = '',
-        int          $deliveryTag = 1,
-        string       $contentType = 'text/plain',
-        string       $contentEncoding = null,
-        int          $deliveryMode = 1,
-        int          $expiration = null,
-        string       $messageId = null,
-        string       $appId = null,
-        string       $userId = null
+        TestCase $testCase,
+        string   $body = '',
+        array    $headers = [],
+        string   $routingKey = '',
+        string   $exchangeName = '',
+        int      $deliveryTag = 1,
+        string   $contentType = 'text/plain',
+        string   $contentEncoding = null,
+        int      $deliveryMode = 1,
+        int      $expiration = null,
+        string   $messageId = null,
+        string   $appId = null,
+        string   $userId = null
     ): \AMQPEnvelope {
         $envelope = (new MockBuilder($testCase, \AMQPEnvelope::class))
             ->getMock();
@@ -90,7 +90,7 @@ class AmqpAdapterHelper
 
         $envelope->expects(new AnyInvokedCount())
             ->method('getExpiration')
-            ->willReturn($expiration);
+            ->willReturn($expiration ? (string) $expiration : null);
 
         $envelope->expects(new AnyInvokedCount())
             ->method('getMessageId')

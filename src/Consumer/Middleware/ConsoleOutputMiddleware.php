@@ -126,15 +126,10 @@ readonly class ConsoleOutputMiddleware implements ConsumerMiddlewareInterface
      */
     private function formatMemory(int $memory): string
     {
-        switch (true) {
-            case $memory > (1024 * 1024 * 1024):
-                return \sprintf('%.2f Mb', $memory / (1024 * 1024 * 1024));
-
-            case $memory > (1024 * 1024):
-                return \sprintf('%.2f Kb', $memory / (1024 * 1024));
-
-            default:
-                return \sprintf('%.2f B', $memory);
-        }
+        return match (true) {
+            $memory > (1024 * 1024 * 1024) => \sprintf('%.2f Mb', $memory / (1024 * 1024 * 1024)),
+            $memory > (1024 * 1024)        => \sprintf('%.2f Kb', $memory / (1024 * 1024)),
+            default                        => \sprintf('%.2f B', $memory),
+        };
     }
 }

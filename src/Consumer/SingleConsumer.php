@@ -25,8 +25,10 @@ use FiveLab\Component\Amqp\Queue\QueueInterface;
 /**
  * Single consumer.
  */
-class SingleConsumer implements ConsumerInterface, MiddlewareAwareInterface
+class SingleConsumer implements EventableConsumerInterface, MiddlewareAwareInterface
 {
+    use EventableConsumerTrait;
+
     /**
      * Constructor.
      *
@@ -105,8 +107,10 @@ class SingleConsumer implements ConsumerInterface, MiddlewareAwareInterface
                     $message->ack();
                 }
             }, $this->configuration->tagGenerator->generate());
-        } catch (StopAfterNExecutesException $error) {
+        } catch (StopAfterNExecutesException) {
             $queue->getChannel()->getConnection()->disconnect();
+
+            $this->triggerEvent(Event::StopAfterNExecutes);
 
             // Normal flow. Exit from loop.
             return;

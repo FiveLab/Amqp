@@ -14,7 +14,9 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Consumer\Spool;
 
 use FiveLab\Component\Amqp\Channel\ChannelInterface;
-use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
+use FiveLab\Component\Amqp\Consumer\Event;
+use FiveLab\Component\Amqp\Consumer\EventableConsumerInterface;
+use FiveLab\Component\Amqp\Consumer\EventableConsumerTrait;
 use FiveLab\Component\Amqp\Consumer\Handler\FlushableMessageHandlerInterface;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareInterface;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
@@ -31,27 +33,9 @@ use FiveLab\Component\Amqp\Queue\QueueInterface;
  *
  * @see \FiveLab\Component\Amqp\Consumer\Handler\FlushableMessageHandlerInterface
  */
-class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
+class SpoolConsumer implements EventableConsumerInterface, MiddlewareAwareInterface
 {
-    /**
-     * @var QueueFactoryInterface
-     */
-    private QueueFactoryInterface $queueFactory;
-
-    /**
-     * @var FlushableMessageHandlerInterface
-     */
-    private FlushableMessageHandlerInterface $messageHandler;
-
-    /**
-     * @var ConsumerMiddlewares
-     */
-    private ConsumerMiddlewares $middlewares;
-
-    /**
-     * @var SpoolConsumerConfiguration
-     */
-    private SpoolConsumerConfiguration $configuration;
+    use EventableConsumerTrait;
 
     /**
      * Indicate what we should throw exception if consumer timeout exceed.
@@ -68,12 +52,12 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
      * @param ConsumerMiddlewares              $middlewares
      * @param SpoolConsumerConfiguration       $configuration
      */
-    public function __construct(QueueFactoryInterface $queueFactory, FlushableMessageHandlerInterface $messageHandler, ConsumerMiddlewares $middlewares, SpoolConsumerConfiguration $configuration)
-    {
-        $this->queueFactory = $queueFactory;
-        $this->messageHandler = $messageHandler;
-        $this->middlewares = $middlewares;
-        $this->configuration = $configuration;
+    public function __construct(
+        private readonly QueueFactoryInterface            $queueFactory,
+        private readonly FlushableMessageHandlerInterface $messageHandler,
+        private readonly ConsumerMiddlewares              $middlewares,
+        private readonly SpoolConsumerConfiguration       $configuration
+    ) {
     }
 
     /**
@@ -180,17 +164,21 @@ class SpoolConsumer implements ConsumerInterface, MiddlewareAwareInterface
                 // We full disconnect and try reconnect
                 $channel->getConnection()->disconnect();
 
+                $this->triggerEvent(Event::ConsumerTimeout);
+
                 // The application must force throw consumer timeout exception.
                 // Can be used manually for force stop consumer or in round robin consumer.
                 if ($this->throwConsumerTimeoutExceededException) {
                     throw $e;
                 }
-            } catch (StopAfterNExecutesException $error) {
+            } catch (StopAfterNExecutesException) {
                 // We must stop next loop.
                 $this->flushMessages($receivedMessages);
 
                 // We must reconnect to broker because client don't return messages to queue on failed.
                 $channel->getConnection()->disconnect();
+
+                $this->triggerEvent(Event::StopAfterNExecutes);
 
                 return;
             } catch (\Throwable $e) {
