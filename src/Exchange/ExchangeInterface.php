@@ -42,4 +42,9 @@ interface ExchangeInterface
      * @param string  $routingKey
      */
     public function publish(Message $message, string $routingKey = ''): void;
+
+    /**
+     * Delete exchange
+     */
+    public function delete(): void;
 }

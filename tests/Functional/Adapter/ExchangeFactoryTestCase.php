@@ -156,6 +156,27 @@ abstract class ExchangeFactoryTestCase extends RabbitMqTestCase
     }
 
     #[Test]
+    public function shouldSuccessDelete(): void
+    {
+        $this->management->createExchange('direct', 'some');
+
+        $definition = new ExchangeDefinition('some', AMQP_EX_TYPE_DIRECT);
+
+        $factory = $this->createExchangeFactory($definition);
+        $exchange = $factory->create();
+
+        $this->management->exchangeByName('some');
+        $this->addToAssertionCount(1); // because we success get exchange by name
+
+        $exchange->delete();
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The exchange with name "some" was not found.');
+
+        $this->management->exchangeByName('some');
+    }
+
+    #[Test]
     public function shouldThrowExceptionOnCreatePassiveIfExchangeNotFound(): void
     {
         $this->expectException(\AMQPExchangeException::class);

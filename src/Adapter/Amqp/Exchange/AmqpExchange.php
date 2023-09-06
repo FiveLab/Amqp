@@ -94,4 +94,12 @@ readonly class AmqpExchange implements ExchangeInterface
 
         $this->exchange->publish($message->payload->data, $routingKey, AMQP_NOPARAM, $options);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete(): void
+    {
+        $this->exchange->delete();
+    }
 }

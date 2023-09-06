@@ -68,6 +68,15 @@ class AmqpQueueTest extends TestCase
     }
 
     #[Test]
+    public function shouldSuccessDelete(): void
+    {
+        $this->originQueue->expects(self::once())
+            ->method('delete');
+
+        $this->queue->delete();
+    }
+
+    #[Test]
     public function shouldSuccessGetChannel(): void
     {
         $channel = $this->queue->getChannel();

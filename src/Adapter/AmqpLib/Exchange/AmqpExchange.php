@@ -98,4 +98,12 @@ readonly class AmqpExchange implements ExchangeInterface
         $amqplibMessage = new AMQPMessage($message->payload->data, $options);
         $this->channel->getChannel()->basic_publish($amqplibMessage, $this->getName(), $routingKey);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete(): void
+    {
+        $this->channel->getChannel()->exchange_delete($this->getName());
+    }
 }

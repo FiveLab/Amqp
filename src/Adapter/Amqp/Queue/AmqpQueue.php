@@ -107,6 +107,14 @@ readonly class AmqpQueue implements QueueInterface
     /**
      * {@inheritdoc}
      */
+    public function delete(): void
+    {
+        $this->queue->delete();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function countMessages(): int
     {
         return $this->queue->declareQueue();

@@ -129,4 +129,13 @@ class AmqpExchangeTest extends TestCase
 
         $this->exchange->publish($message, 'foo-bar');
     }
+
+    #[Test]
+    public function shouldSuccessDelete(): void
+    {
+        $this->originalExchange->expects(self::once())
+            ->method('delete');
+
+        $this->exchange->delete();
+    }
 }

@@ -273,6 +273,65 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
     }
 
     #[Test]
+    public function shouldSuccessPurgeQueue(): void
+    {
+        $this->management->createExchange(AMQP_EX_TYPE_DIRECT, 'test.direct');
+        $this->management->createQueue('some');
+        $this->management->queueBind('some', 'test.direct', 'test');
+
+        $this->management->publishMessage('test.direct', 'test', 'some foo bar');
+        $this->management->publishMessage('test.direct', 'test', 'some foo bar');
+
+        $definition = new QueueDefinition(
+            'some',
+            new BindingDefinitions(
+                new BindingDefinition('test.direct', 'test')
+            )
+        );
+
+        $factory = $this->createQueueFactory($definition);
+        $queue = $factory->create();
+
+        $messages = $this->management->queueGetMessages('some', 2);
+
+        self::assertCount(2, $messages);
+
+        $queue->purge();
+
+        $messages = $this->management->queueGetMessages('some', 1);
+
+        self::assertCount(0, $messages);
+    }
+
+    #[Test]
+    public function shouldSuccessDeleteQueue(): void
+    {
+        $this->management->createExchange(AMQP_EX_TYPE_DIRECT, 'test.direct');
+        $this->management->createQueue('some');
+        $this->management->queueBind('some', 'test.direct', 'test');
+
+        $definition = new QueueDefinition(
+            'some',
+            new BindingDefinitions(
+                new BindingDefinition('test.direct', 'test')
+            )
+        );
+
+        $factory = $this->createQueueFactory($definition);
+        $queue = $factory->create();
+
+        $this->management->queueByName('some');
+        $this->addToAssertionCount(1); // Because success get queue by name
+
+        $queue->delete();
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The queue with name "some" was not found.');
+
+        $this->management->queueByName('some');
+    }
+
+    #[Test]
     public function shouldSuccessGetCountMessages(): void
     {
         $this->management->createExchange(AMQP_EX_TYPE_DIRECT, 'test.direct');

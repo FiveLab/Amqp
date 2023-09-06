@@ -116,6 +116,14 @@ readonly class AmqpQueue implements QueueInterface
 
     /**
      * {@inheritdoc}
+     */
+    public function delete(): void
+    {
+        $this->channel->getChannel()->queue_delete($this->getName());
+    }
+
+    /**
+     * {@inheritdoc}
      *
      * Declares queue as a side-effect
      */

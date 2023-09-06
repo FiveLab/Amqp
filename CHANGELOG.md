@@ -6,6 +6,7 @@ next release
 
 * Add `EventableConsumerInterface` for control specific errors (consumer timeout, stop after N executes, etc...).
 * Add possible to shuffle spool connections.
+* Add function for delete exchange and queue.
 
 v2.0.1
 ------
