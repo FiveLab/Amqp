@@ -63,9 +63,12 @@ class SpoolConnectionFactoryTest extends TestCase
     #[Test]
     public function shouldSuccessCreateConnectionFromDsnForAmqpExt(): void
     {
-        $spool = SpoolConnectionFactory::fromDsn(Dsn::fromDsn('amqp://host.net,host.com:5673/%2fsome?read_timeout=44'));
+        $spool = SpoolConnectionFactory::fromDsn(Dsn::fromDsn('amqp://host.net,host.com:5673/%2fsome?read_timeout=44&shuffle=0'));
 
         $factories = (new \ReflectionProperty($spool, 'factories'))->getValue($spool);
+        $shuffleBeforeConnect = (new \ReflectionProperty($spool, 'shuffleBeforeConnect'))->getValue($spool);
+
+        self::assertFalse($shuffleBeforeConnect);
 
         self::assertCount(2, $factories);
 
@@ -83,6 +86,35 @@ class SpoolConnectionFactoryTest extends TestCase
             5673,
             '/some',
             options: ['read_timeout' => 44.0]
+        )), $factories[1]);
+    }
+
+    #[Test]
+    public function shouldSuccessCreateConnectionFromDsnWithShuffle(): void
+    {
+        $spool = SpoolConnectionFactory::fromDsn(Dsn::fromDsn('amqp://host.net,host.com:5673/%2fsome?read_timeout=42&shuffle=1'));
+
+        $factories = (new \ReflectionProperty($spool, 'factories'))->getValue($spool);
+        $shuffleBeforeConnect = (new \ReflectionProperty($spool, 'shuffleBeforeConnect'))->getValue($spool);
+
+        self::assertTrue($shuffleBeforeConnect);
+
+        self::assertCount(2, $factories);
+
+        self::assertEquals(new AmqpExtConnectionFactory(new Dsn(
+            Driver::AmqpExt,
+            'host.net',
+            5673,
+            '/some',
+            options: ['read_timeout' => 42.0]
+        )), $factories[0]);
+
+        self::assertEquals(new AmqpExtConnectionFactory(new Dsn(
+            Driver::AmqpExt,
+            'host.com',
+            5673,
+            '/some',
+            options: ['read_timeout' => 42.0]
         )), $factories[1]);
     }
 

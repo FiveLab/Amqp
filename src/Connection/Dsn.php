@@ -171,6 +171,30 @@ readonly class Dsn implements \IteratorAggregate, \Countable, \Stringable
     }
 
     /**
+     * Remove option by name
+     *
+     * @param string $option
+     *
+     * @return self
+     */
+    public function removeOption(string $option): self
+    {
+        $options = $this->options;
+
+        unset($options[$option]);
+
+        return new self(
+            $this->driver,
+            $this->host,
+            $this->port,
+            $this->vhost,
+            $this->username,
+            $this->password,
+            $options
+        );
+    }
+
+    /**
      * Convert DSN to string
      *
      * @param bool $hidePassword

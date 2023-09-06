@@ -24,14 +24,19 @@ class SpoolConnection implements ConnectionInterface
     use SplSubjectTrait;
 
     /**
-     * @var array|ConnectionInterface[]
+     * @var array<ConnectionInterface>
      */
-    private array $connections;
+    private readonly array $connections;
 
     /**
      * @var ConnectionInterface|null
      */
     private ?ConnectionInterface $originConnection = null;
+
+    /**
+     * @var bool
+     */
+    private bool $shuffleBeforeConnect = false;
 
     /**
      * Constructor.
@@ -45,6 +50,14 @@ class SpoolConnection implements ConnectionInterface
         }
 
         $this->connections = $connections;
+    }
+
+    /**
+     * Mark for should shuffle connections before connect (for get random first connection)
+     */
+    public function shuffleBeforeConnect(): void
+    {
+        $this->shuffleBeforeConnect = true;
     }
 
     /**
@@ -66,9 +79,15 @@ class SpoolConnection implements ConnectionInterface
      */
     public function connect(): void
     {
+        $connections = $this->connections;
+
+        if ($this->shuffleBeforeConnect) {
+            \shuffle($connections);
+        }
+
         $firstException = null;
 
-        foreach ($this->connections as $connection) {
+        foreach ($connections as $connection) {
             try {
                 $connection->connect();
 

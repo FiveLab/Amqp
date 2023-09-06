@@ -33,6 +33,11 @@ class SpoolConnectionFactory implements ConnectionFactoryInterface
     private ?SpoolConnection $connection = null;
 
     /**
+     * @var bool
+     */
+    private bool $shuffleBeforeConnect = false;
+
+    /**
      * Constructor.
      *
      * @param ConnectionFactoryInterface ...$factories
@@ -44,6 +49,14 @@ class SpoolConnectionFactory implements ConnectionFactoryInterface
         }
 
         $this->factories = $factories;
+    }
+
+    /**
+     * Mark for should shuffle connections before connect.
+     */
+    public function shuffleBeforeConnect(): void
+    {
+        $this->shuffleBeforeConnect = true;
     }
 
     /**
@@ -64,10 +77,18 @@ class SpoolConnectionFactory implements ConnectionFactoryInterface
         $connectionFactories = [];
 
         foreach ($dsn as $entry) {
+            $entry = $entry->removeOption('shuffle');
+
             $connectionFactories[] = new $connectionFactoryClass($entry);
         }
 
-        return new self(...$connectionFactories);
+        $factory = new self(...$connectionFactories);
+
+        if (\array_key_exists('shuffle', $dsn->options) && $dsn->options['shuffle']) {
+            $factory->shuffleBeforeConnect();
+        }
+
+        return $factory;
     }
 
     /**
@@ -84,6 +105,10 @@ class SpoolConnectionFactory implements ConnectionFactoryInterface
         }, $this->factories);
 
         $this->connection = new SpoolConnection(...$connections);
+
+        if ($this->shuffleBeforeConnect) {
+            $this->connection->shuffleBeforeConnect();
+        }
 
         return $this->connection;
     }

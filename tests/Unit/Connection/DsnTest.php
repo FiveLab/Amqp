@@ -85,6 +85,27 @@ class DsnTest extends TestCase
         self::assertEquals($expected, $dsn->toString($hidePassword));
     }
 
+    #[Test]
+    public function shouldSuccessRemoveOptions(): void
+    {
+        $dsn = Dsn::fromDsn('amqp://foo:bar@host1,host2:5673/%2Foo?read=1&foo=bar&bar=foo&some=1234');
+
+        self::assertEquals([
+            'read' => '1',
+            'foo'  => 'bar',
+            'bar'  => 'foo',
+            'some' => '1234',
+        ], $dsn->options);
+
+        $dsn = $dsn->removeOption('bar');
+        $dsn = $dsn->removeOption('some');
+
+        self::assertEquals([
+            'read' => '1',
+            'foo'  => 'bar',
+        ], $dsn->options);
+    }
+
     /**
      * Provide DSN for testing
      *
