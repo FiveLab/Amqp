@@ -61,7 +61,7 @@ class RunRoundRobinConsumerCommand extends Command
      */
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
-        $this->consumer->setEventHandler(static function (Event $event, mixed ...$args) use ($output) {
+        $this->consumer->addEventHandler(static function (Event $event, mixed ...$args) use ($output) {
             if (Event::ChangeConsumer === $event) {
                 /** @var ConsumerInterface $consumer */
                 $consumer = $args[0];

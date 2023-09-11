@@ -75,7 +75,7 @@ class RunConsumerCommand extends Command
         if ($consumer instanceof EventableConsumerInterface) {
             $closure = (new OutputEventHandler($output))(...);
 
-            $consumer->setEventHandler($closure);
+            $consumer->addEventHandler($closure);
         }
 
         // Verify input parameters

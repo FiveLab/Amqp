@@ -21,9 +21,16 @@ namespace FiveLab\Component\Amqp\Consumer;
 interface EventableConsumerInterface extends ConsumerInterface
 {
     /**
-     * Set event handler
+     * Set event handler. This method replace old event handler.
      *
      * @param \Closure(Event $event): void|null $eventHandler
      */
     public function setEventHandler(?\Closure $eventHandler): void;
+
+    /**
+     * Add event handler.
+     *
+     * @param \Closure(Event $event): void $eventHandler
+     */
+    public function addEventHandler(\Closure $eventHandler): void;
 }

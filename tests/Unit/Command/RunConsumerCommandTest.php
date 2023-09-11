@@ -141,7 +141,7 @@ class RunConsumerCommandTest extends TestCase
         $consumer = $this->createMock(EventableConsumerInterface::class);
 
         $consumer->expects(self::once())
-            ->method('setEventHandler')
+            ->method('addEventHandler')
             ->with(self::callback(function (mixed $arg) {
                 self::assertInstanceOf(\Closure::class, $arg);
 

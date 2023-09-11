@@ -34,6 +34,20 @@ trait EventableConsumerTrait
     }
 
     /**
+     * Add event handler.
+     *
+     * @param \Closure $eventHandler
+     */
+    public function addEventHandler(\Closure $eventHandler): void
+    {
+        if ($this->eventHandler) {
+            $eventHandler = (new EventHandlers($this->eventHandler, $eventHandler))(...);
+        }
+
+        $this->eventHandler = $eventHandler;
+    }
+
+    /**
      * Trigger event.
      *
      * @param Event $event
