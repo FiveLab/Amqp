@@ -1,8 +1,8 @@
 CHANGELOG
 =========
 
-Next release
-------------
+v2.0.3
+------
 
 * Add `EventHandlers` for possible to use multiple event handlers.
 
