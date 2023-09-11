@@ -37,9 +37,15 @@ trait EventableConsumerTrait
      * Add event handler.
      *
      * @param \Closure $eventHandler
+     * @param bool     $isLazyFactory
      */
-    public function addEventHandler(\Closure $eventHandler): void
+    public function addEventHandler(\Closure $eventHandler, bool $isLazyFactory = false): void
     {
+        if ($isLazyFactory) {
+            $eventHandler = ($eventHandler)();
+            $eventHandler = ($eventHandler)(...);
+        }
+
         if ($this->eventHandler) {
             $eventHandler = (new EventHandlers($this->eventHandler, $eventHandler))(...);
         }

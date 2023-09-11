@@ -113,4 +113,24 @@ class EventableConsumerTraitTest extends TestCase
             [Event::ChangeConsumer, ['foo']],
         ], $secondCalls);
     }
+
+    #[Test]
+    public function shouldSuccessAddEventHandlerAsLazyFactory(): void
+    {
+        $calls = [];
+
+        $handler = static function (Event $event, mixed ...$args) use (&$calls) {
+            $calls[] = [$event, $args];
+        };
+
+        $this->consumer->addEventHandler(static fn() => $handler, true);
+
+        $this->consumer->run();
+
+        self::assertEquals([
+            [Event::StopAfterNExecutes, []],
+            [Event::ConsumerTimeout, []],
+            [Event::ChangeConsumer, ['foo']],
+        ], $calls);
+    }
 }
