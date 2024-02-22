@@ -1,10 +1,10 @@
 CHANGELOG
 =========
 
-Next release
-------------
+v2.1.0
+------
 
-* Add run checker (check before run consumer). 
+* Add run checker for check any requirements before run consumer. 
 
 v2.0.3
 ------
