@@ -395,7 +395,9 @@ class RunConsumerCommandTest extends TestCase
     {
         $checker = $this->createMock(RunConsumerCheckerInterface::class);
 
-        $matcher = $checker->expects(self::once())->method('checkBeforeRun');
+        $matcher = $checker->expects(self::once())
+            ->method('checkBeforeRun')
+            ->with($key);
 
         if ($error) {
             $matcher->willThrowException($error);

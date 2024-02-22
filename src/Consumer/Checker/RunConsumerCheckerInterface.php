@@ -23,7 +23,9 @@ interface RunConsumerCheckerInterface
     /**
      * Call to this method before run consumer.
      *
+     * @param string $consumer
+     *
      * @throws CannotRunConsumerException
      */
-    public function checkBeforeRun(): void;
+    public function checkBeforeRun(string $consumer): void;
 }

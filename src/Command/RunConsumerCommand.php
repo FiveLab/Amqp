@@ -88,14 +88,14 @@ class RunConsumerCommand extends Command
 
         if ($input->getOption('dry-run')) {
             $checker = $this->runCheckerRegistry->get($consumerKey);
-            $checker->checkBeforeRun();
+            $checker->checkBeforeRun($consumerKey);
 
             return 0;
         }
 
         try {
             $checker = $this->runCheckerRegistry->get($consumerKey);
-            $checker->checkBeforeRun();
+            $checker->checkBeforeRun($consumerKey);
         } catch (RunConsumerCheckerNotFoundException) {
             // Normal flow. Checker not found.
         }
