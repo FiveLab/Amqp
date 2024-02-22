@@ -42,7 +42,7 @@ readonly class OutputEventHandler
                 '<error>Receive consumer timeout exceed error.</error>',
                 OutputInterface::VERBOSITY_VERBOSE
             );
-        } else if (Event::StopAfterNExecutes === $event) {
+        } elseif (Event::StopAfterNExecutes === $event) {
             $this->output->writeln(
                 '<error>Stop consumer after N executes.</error>',
                 OutputInterface::VERBOSITY_VERBOSE

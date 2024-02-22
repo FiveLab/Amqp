@@ -16,13 +16,17 @@ namespace FiveLab\Component\Amqp\Tests\Unit\Command;
 use FiveLab\Component\Amqp\Channel\ChannelInterface;
 use FiveLab\Component\Amqp\Command\RunConsumerCommand;
 use FiveLab\Component\Amqp\Connection\ConnectionInterface;
+use FiveLab\Component\Amqp\Consumer\Checker\RunConsumerCheckerInterface;
+use FiveLab\Component\Amqp\Consumer\Checker\RunConsumerCheckerRegistryInterface;
 use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
 use FiveLab\Component\Amqp\Consumer\ConsumerWithMiddlewaresInterface;
 use FiveLab\Component\Amqp\Consumer\Event;
 use FiveLab\Component\Amqp\Consumer\EventableConsumerInterface;
 use FiveLab\Component\Amqp\Consumer\Middleware\StopAfterNExecutesMiddleware;
 use FiveLab\Component\Amqp\Consumer\Registry\ConsumerRegistryInterface;
+use FiveLab\Component\Amqp\Exception\CannotRunConsumerException;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
+use FiveLab\Component\Amqp\Exception\RunConsumerCheckerNotFoundException;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -37,6 +41,11 @@ class RunConsumerCommandTest extends TestCase
      * @var ConsumerRegistryInterface
      */
     private ConsumerRegistryInterface $registry;
+
+    /**
+     * @var RunConsumerCheckerRegistryInterface
+     */
+    private RunConsumerCheckerRegistryInterface $checkerRegistry;
 
     /**
      * @var ConnectionInterface
@@ -59,6 +68,7 @@ class RunConsumerCommandTest extends TestCase
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ConsumerRegistryInterface::class);
+        $this->checkerRegistry = $this->createMock(RunConsumerCheckerRegistryInterface::class);
         $this->connection = $this->createMock(ConnectionInterface::class);
         $this->channel = $this->createMock(ChannelInterface::class);
         $this->queue = $this->createMock(QueueInterface::class);
@@ -294,5 +304,106 @@ class RunConsumerCommandTest extends TestCase
 
             throw $error;
         }
+    }
+
+    #[Test]
+    public function shouldSuccessExecuteIfCheckerNotFoundInRegistry(): void
+    {
+        $command = new RunConsumerCommand($this->registry, $this->checkerRegistry);
+
+        $input = new ArrayInput([
+            'key' => 'some',
+        ]);
+
+        $status = $command->run($input, new BufferedOutput());
+
+        self::assertEquals(0, $status);
+    }
+
+    #[Test]
+    public function shouldFailExecuteIfCheckerThrowError(): void
+    {
+        $this->configureChecker('some', new CannotRunConsumerException('foo bar'));
+
+        $this->registry->expects(self::never())
+            ->method('get');
+
+        $command = new RunConsumerCommand($this->registry, $this->checkerRegistry);
+
+        $input = new ArrayInput([
+            'key' => 'some',
+        ]);
+
+        $this->expectException(CannotRunConsumerException::class);
+        $this->expectExceptionMessage('foo bar');
+
+        $command->run($input, new BufferedOutput());
+    }
+
+    #[Test]
+    public function shouldSuccessExecuteWithDryRun(): void
+    {
+        $this->configureChecker('some', null);
+
+        $command = new RunConsumerCommand($this->registry, $this->checkerRegistry);
+
+        $input = new ArrayInput([
+            'key'       => 'some',
+            '--dry-run' => true,
+        ]);
+
+        $status = $command->run($input, new BufferedOutput());
+
+        self::assertEquals(0, $status);
+    }
+
+    #[Test]
+    public function shouldFailExecuteWithDryRunIfCheckerNotFound(): void
+    {
+        $command = new RunConsumerCommand($this->registry);
+
+        $input = new ArrayInput([
+            'key'       => 'some',
+            '--dry-run' => true,
+        ]);
+
+        $this->expectException(RunConsumerCheckerNotFoundException::class);
+        $this->expectExceptionMessage('The checker for consumer "some" was not found.');
+
+        $command->run($input, new BufferedOutput());
+    }
+
+    #[Test]
+    public function shouldFailExecuteWithDryRunIfCheckerThrowError(): void
+    {
+        $this->configureChecker('some', new CannotRunConsumerException('bla bla'));
+
+        $command = new RunConsumerCommand($this->registry, $this->checkerRegistry);
+
+        $input = new ArrayInput([
+            'key'       => 'some',
+            '--dry-run' => true,
+        ]);
+
+        $this->expectException(CannotRunConsumerException::class);
+        $this->expectExceptionMessage('bla bla');
+
+        $command->run($input, new BufferedOutput());
+    }
+
+    private function configureChecker(string $key, ?\Throwable $error): void
+    {
+        $checker = $this->createMock(RunConsumerCheckerInterface::class);
+
+        $matcher = $checker->expects(self::once())->method('checkBeforeRun');
+
+        if ($error) {
+            $matcher->willThrowException($error);
+        }
+
+        $this->checkerRegistry->expects(self::once())
+            ->method('get')
+            ->with($key)
+            ->willReturn($checker);
     }
 }

@@ -36,7 +36,7 @@ class ConsumerRegistryTest extends TestCase
 
         $result = $registry->get('test_2');
 
-        self::assertEquals($consumer2, $result);
+        self::assertSame($consumer2, $result);
     }
 
     #[Test]

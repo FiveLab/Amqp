@@ -13,12 +13,15 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Command;
 
+use FiveLab\Component\Amqp\Consumer\Checker\RunConsumerCheckerRegistry;
+use FiveLab\Component\Amqp\Consumer\Checker\RunConsumerCheckerRegistryInterface;
 use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
 use FiveLab\Component\Amqp\Consumer\EventableConsumerInterface;
 use FiveLab\Component\Amqp\Consumer\Middleware\StopAfterNExecutesMiddleware;
 use FiveLab\Component\Amqp\Consumer\MiddlewareAwareInterface;
 use FiveLab\Component\Amqp\Consumer\Registry\ConsumerRegistryInterface;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
+use FiveLab\Component\Amqp\Exception\RunConsumerCheckerNotFoundException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -43,13 +46,23 @@ class RunConsumerCommand extends Command
     protected static $defaultDescription = 'Run consumer.';
 
     /**
+     * @var RunConsumerCheckerRegistryInterface
+     */
+    private readonly RunConsumerCheckerRegistryInterface $runCheckerRegistry;
+
+    /**
      * Constructor.
      *
-     * @param ConsumerRegistryInterface $consumerRegistry
+     * @param ConsumerRegistryInterface                $consumerRegistry
+     * @param RunConsumerCheckerRegistryInterface|null $runCheckerRegistry
      */
-    public function __construct(private readonly ConsumerRegistryInterface $consumerRegistry)
-    {
+    public function __construct(
+        private readonly ConsumerRegistryInterface $consumerRegistry,
+        RunConsumerCheckerRegistryInterface        $runCheckerRegistry = null
+    ) {
         parent::__construct();
+
+        $this->runCheckerRegistry = $runCheckerRegistry ?: new RunConsumerCheckerRegistry();
     }
 
     /**
@@ -62,7 +75,8 @@ class RunConsumerCommand extends Command
             ->addArgument('key', InputArgument::REQUIRED, 'The key of consumer.')
             ->addOption('read-timeout', null, InputOption::VALUE_REQUIRED, 'Set the read timeout for RabbitMQ.')
             ->addOption('loop', null, InputOption::VALUE_NONE, 'Loop consume (used only with read-timeout).')
-            ->addOption('messages', null, InputOption::VALUE_REQUIRED, 'After process number of messages process be normal exits.');
+            ->addOption('messages', null, InputOption::VALUE_REQUIRED, 'After process number of messages process be normal exits.')
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Check if consumer can be run.');
     }
 
     /**
@@ -70,7 +84,23 @@ class RunConsumerCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $consumer = $this->consumerRegistry->get((string) $input->getArgument('key'));
+        $consumerKey = (string) $input->getArgument('key');
+
+        if ($input->getOption('dry-run')) {
+            $checker = $this->runCheckerRegistry->get($consumerKey);
+            $checker->checkBeforeRun();
+
+            return 0;
+        }
+
+        try {
+            $checker = $this->runCheckerRegistry->get($consumerKey);
+            $checker->checkBeforeRun();
+        } catch (RunConsumerCheckerNotFoundException) {
+            // Normal flow. Checker not found.
+        }
+
+        $consumer = $this->consumerRegistry->get($consumerKey);
 
         if ($consumer instanceof EventableConsumerInterface) {
             $closure = (new OutputEventHandler($output))(...);

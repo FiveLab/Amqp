@@ -64,10 +64,10 @@ class ContainerConsumerRegistryTest extends TestCase
     public function shouldSuccessGet(): void
     {
         $consumer2 = $this->registry->get('consumer_2');
-        self::assertEquals($this->consumers[1], $consumer2);
+        self::assertSame($this->consumers[1], $consumer2);
 
         $consumer1 = $this->registry->get('consumer_1');
-        self::assertEquals($this->consumers[0], $consumer1);
+        self::assertSame($this->consumers[0], $consumer1);
     }
 
     #[Test]
