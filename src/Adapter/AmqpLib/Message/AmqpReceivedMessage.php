@@ -29,8 +29,9 @@ class AmqpReceivedMessage extends ReceivedMessage
      * Constructor.
      *
      * @param AMQPMessage $message
+     * @param string      $queueName
      */
-    public function __construct(private readonly AMQPMessage $message)
+    public function __construct(private readonly AMQPMessage $message, string $queueName)
     {
         $payload = new Payload(
             $this->message->getBody(),
@@ -49,6 +50,7 @@ class AmqpReceivedMessage extends ReceivedMessage
         parent::__construct(
             $payload,
             $this->message->getDeliveryTag(),
+            $queueName,
             (string) $this->message->getRoutingKey(),
             (string) $this->message->getExchange(),
             new Options(

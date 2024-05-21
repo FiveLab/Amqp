@@ -52,6 +52,7 @@ class AmqpReceivedMessage extends ReceivedMessage
         parent::__construct(
             $payload,
             (int) $this->envelope->getDeliveryTag(),
+            $this->queue->getName(),
             $this->envelope->getRoutingKey(),
             $this->envelope->getExchangeName(),
             new Options(

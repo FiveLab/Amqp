@@ -201,6 +201,7 @@ EXPECTED;
         return new ReceivedMessageStub(
             $payload ?: new Payload(''),
             $deliveryTag,
+            '',
             $routingKey,
             'exchange-name'
         );

@@ -56,16 +56,18 @@ readonly class AmqpQueue implements QueueInterface
     {
         $amqplibChannel = $this->channel->getChannel();
 
+        $queueName = $this->getName();
+
         try {
             $amqplibChannel->basic_consume(
-                $this->getName(),
+                $queueName,
                 $tag,
                 false,
                 false,
                 $this->definition->exclusive,
                 false,
-                function (AMQPMessage $message) use ($handler) {
-                    $receivedMessage = new AmqpReceivedMessage($message);
+                function (AMQPMessage $message) use ($handler, $queueName) {
+                    $receivedMessage = new AmqpReceivedMessage($message, $queueName);
 
                     $handler($receivedMessage);
                 }
@@ -100,7 +102,7 @@ readonly class AmqpQueue implements QueueInterface
         $message = $this->channel->getChannel()->basic_get($this->getName());
 
         if ($message) {
-            return new AmqpReceivedMessage($message);
+            return new AmqpReceivedMessage($message, $this->getName());
         }
 
         return null;

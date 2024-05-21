@@ -35,6 +35,30 @@ class AmqpReceivedMessageTest extends TestCase
     protected function setUp(): void
     {
         $this->queue = $this->createMock(\AMQPQueue::class);
+
+        $this->queue->expects(self::any())
+            ->method('getName')
+            ->willReturn('test_queue');
+    }
+
+    #[Test]
+    public function shouldSuccessCheckIsDirectPublished(): void
+    {
+        $receivedMessage = $this->makeReceivedMessage(routingKey: 'test_queue', exchangeName: '');
+
+        self::assertTrue($receivedMessage->isDirectPublished());
+
+        $receivedMessage = $this->makeReceivedMessage(routingKey: 'test_queue', exchangeName: 'bla');
+
+        self::assertFalse($receivedMessage->isDirectPublished());
+    }
+
+    #[Test]
+    public function shouldSuccessGetQueueName(): void
+    {
+        $receivedMessage = $this->makeReceivedMessage();
+
+        self::assertEquals('test_queue', $receivedMessage->queueName);
     }
 
     #[Test]

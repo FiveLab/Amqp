@@ -25,6 +25,7 @@ abstract class ReceivedMessage extends Message
      *
      * @param Payload         $payload
      * @param int             $deliveryTag
+     * @param string          $queueName
      * @param string          $routingKey
      * @param string          $exchangeName
      * @param Options|null    $options
@@ -32,15 +33,26 @@ abstract class ReceivedMessage extends Message
      * @param Identifier|null $identifier
      */
     public function __construct(
-        Payload                 $payload,
-        public readonly int     $deliveryTag,
+        Payload                $payload,
+        public readonly int    $deliveryTag,
+        public readonly string $queueName,
         public readonly string $routingKey,
-        public readonly string  $exchangeName,
-        Options                 $options = null,
-        Headers                 $headers = null,
-        Identifier              $identifier = null
+        public readonly string $exchangeName,
+        Options                $options = null,
+        Headers                $headers = null,
+        Identifier             $identifier = null
     ) {
         parent::__construct($payload, $options, $headers, $identifier);
+    }
+
+    /**
+     * Is direct published?
+     *
+     * @return bool
+     */
+    public function isDirectPublished(): bool
+    {
+        return $this->exchangeName === '' && $this->routingKey === $this->queueName;
     }
 
     /**

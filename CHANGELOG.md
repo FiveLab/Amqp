@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+Next release
+------------
+
+* Add queue name to `ReceivedMessage`.
+* Add method `ReceivedMessage::isDirectPublisher` for check, is message direct published to queue (via default exchange).
+
 v2.1.0
 ------
 

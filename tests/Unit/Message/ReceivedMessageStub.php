@@ -26,19 +26,20 @@ class ReceivedMessageStub extends ReceivedMessage
      *
      * @param Payload         $payload
      * @param int|null        $deliveryTag
+     * @param string          $queueName
      * @param string|null     $routingKey
      * @param string          $exchangeName
      * @param Options|null    $options
      * @param Headers|null    $headers
      * @param Identifier|null $identifier
      */
-    public function __construct(Payload $payload, ?int $deliveryTag, ?string $routingKey, string $exchangeName, Options $options = null, Headers $headers = null, Identifier $identifier = null)
+    public function __construct(Payload $payload, ?int $deliveryTag, string $queueName, ?string $routingKey, string $exchangeName, Options $options = null, Headers $headers = null, Identifier $identifier = null)
     {
         $options = $options ?: new Options(false);
         $deliveryTag = $deliveryTag ?: 0;
         $routingKey = $routingKey ?: '';
 
-        parent::__construct($payload, $deliveryTag, $routingKey, $exchangeName, $options, $headers, $identifier);
+        parent::__construct($payload, $deliveryTag, $queueName, $routingKey, $exchangeName, $options, $headers, $identifier);
     }
 
     /**

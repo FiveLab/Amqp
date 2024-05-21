@@ -129,6 +129,10 @@ class AmqpQueueTest extends TestCase
             ->method('get')
             ->willReturn($envelope);
 
+        $this->originQueue->expects(self::any())
+            ->method('getName')
+            ->willReturn('bla-bla');
+
         $message = $this->queue->get();
 
         self::assertEquals(new AmqpReceivedMessage($this->originQueue, $envelope), $message);

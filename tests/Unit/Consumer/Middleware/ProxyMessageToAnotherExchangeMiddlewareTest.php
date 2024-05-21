@@ -68,7 +68,7 @@ class ProxyMessageToAnotherExchangeMiddlewareTest extends TestCase
     #[Test]
     public function shouldSuccessProxy(): void
     {
-        $message = new ReceivedMessageStub(new Payload('data'), 0, 'some', 'some');
+        $message = new ReceivedMessageStub(new Payload('data'), 0, '', 'some', 'some');
 
         $this->exchange->expects(self::once())
             ->method('publish')
@@ -89,7 +89,7 @@ class ProxyMessageToAnotherExchangeMiddlewareTest extends TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Loop detection. You try to proxy message from "to-another" exchange to "to-another" exchange by same routing key.');
 
-        $message = new ReceivedMessageStub(new Payload('data'), 0, 'foo', 'to-another');
+        $message = new ReceivedMessageStub(new Payload('data'), 0, '', 'foo', 'to-another');
 
         $this->exchange->expects(self::never())
             ->method('publish');

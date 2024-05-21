@@ -58,7 +58,7 @@ class HandleExpiredMessageHandlerTest extends TestCase
     #[TestWith(['foo', false])]
     public function shouldSuccessSupports(string $routing, bool $supports): void
     {
-        $message = new ReceivedMessageStub(new Payload(''), 0, '', '', null, new Headers([
+        $message = new ReceivedMessageStub(new Payload(''), 0, '', '', '', null, new Headers([
             'x-death' => [
                 [
                     'routing-keys' => [$routing],
@@ -77,6 +77,7 @@ class HandleExpiredMessageHandlerTest extends TestCase
         $message = new ReceivedMessageStub(
             new Payload('foo bar'),
             0,
+            '',
             '',
             '',
             new Options(false),
@@ -117,6 +118,7 @@ class HandleExpiredMessageHandlerTest extends TestCase
         $message = new ReceivedMessageStub(
             new Payload('foo bar'),
             0,
+            '',
             '',
             '',
             null,
