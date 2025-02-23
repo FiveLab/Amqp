@@ -18,21 +18,10 @@ use FiveLab\Component\Amqp\Connection\ConnectionInterface;
 use FiveLab\Component\Amqp\Connection\Driver;
 use FiveLab\Component\Amqp\Connection\Dsn;
 
-/**
- * The factory for create connection provided via php-amqp extension.
- */
 class AmqpConnectionFactory implements ConnectionFactoryInterface
 {
-    /**
-     * @var AmqpConnection|null
-     */
     private ?AmqpConnection $connection = null;
 
-    /**
-     * Constructor.
-     *
-     * @param Dsn $dsn
-     */
     public function __construct(private readonly Dsn $dsn)
     {
         if ($this->dsn->driver !== Driver::AmqpExt) {
@@ -44,9 +33,6 @@ class AmqpConnectionFactory implements ConnectionFactoryInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(): ConnectionInterface
     {
         if ($this->connection) {

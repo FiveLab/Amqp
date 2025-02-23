@@ -13,9 +13,6 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Publisher;
 
-/**
- * All publishers with support savepoint must implement this interface.
- */
 interface SavepointPublisherInterface extends PublisherInterface
 {
     /**

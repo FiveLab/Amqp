@@ -28,28 +28,12 @@ use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
 
-/**
- * Loop consumer.
- */
 class LoopConsumer implements EventableConsumerInterface, MiddlewareAwareInterface
 {
     use EventableConsumerTrait;
 
-    /**
-     * Indicate what we should throw exception if consumer timeout exceed.
-     *
-     * @var bool
-     */
     private bool $throwConsumerTimeoutExceededException = false;
 
-    /**
-     * Constructor.
-     *
-     * @param QueueFactoryInterface     $queueFactory
-     * @param MessageHandlerInterface   $messageHandler
-     * @param ConsumerMiddlewares       $middlewares
-     * @param LoopConsumerConfiguration $configuration
-     */
     public function __construct(
         private readonly QueueFactoryInterface     $queueFactory,
         private readonly MessageHandlerInterface   $messageHandler,
@@ -58,33 +42,21 @@ class LoopConsumer implements EventableConsumerInterface, MiddlewareAwareInterfa
     ) {
     }
 
-    /**
-     * Set flag for force throw consumer timeout exceeded exception.
-     */
     public function throwExceptionOnConsumerTimeoutExceed(): void
     {
         $this->throwConsumerTimeoutExceededException = true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function pushMiddleware(ConsumerMiddlewareInterface $middleware): void
     {
         $this->middlewares->push($middleware);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getQueue(): QueueInterface
     {
         return $this->queueFactory->create();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function run(): void
     {
         $executable = $this->middlewares->createExecutable(function (ReceivedMessage $message) {
@@ -164,11 +136,6 @@ class LoopConsumer implements EventableConsumerInterface, MiddlewareAwareInterfa
         }
     }
 
-    /**
-     * Configure channel and connection before consume
-     *
-     * @param ChannelInterface $channel
-     */
     private function configureBeforeConsume(ChannelInterface $channel): void
     {
         $connection = $channel->getConnection();

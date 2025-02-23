@@ -14,48 +14,22 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Exchange\Definition;
 
 use FiveLab\Component\Amqp\Argument\ArgumentDefinitions;
-use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 
-/**
- * Exchange definition.
- */
 readonly class ExchangeDefinition
 {
-    /**
-     * @var ArgumentDefinitions
-     */
     public ArgumentDefinitions $arguments;
-
-    /**
-     * @var BindingDefinitions|BindingDefinition[]
-     */
     public BindingDefinitions $bindings;
-
-    /**
-     * @var BindingDefinitions|BindingDefinition[]
-     */
     public BindingDefinitions $unbindings;
 
-    /**
-     * Constructor.
-     *
-     * @param string                   $name
-     * @param string                   $type
-     * @param bool                     $durable
-     * @param bool                     $passive
-     * @param ArgumentDefinitions|null $arguments
-     * @param BindingDefinitions|null  $bindings
-     * @param BindingDefinitions|null  $unbindings
-     */
     public function __construct(
-        public string       $name,
-        public string       $type,
-        public bool         $durable = true,
-        public bool         $passive = false,
-        ArgumentDefinitions $arguments = null,
-        BindingDefinitions  $bindings = null,
-        BindingDefinitions  $unbindings = null
+        public string        $name,
+        public string        $type,
+        public bool          $durable = true,
+        public bool          $passive = false,
+        ?ArgumentDefinitions $arguments = null,
+        ?BindingDefinitions  $bindings = null,
+        ?BindingDefinitions  $unbindings = null
     ) {
         if ('' === $this->name) {
             // Try to create default direct exchange.

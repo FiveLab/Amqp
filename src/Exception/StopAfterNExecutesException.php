@@ -13,9 +13,6 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Exception;
 
-/**
- * Throw this exception if the consumer stop process after N executes.
- */
 class StopAfterNExecutesException extends \Exception
 {
 }

@@ -23,19 +23,9 @@ use PHPUnit\Framework\TestCase;
 
 class DelayPublisherTest extends TestCase
 {
-    /**
-     * @var PublisherInterface
-     */
     private PublisherInterface $originalPublisher;
-
-    /**
-     * @var DelayPublisher
-     */
     private DelayPublisher $delayPublisher;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->originalPublisher = $this->createMock(PublisherInterface::class);

@@ -37,21 +37,8 @@ class SpoolConsumer implements EventableConsumerInterface, MiddlewareAwareInterf
 {
     use EventableConsumerTrait;
 
-    /**
-     * Indicate what we should throw exception if consumer timeout exceed.
-     *
-     * @var bool
-     */
     private bool $throwConsumerTimeoutExceededException = false;
 
-    /**
-     * Constructor.
-     *
-     * @param QueueFactoryInterface            $queueFactory
-     * @param FlushableMessageHandlerInterface $messageHandler
-     * @param ConsumerMiddlewares              $middlewares
-     * @param SpoolConsumerConfiguration       $configuration
-     */
     public function __construct(
         private readonly QueueFactoryInterface            $queueFactory,
         private readonly FlushableMessageHandlerInterface $messageHandler,
@@ -60,33 +47,21 @@ class SpoolConsumer implements EventableConsumerInterface, MiddlewareAwareInterf
     ) {
     }
 
-    /**
-     * Set flag for force throw consumer timeout exceeded exception.
-     */
     public function throwExceptionOnConsumerTimeoutExceed(): void
     {
         $this->throwConsumerTimeoutExceededException = true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function pushMiddleware(ConsumerMiddlewareInterface $middleware): void
     {
         $this->middlewares->push($middleware);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getQueue(): QueueInterface
     {
         return $this->queueFactory->create();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function run(): void
     {
         $executable = $this->middlewares->createExecutable(function (ReceivedMessage $message) {
@@ -190,11 +165,6 @@ class SpoolConsumer implements EventableConsumerInterface, MiddlewareAwareInterf
         }
     }
 
-    /**
-     * Flush all messages
-     *
-     * @param MutableReceivedMessages $messages
-     */
     private function flushMessages(MutableReceivedMessages $messages): void
     {
         if (!\count($messages)) {
@@ -224,11 +194,6 @@ class SpoolConsumer implements EventableConsumerInterface, MiddlewareAwareInterf
         $messages->clear();
     }
 
-    /**
-     * Configure channel and connection before consume
-     *
-     * @param ChannelInterface $channel
-     */
     private function configureBeforeConsume(ChannelInterface $channel): void
     {
         $connection = $channel->getConnection();

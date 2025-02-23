@@ -13,9 +13,6 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Exception;
 
-/**
- * Throw this exception if you pass invalid credentials for connect to RabbitMQ.
- */
 class BadCredentialsException extends \Exception
 {
 }

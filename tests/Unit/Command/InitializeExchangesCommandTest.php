@@ -24,24 +24,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class InitializeExchangesCommandTest extends TestCase
 {
-    /**
-     * @var ExchangeFactoryRegistry
-     */
     private ExchangeFactoryRegistry $registry;
-
-    /**
-     * @var ArrayInput
-     */
     private ArrayInput $input;
-
-    /**
-     * @var BufferedOutput
-     */
     private BufferedOutput $output;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->registry = new ExchangeFactoryRegistry();
@@ -108,12 +94,6 @@ OUTPUT;
         self::assertEquals($expectedOutput, $this->output->fetch());
     }
 
-    /**
-     * Create the factory and add to registry
-     *
-     * @param string $key
-     * @param bool   $shouldCreate
-     */
     private function createFactory(string $key, bool $shouldCreate): void
     {
         $factory = $this->createMock(ExchangeFactoryInterface::class);

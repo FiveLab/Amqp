@@ -14,7 +14,7 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Message;
 
 /**
- * Implement delay message. It add common headers for next control in handlers.
+ * Implement delay message. It adds common headers for next control in handlers.
  */
 class DelayMessage extends Message
 {
@@ -22,14 +22,6 @@ class DelayMessage extends Message
     public const HEADER_ROUTING_KEY   = 'x-delay-routing-key';
     public const HEADER_COUNTER       = 'x-delay-counter';
 
-    /**
-     * Constructor.
-     *
-     * @param Message            $message
-     * @param string             $publisherKey
-     * @param string|\BackedEnum $routingKey
-     * @param int                $counter
-     */
     public function __construct(
         Message            $message,
         string             $publisherKey,

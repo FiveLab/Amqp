@@ -23,21 +23,12 @@ use FiveLab\Component\Amqp\Message\ReceivedMessage;
  */
 readonly class ProxyMessageToAnotherExchangeMiddleware implements ConsumerMiddlewareInterface
 {
-    /**
-     * Constructor.
-     *
-     * @param ExchangeFactoryRegistryInterface $exchangeFactoryRegistry
-     * @param string                           $toExchange
-     */
     public function __construct(
         private ExchangeFactoryRegistryInterface $exchangeFactoryRegistry,
         private string                           $toExchange
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function handle(ReceivedMessage $message, callable $next): void
     {
         if ($this->toExchange === $message->exchangeName) {

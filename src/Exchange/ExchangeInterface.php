@@ -16,9 +16,6 @@ namespace FiveLab\Component\Amqp\Exchange;
 use FiveLab\Component\Amqp\Channel\ChannelInterface;
 use FiveLab\Component\Amqp\Message\Message;
 
-/**
- * All exchanges should implement this interface.
- */
 interface ExchangeInterface
 {
     /**

@@ -19,25 +19,6 @@ use PHPUnit\Framework\TestCase;
 
 class AmqpAdapterHelper
 {
-    /**
-     * Make envelope mock for testing.
-     *
-     * @param TestCase     $testCase
-     * @param string|false $body
-     * @param array        $headers
-     * @param string       $routingKey
-     * @param string       $exchangeName
-     * @param int          $deliveryTag
-     * @param string       $contentType
-     * @param string|null  $contentEncoding
-     * @param int          $deliveryMode
-     * @param int|null     $expiration
-     * @param string|null  $messageId
-     * @param string|null  $appId
-     * @param string|null  $userId
-     *
-     * @return \AMQPEnvelope
-     */
     public static function makeEnvelope(
         TestCase $testCase,
         string   $body = '',
@@ -46,12 +27,12 @@ class AmqpAdapterHelper
         string   $exchangeName = '',
         int      $deliveryTag = 1,
         string   $contentType = 'text/plain',
-        string   $contentEncoding = null,
+        ?string  $contentEncoding = null,
         int      $deliveryMode = 1,
-        int      $expiration = null,
-        string   $messageId = null,
-        string   $appId = null,
-        string   $userId = null
+        ?int     $expiration = null,
+        ?string  $messageId = null,
+        ?string  $appId = null,
+        ?string  $userId = null
     ): \AMQPEnvelope {
         $envelope = (new MockBuilder($testCase, \AMQPEnvelope::class))
             ->getMock();

@@ -15,14 +15,8 @@ namespace FiveLab\Component\Amqp\Queue\Definition\Arguments;
 
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 
-/**
- * Definition for "x-single-active-consumer" argument.
- */
 readonly class SingleActiveCustomerArgument extends ArgumentDefinition
 {
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         parent::__construct('x-single-active-consumer', true);

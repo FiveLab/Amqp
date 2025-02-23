@@ -13,9 +13,6 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Consumer;
 
-/**
- * Trait for implement EventableConsumerInterface
- */
 trait EventableConsumerTrait
 {
     /**
@@ -23,27 +20,16 @@ trait EventableConsumerTrait
      */
     private ?\Closure $eventHandler = null;
 
-    /**
-     * Set event handler
-     *
-     * @param \Closure|null $eventHandler
-     */
     public function setEventHandler(?\Closure $eventHandler): void
     {
         $this->eventHandler = $eventHandler;
     }
 
-    /**
-     * Add event handler.
-     *
-     * @param \Closure $eventHandler
-     * @param bool     $isLazyFactory
-     */
     public function addEventHandler(\Closure $eventHandler, bool $isLazyFactory = false): void
     {
         if ($isLazyFactory) {
-            $eventHandler = ($eventHandler)();
-            $eventHandler = ($eventHandler)(...);
+            $eventHandler = ($eventHandler)(); // @phpstan-ignore-line
+            $eventHandler = ($eventHandler)(...); // @phpstan-ignore-line
         }
 
         if ($this->eventHandler) {
@@ -53,12 +39,6 @@ trait EventableConsumerTrait
         $this->eventHandler = $eventHandler;
     }
 
-    /**
-     * Trigger event.
-     *
-     * @param Event $event
-     * @param mixed ...$args
-     */
     protected function triggerEvent(Event $event, mixed ...$args): void
     {
         if ($this->eventHandler) {

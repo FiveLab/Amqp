@@ -21,19 +21,9 @@ use PHPUnit\Framework\TestCase;
 
 class AmqpTransactionalTest extends TestCase
 {
-    /**
-     * @var ChannelInterface
-     */
     private ChannelInterface $channel;
-
-    /**
-     * @var AmqpTransactional
-     */
     private AmqpTransactional $transactional;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->channel = $this->createMock(ChannelInterface::class);

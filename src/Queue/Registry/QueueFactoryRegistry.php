@@ -16,30 +16,18 @@ namespace FiveLab\Component\Amqp\Queue\Registry;
 use FiveLab\Component\Amqp\Exception\QueueFactoryNotFoundException;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 
-/**
- * Simple queue factory.
- */
 class QueueFactoryRegistry implements QueueFactoryRegistryInterface
 {
     /**
-     * @var array|QueueFactoryInterface[]
+     * @var array<QueueFactoryInterface>
      */
     private array $factories = [];
 
-    /**
-     * Add the factory to registry
-     *
-     * @param string                $key
-     * @param QueueFactoryInterface $factory
-     */
     public function add(string $key, QueueFactoryInterface $factory): void
     {
         $this->factories[$key] = $factory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(string $key): QueueFactoryInterface
     {
         if (!\array_key_exists($key, $this->factories)) {

@@ -30,24 +30,10 @@ use PHPUnit\Framework\Attributes\Test;
 
 abstract class LoopConsumerTestCase extends RabbitMqTestCase
 {
-    /**
-     * @var QueueFactoryInterface
-     */
     private QueueFactoryInterface $queueFactory;
-
-    /**
-     * @var MessageHandlerMock
-     */
     private MessageHandlerMock $messageHandler;
-
-    /**
-     * @var ThrowableMessageHandlerMock
-     */
     private ThrowableMessageHandlerMock $throwableMessageHandler;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -66,13 +52,6 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
         $this->throwableMessageHandler = new ThrowableMessageHandlerMock('');
     }
 
-    /**
-     * Create the queue factory
-     *
-     * @param QueueDefinition $definition
-     *
-     * @return QueueFactoryInterface
-     */
     abstract protected function createQueueFactory(QueueDefinition $definition): QueueFactoryInterface;
 
     #[Test]
@@ -293,11 +272,6 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
         self::assertQueueContainsCountMessages($this->queueFactory, 7);
     }
 
-    /**
-     * Run consumer
-     *
-     * @param LoopConsumer $consumer
-     */
     private function runConsumer(LoopConsumer $consumer): void
     {
         $consumer->throwExceptionOnConsumerTimeoutExceed();
@@ -310,11 +284,6 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
         }
     }
 
-    /**
-     * Publish more messages
-     *
-     * @param int $messages
-     */
     private function publishMessages(int $messages): void
     {
         for ($i = 1; $i <= $messages; $i++) {
@@ -322,11 +291,6 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
         }
     }
 
-    /**
-     * Publish message to broker
-     *
-     * @param string $payload
-     */
     private function publishMessage(string $payload = 'some payload'): void
     {
         $this->management->publishMessage('ex-loop', '', $payload);

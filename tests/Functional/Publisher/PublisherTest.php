@@ -28,14 +28,8 @@ use PHPUnit\Framework\Attributes\Test;
 
 class PublisherTest extends RabbitMqTestCase
 {
-    /**
-     * @var Publisher
-     */
     private Publisher $publisher;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();

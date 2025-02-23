@@ -15,9 +15,6 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Consumer;
 
-/**
- * Add possible to add event handler to consumer.
- */
 interface EventableConsumerInterface extends ConsumerInterface
 {
     /**

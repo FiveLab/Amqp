@@ -22,19 +22,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class OutputEventHandlerTest extends TestCase
 {
-    /**
-     * @var OutputInterface
-     */
     private OutputInterface $output;
-
-    /**
-     * @var OutputEventHandler
-     */
     private OutputEventHandler $handler;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->output = $this->createMock(OutputInterface::class);

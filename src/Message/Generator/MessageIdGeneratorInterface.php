@@ -13,9 +13,6 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Message\Generator;
 
-/**
- * All message id generators should implement this interface.
- */
 interface MessageIdGeneratorInterface
 {
     /**

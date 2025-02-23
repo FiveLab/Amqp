@@ -17,24 +17,12 @@ use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
 use FiveLab\Component\Amqp\Message\Message;
 use FiveLab\Component\Amqp\Publisher\Middleware\PublisherMiddlewares;
 
-/**
- * The default publisher
- */
 readonly class Publisher implements PublisherInterface
 {
-    /**
-     * Constructor.
-     *
-     * @param ExchangeFactoryInterface $exchangeFactory
-     * @param PublisherMiddlewares     $middlewares
-     */
     public function __construct(private ExchangeFactoryInterface $exchangeFactory, private PublisherMiddlewares $middlewares)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function publish(Message $message, string|\BackedEnum $routingKey = ''): void
     {
         if ($routingKey instanceof \BackedEnum) {

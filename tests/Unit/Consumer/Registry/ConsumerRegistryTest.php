@@ -65,11 +65,6 @@ class ConsumerRegistryTest extends TestCase
         $registry->get('foo');
     }
 
-    /**
-     * Create unique consumer
-     *
-     * @return ConsumerInterface
-     */
     private function createUniqueConsumer(): ConsumerInterface
     {
         return $this->createMock(ConsumerInterface::class);

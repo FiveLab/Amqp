@@ -16,9 +16,6 @@ namespace FiveLab\Component\Amqp\Connection;
 use FiveLab\Component\Amqp\Exception\ConnectionException;
 use FiveLab\Component\Amqp\SplSubjectTrait;
 
-/**
- * Spool connection.
- */
 class SpoolConnection implements ConnectionInterface
 {
     use SplSubjectTrait;
@@ -28,21 +25,9 @@ class SpoolConnection implements ConnectionInterface
      */
     private readonly array $connections;
 
-    /**
-     * @var ConnectionInterface|null
-     */
     private ?ConnectionInterface $originConnection = null;
-
-    /**
-     * @var bool
-     */
     private bool $shuffleBeforeConnect = false;
 
-    /**
-     * Constructor.
-     *
-     * @param ConnectionInterface ...$connections
-     */
     public function __construct(ConnectionInterface ...$connections)
     {
         if (!\count($connections)) {
@@ -52,31 +37,25 @@ class SpoolConnection implements ConnectionInterface
         $this->connections = $connections;
     }
 
-    /**
-     * Mark for should shuffle connections before connect (for get random first connection)
-     */
     public function shuffleBeforeConnect(): void
     {
         $this->shuffleBeforeConnect = true;
     }
 
     /**
-     * Proxy call to original connection
+     * Call method in original connection
      *
-     * @param string            $methodName
-     * @param array<int, mixed> $arguments
+     * @param string       $methodName
+     * @param array<mixed> $arguments
      *
      * @return mixed
      */
-    public function __call(string $methodName, array $arguments)
+    public function __call(string $methodName, array $arguments): mixed
     {
         // @phpstan-ignore-next-line
         return \call_user_func_array([$this->getOriginConnection(), $methodName], $arguments);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function connect(): void
     {
         $connections = $this->connections;
@@ -103,9 +82,6 @@ class SpoolConnection implements ConnectionInterface
         throw $firstException;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isConnected(): bool
     {
         if (!$this->originConnection) {
@@ -115,9 +91,6 @@ class SpoolConnection implements ConnectionInterface
         return $this->getOriginConnection()->isConnected();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function disconnect(): void
     {
         $this->getOriginConnection()->disconnect();
@@ -126,36 +99,22 @@ class SpoolConnection implements ConnectionInterface
         $this->originConnection = null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reconnect(): void
     {
         $this->disconnect();
         $this->connect();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setReadTimeout(float $timeout): void
     {
         $this->getOriginConnection()->setReadTimeout($timeout);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getReadTimeout(): float
     {
         return $this->getOriginConnection()->getReadTimeout();
     }
 
-    /**
-     * Get active connection
-     *
-     * @return ConnectionInterface
-     */
     private function getOriginConnection(): ConnectionInterface
     {
         if (!$this->originConnection) {

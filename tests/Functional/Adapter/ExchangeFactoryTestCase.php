@@ -24,13 +24,6 @@ use PHPUnit\Framework\Attributes\Test;
 
 abstract class ExchangeFactoryTestCase extends RabbitMqTestCase
 {
-    /**
-     * Create exchange factory for testing
-     *
-     * @param ExchangeDefinition $definition
-     *
-     * @return ExchangeFactoryInterface
-     */
     abstract protected function createExchangeFactory(ExchangeDefinition $definition): ExchangeFactoryInterface;
 
     #[Test]

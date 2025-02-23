@@ -22,23 +22,12 @@ use FiveLab\Component\Amqp\Message\ReceivedMessage;
  */
 class StopAfterNExecutesMiddleware implements ConsumerMiddlewareInterface
 {
-    /**
-     * @var int
-     */
     private int $executesCounter = 0;
 
-    /**
-     * Constructor.
-     *
-     * @param int $stopAfterExecutes
-     */
     public function __construct(private readonly int $stopAfterExecutes)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function handle(ReceivedMessage $message, callable $next): void
     {
         $next($message);

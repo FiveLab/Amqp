@@ -22,9 +22,6 @@ use FiveLab\Component\Amqp\Tests\Functional\Adapter\ExchangeFactoryTestCase;
 
 class AmqpExchangeFactoryTest extends ExchangeFactoryTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function createExchangeFactory(ExchangeDefinition $definition): ExchangeFactoryInterface
     {
         $amqpConnection = new \AMQPConnection([

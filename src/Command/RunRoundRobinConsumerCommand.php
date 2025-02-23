@@ -21,44 +21,23 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * Command for run round robin consumer
- */
 #[AsCommand(name: 'event-broker:consumer:round-robin', description: 'Run round robin consumer.')]
 class RunRoundRobinConsumerCommand extends Command
 {
-    /**
-     * @var string
-     */
     protected static $defaultName = 'event-broker:consumer:round-robin';
-
-    /**
-     * @var string
-     */
     protected static $defaultDescription = 'Run round robin consumer.';
 
-    /**
-     * Constructor.
-     *
-     * @param RoundRobinConsumer $consumer
-     */
     public function __construct(private readonly RoundRobinConsumer $consumer)
     {
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this
             ->setDescription(self::$defaultDescription);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         $this->consumer->addEventHandler(static function (Event $event, mixed ...$args) use ($output) {
@@ -74,9 +53,6 @@ class RunRoundRobinConsumerCommand extends Command
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->consumer->run();

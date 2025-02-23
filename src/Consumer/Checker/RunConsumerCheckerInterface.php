@@ -15,9 +15,6 @@ namespace FiveLab\Component\Amqp\Consumer\Checker;
 
 use FiveLab\Component\Amqp\Exception\CannotRunConsumerException;
 
-/**
- * All consumer checkers should implement this interface.
- */
 interface RunConsumerCheckerInterface
 {
     /**

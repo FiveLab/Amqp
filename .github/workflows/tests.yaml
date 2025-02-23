@@ -19,7 +19,7 @@ jobs:
                     coverage: "none"
                     extensions: "json,amqp"
                     ini-values: "memory_limit=-1"
-                    php-version: "8.2"
+                    php-version: "8.4"
                     tools: "composer"
 
             -   name: Install vendors
@@ -60,7 +60,7 @@ jobs:
 
         strategy:
             matrix:
-                php: [ '8.2', '8.3' ]
+                php: [ '8.2', '8.3', '8.4' ]
 
         services:
             rabbitmq:

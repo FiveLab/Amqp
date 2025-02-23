@@ -22,21 +22,10 @@ use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
 
-/**
- * Single consumer.
- */
 class SingleConsumer implements EventableConsumerInterface, MiddlewareAwareInterface
 {
     use EventableConsumerTrait;
 
-    /**
-     * Constructor.
-     *
-     * @param QueueFactoryInterface   $queueFactory
-     * @param MessageHandlerInterface $messageHandler
-     * @param ConsumerMiddlewares     $middlewares
-     * @param ConsumerConfiguration   $configuration
-     */
     public function __construct(
         private readonly QueueFactoryInterface   $queueFactory,
         private readonly MessageHandlerInterface $messageHandler,
@@ -45,25 +34,16 @@ class SingleConsumer implements EventableConsumerInterface, MiddlewareAwareInter
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getQueue(): QueueInterface
     {
         return $this->queueFactory->create();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function pushMiddleware(ConsumerMiddlewareInterface $middleware): void
     {
         $this->middlewares->push($middleware);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function run(): void
     {
         $queue = $this->queueFactory->create();

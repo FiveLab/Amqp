@@ -65,11 +65,6 @@ class QueueFactoryRegistryTest extends TestCase
         $registry->get('foo');
     }
 
-    /**
-     * Create unique factory
-     *
-     * @return QueueFactoryInterface
-     */
     private function createUniqueFactory(): QueueFactoryInterface
     {
         return $this->createMock(QueueFactoryInterface::class);

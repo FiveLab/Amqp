@@ -24,24 +24,10 @@ use PHPUnit\Framework\TestCase;
 
 class AmqpExchangeTest extends TestCase
 {
-    /**
-     * @var AmqpChannel
-     */
     private AmqpChannel $channel;
-
-    /**
-     * @var \AMQPExchange
-     */
     private \AMQPExchange $originalExchange;
-
-    /**
-     * @var AmqpExchange
-     */
     private AmqpExchange $exchange;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->channel = $this->createMock(AmqpChannel::class);

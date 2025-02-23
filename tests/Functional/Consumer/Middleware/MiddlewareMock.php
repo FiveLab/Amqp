@@ -19,13 +19,10 @@ use FiveLab\Component\Amqp\Message\ReceivedMessage;
 class MiddlewareMock implements ConsumerMiddlewareInterface
 {
     /**
-     * @var array
+     * @var array<ReceivedMessage>
      */
     private array $receivedMessages = [];
 
-    /**
-     * {@inheritdoc}
-     */
     public function handle(ReceivedMessage $message, callable $next): void
     {
         $this->receivedMessages[] = $message;
@@ -36,7 +33,7 @@ class MiddlewareMock implements ConsumerMiddlewareInterface
     /**
      * Get received messages
      *
-     * @return array
+     * @return array<ReceivedMessage>
      */
     public function getReceivedMessages(): array
     {

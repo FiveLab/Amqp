@@ -16,32 +16,20 @@ namespace FiveLab\Component\Amqp\Consumer\Middleware;
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
 
 /**
- * The collection for store middlewares for consumers.
- *
  * @implements \IteratorAggregate<ConsumerMiddlewareInterface>
  */
 class ConsumerMiddlewares implements \IteratorAggregate
 {
     /**
-     * @var array|ConsumerMiddlewareInterface[]
+     * @var array<ConsumerMiddlewareInterface>
      */
     private array $middlewares;
 
-    /**
-     * Constructor.
-     *
-     * @param ConsumerMiddlewareInterface ...$middlewares
-     */
     public function __construct(ConsumerMiddlewareInterface ...$middlewares)
     {
         $this->middlewares = $middlewares;
     }
 
-    /**
-     * Push middleware
-     *
-     * @param ConsumerMiddlewareInterface $middleware
-     */
     public function push(ConsumerMiddlewareInterface $middleware): void
     {
         $this->middlewares[] = $middleware;
@@ -57,13 +45,6 @@ class ConsumerMiddlewares implements \IteratorAggregate
         return new \ArrayIterator($this->middlewares);
     }
 
-    /**
-     * Create executable
-     *
-     * @param \Closure $lastExecutable
-     *
-     * @return \Closure
-     */
     public function createExecutable(\Closure $lastExecutable): \Closure
     {
         $middlewares = $this->middlewares;

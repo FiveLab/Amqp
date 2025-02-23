@@ -19,25 +19,11 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * The command for initialize exchanges.
- */
 #[AsCommand(name: 'event-broker:initialize:exchanges', description: 'Initialize exchanges.')]
 class InitializeExchangesCommand extends Command
 {
-    /**
-     * @var string
-     */
     protected static $defaultName = 'event-broker:initialize:exchanges';
-
-    /**
-     * @var string
-     */
     protected static $defaultDescription = 'Initialize exchanges.';
-
-    /**
-     * @var ExchangeFactoryRegistryInterface
-     */
     private ExchangeFactoryRegistryInterface $registry;
 
     /**
@@ -59,18 +45,12 @@ class InitializeExchangesCommand extends Command
         $this->exchanges = $exchanges;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this
             ->setDescription(self::$defaultDescription);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         foreach ($this->exchanges as $exchange) {

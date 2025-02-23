@@ -34,29 +34,11 @@ use PHPUnit\Framework\Attributes\Test;
 
 class RoundRobinConsumerTest extends RabbitMqTestCase
 {
-    /**
-     * @var MessageHandlerMock
-     */
     private MessageHandlerMock $handler1;
-
-    /**
-     * @var MessageHandlerMock
-     */
     private MessageHandlerMock $handler2;
-
-    /**
-     * @var AmqpQueueFactory
-     */
     private AmqpQueueFactory $queueFactory1;
-
-    /**
-     * @var AmqpQueueFactory
-     */
     private AmqpQueueFactory $queueFactory2;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();

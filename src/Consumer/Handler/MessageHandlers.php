@@ -17,29 +17,18 @@ use FiveLab\Component\Amqp\Exception\MessageHandlerNotSupportedException;
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Message\ReceivedMessages;
 
-/**
- * The chain of message handlers.
- */
-class MessageHandlers implements MessageHandlerInterface, FlushableMessageHandlerInterface, ThrowableMessageHandlerInterface
+readonly class MessageHandlers implements MessageHandlerInterface, FlushableMessageHandlerInterface, ThrowableMessageHandlerInterface
 {
     /**
-     * @var array|MessageHandlerInterface[]
+     * @var array<MessageHandlerInterface>
      */
-    private readonly array $handlers;
+    private array $handlers;
 
-    /**
-     * Constructor.
-     *
-     * @param MessageHandlerInterface ...$handlers
-     */
     public function __construct(MessageHandlerInterface ...$handlers)
     {
         $this->handlers = $handlers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(ReceivedMessage $message): bool
     {
         try {
@@ -51,9 +40,6 @@ class MessageHandlers implements MessageHandlerInterface, FlushableMessageHandle
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function handle(ReceivedMessage $message): void
     {
         $handler = $this->getMessageHandlerForMessage($message);
@@ -61,9 +47,6 @@ class MessageHandlers implements MessageHandlerInterface, FlushableMessageHandle
         $handler->handle($message);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function flush(ReceivedMessages $receivedMessages): void
     {
         foreach ($this->handlers as $handler) {
@@ -78,9 +61,6 @@ class MessageHandlers implements MessageHandlerInterface, FlushableMessageHandle
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function catchError(ReceivedMessage $message, \Throwable $error): void
     {
         $handler = $this->getMessageHandlerForMessage($message);
@@ -92,15 +72,6 @@ class MessageHandlers implements MessageHandlerInterface, FlushableMessageHandle
         }
     }
 
-    /**
-     * Get the message handler for message
-     *
-     * @param ReceivedMessage $message
-     *
-     * @return MessageHandlerInterface
-     *
-     * @throws MessageHandlerNotSupportedException
-     */
     private function getMessageHandlerForMessage(ReceivedMessage $message): MessageHandlerInterface
     {
         foreach ($this->handlers as $handler) {

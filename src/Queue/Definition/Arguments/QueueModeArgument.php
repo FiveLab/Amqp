@@ -15,16 +15,8 @@ namespace FiveLab\Component\Amqp\Queue\Definition\Arguments;
 
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 
-/**
- * Definition for "x-queue-mode" argument.
- */
 readonly class QueueModeArgument extends ArgumentDefinition
 {
-    /**
-     * Constructor.
-     *
-     * @param string $mode
-     */
     public function __construct(string $mode)
     {
         $possibleModes = [

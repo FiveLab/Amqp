@@ -15,15 +15,7 @@ namespace FiveLab\Component\Amqp\Consumer;
 
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareInterface;
 
-/**
- * All services with aware middleware should implement this interface.
- */
 interface MiddlewareAwareInterface
 {
-    /**
-     * Push the middleware
-     *
-     * @param ConsumerMiddlewareInterface $middleware
-     */
     public function pushMiddleware(ConsumerMiddlewareInterface $middleware): void;
 }

@@ -28,13 +28,6 @@ use PHPUnit\Framework\Attributes\Test;
 
 abstract class QueueFactoryTestCase extends RabbitMqTestCase
 {
-    /**
-     * Create queue factory for testing
-     *
-     * @param QueueDefinition $definition
-     *
-     * @return QueueFactoryInterface
-     */
     abstract protected function createQueueFactory(QueueDefinition $definition): QueueFactoryInterface;
 
     #[Test]

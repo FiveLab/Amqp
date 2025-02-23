@@ -20,22 +20,11 @@ readonly class EventHandlers
      */
     private array $handlers;
 
-    /**
-     * Constructor.
-     *
-     * @param \Closure ...$handlers
-     */
     public function __construct(\Closure ...$handlers)
     {
         $this->handlers = $handlers;
     }
 
-    /**
-     * Handle specific event
-     *
-     * @param Event $event
-     * @param mixed ...$args
-     */
     public function __invoke(Event $event, mixed ...$args): void
     {
         foreach ($this->handlers as $handler) {

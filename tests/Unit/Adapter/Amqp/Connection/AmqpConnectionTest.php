@@ -21,19 +21,9 @@ use PHPUnit\Framework\TestCase;
 
 class AmqpConnectionTest extends TestCase
 {
-    /**
-     * @var \AMQPConnection
-     */
     private \AMQPConnection $realConnection;
-
-    /**
-     * @var AmqpConnection
-     */
     private AmqpConnection $connection;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         if (!\class_exists(\AMQPConnection::class)) {

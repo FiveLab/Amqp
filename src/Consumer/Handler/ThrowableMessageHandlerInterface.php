@@ -15,9 +15,6 @@ namespace FiveLab\Component\Amqp\Consumer\Handler;
 
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
 
-/**
- * You must implement this interface if you want to catch the error in process of message handlers.
- */
 interface ThrowableMessageHandlerInterface extends MessageHandlerInterface
 {
     /**

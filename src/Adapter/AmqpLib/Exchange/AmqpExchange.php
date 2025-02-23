@@ -21,42 +21,24 @@ use FiveLab\Component\Amqp\Message\Message;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 
-/**
- * The exchanged provided via php-amqplib library.
- */
 readonly class AmqpExchange implements ExchangeInterface
 {
-    /**
-     * Constructor.
-     *
-     * @param AmqpChannel        $channel
-     * @param ExchangeDefinition $definition
-     */
     public function __construct(
         private AmqpChannel        $channel,
         private ExchangeDefinition $definition
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getChannel(): ChannelInterface
     {
         return $this->channel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return $this->definition->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function publish(Message $message, string $routingKey = ''): void
     {
         $headers = $message->headers->all();
@@ -99,9 +81,6 @@ readonly class AmqpExchange implements ExchangeInterface
         $this->channel->getChannel()->basic_publish($amqplibMessage, $this->getName(), $routingKey);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function delete(): void
     {
         $this->channel->getChannel()->exchange_delete($this->getName());

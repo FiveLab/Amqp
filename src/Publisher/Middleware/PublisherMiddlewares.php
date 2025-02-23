@@ -16,22 +16,15 @@ namespace FiveLab\Component\Amqp\Publisher\Middleware;
 use FiveLab\Component\Amqp\Message\Message;
 
 /**
- * The collection for store middlewares for consumers.
- *
  * @implements \IteratorAggregate<PublisherMiddlewareInterface>
  */
-class PublisherMiddlewares implements \IteratorAggregate
+readonly class PublisherMiddlewares implements \IteratorAggregate
 {
     /**
-     * @var array|PublisherMiddlewareInterface[]
+     * @var array<PublisherMiddlewareInterface>
      */
     private array $middlewares;
 
-    /**
-     * Constructor.
-     *
-     * @param PublisherMiddlewareInterface ...$middlewares
-     */
     public function __construct(PublisherMiddlewareInterface ...$middlewares)
     {
         $this->middlewares = $middlewares;
@@ -47,13 +40,6 @@ class PublisherMiddlewares implements \IteratorAggregate
         return new \ArrayIterator($this->middlewares);
     }
 
-    /**
-     * Create executable
-     *
-     * @param \Closure $lastExecutable
-     *
-     * @return \Closure
-     */
     public function createExecutable(\Closure $lastExecutable): \Closure
     {
         $middlewares = $this->middlewares;

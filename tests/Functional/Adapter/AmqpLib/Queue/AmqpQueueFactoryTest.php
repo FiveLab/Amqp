@@ -39,9 +39,6 @@ class AmqpQueueFactoryTest extends QueueFactoryTestCase
         parent::shouldThrowExceptionWithCreatePassiveQueueAndQueueWasNotFound();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function createQueueFactory(QueueDefinition $definition): QueueFactoryInterface
     {
         $connectionFactory = new AmqpConnectionFactory($this->getRabbitMqDsn(Driver::AmqpLib));

@@ -15,14 +15,8 @@ namespace FiveLab\Component\Amqp\Message\Generator;
 
 use Ramsey\Uuid\Uuid;
 
-/**
- * Generate message id based on UUID.
- */
 readonly class RamseyUuidMessageIdGenerator implements MessageIdGeneratorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function generate(): string
     {
         return Uuid::uuid4()->toString();

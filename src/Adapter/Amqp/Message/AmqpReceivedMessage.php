@@ -19,17 +19,8 @@ use FiveLab\Component\Amqp\Message\Options;
 use FiveLab\Component\Amqp\Message\Payload;
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
 
-/**
- * The received message provided via php-amqp extension.
- */
 class AmqpReceivedMessage extends ReceivedMessage
 {
-    /**
-     * Constructor.
-     *
-     * @param \AMQPQueue    $queue
-     * @param \AMQPEnvelope $envelope
-     */
     public function __construct(
         private readonly \AMQPQueue    $queue,
         private readonly \AMQPEnvelope $envelope
@@ -52,9 +43,9 @@ class AmqpReceivedMessage extends ReceivedMessage
         parent::__construct(
             $payload,
             (int) $this->envelope->getDeliveryTag(),
-            $this->queue->getName(),
+            (string) $this->queue->getName(),
             $this->envelope->getRoutingKey(),
-            $this->envelope->getExchangeName(),
+            (string) $this->envelope->getExchangeName(),
             new Options(
                 $this->envelope->getDeliveryMode() === 2,
                 $this->envelope->getExpiration() ? (int) $this->envelope->getExpiration() : 0,
@@ -69,17 +60,11 @@ class AmqpReceivedMessage extends ReceivedMessage
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doAck(): void
     {
-        $this->queue->ack($this->envelope->getDeliveryTag());
+        $this->queue->ack((int) $this->envelope->getDeliveryTag());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doNack(bool $requeue = true): void
     {
         $flags = AMQP_NOPARAM;
@@ -88,6 +73,6 @@ class AmqpReceivedMessage extends ReceivedMessage
             $flags |= AMQP_REQUEUE;
         }
 
-        $this->queue->nack($this->envelope->getDeliveryTag(), $flags);
+        $this->queue->nack((int) $this->envelope->getDeliveryTag(), $flags);
     }
 }

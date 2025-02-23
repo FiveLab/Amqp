@@ -20,11 +20,6 @@ use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
  */
 readonly class AlternateExchangeArgument extends ArgumentDefinition
 {
-    /**
-     * Constructor.
-     *
-     * @param string $alternateExchange
-     */
     public function __construct(string $alternateExchange)
     {
         parent::__construct('alternate-exchange', $alternateExchange);

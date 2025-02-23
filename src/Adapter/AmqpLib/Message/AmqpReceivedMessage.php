@@ -20,17 +20,8 @@ use FiveLab\Component\Amqp\Message\Payload;
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use PhpAmqpLib\Message\AMQPMessage;
 
-/**
- * The received message provided via php-amqplib library.
- */
 class AmqpReceivedMessage extends ReceivedMessage
 {
-    /**
-     * Constructor.
-     *
-     * @param AMQPMessage $message
-     * @param string      $queueName
-     */
     public function __construct(private readonly AMQPMessage $message, string $queueName)
     {
         $payload = new Payload(
@@ -66,17 +57,11 @@ class AmqpReceivedMessage extends ReceivedMessage
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doAck(): void
     {
         $this->message->ack();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doNack(bool $requeue = true): void
     {
         $this->message->nack($requeue);

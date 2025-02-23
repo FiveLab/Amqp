@@ -188,11 +188,6 @@ class SpoolConnectionTest extends TestCase
         self::assertFalse($spool->isConnected());
     }
 
-    /**
-     * Make default amqp connection
-     *
-     * @return AmqpConnection&MockObject
-     */
     private function makeAmqpConnection(): AmqpConnection&MockObject
     {
         $connection = $this->createMock(AmqpConnection::class);

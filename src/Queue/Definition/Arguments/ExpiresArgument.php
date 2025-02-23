@@ -15,16 +15,8 @@ namespace FiveLab\Component\Amqp\Queue\Definition\Arguments;
 
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 
-/**
- * Definition for "x-expires" argument.
- */
 readonly class ExpiresArgument extends ArgumentDefinition
 {
-    /**
-     * Constructor.
-     *
-     * @param int $miliseconds
-     */
     public function __construct(int $miliseconds)
     {
         parent::__construct('x-expires', $miliseconds);

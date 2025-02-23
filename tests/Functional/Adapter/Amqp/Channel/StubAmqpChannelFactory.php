@@ -20,33 +20,15 @@ use FiveLab\Component\Amqp\Channel\ChannelInterface;
 
 class StubAmqpChannelFactory extends AmqpChannelFactory
 {
-    /**
-     * @var AmqpConnection
-     */
     private AmqpConnection $connection;
-
-    /**
-     * @var \AMQPChannel
-     */
     private \AMQPChannel $channel;
 
-    /**
-     * Constructor.
-     *
-     * @param AmqpConnection $connection
-     * @param \AMQPChannel   $channel
-     */
     public function __construct(AmqpConnection $connection, \AMQPChannel $channel)
     {
         $this->connection = $connection;
         $this->channel = $channel;
     }
 
-    /**
-     * Get the channel
-     *
-     * @return ChannelInterface|AmqpChannel
-     */
     public function create(): ChannelInterface
     {
         return new AmqpChannel($this->connection, $this->channel);

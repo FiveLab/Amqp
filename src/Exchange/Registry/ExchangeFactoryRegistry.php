@@ -16,30 +16,18 @@ namespace FiveLab\Component\Amqp\Exchange\Registry;
 use FiveLab\Component\Amqp\Exception\ExchangeFactoryNotFoundException;
 use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
 
-/**
- * The simple registry of exchange factories
- */
 class ExchangeFactoryRegistry implements ExchangeFactoryRegistryInterface
 {
     /**
-     * @var array|ExchangeFactoryInterface[]
+     * @var array<ExchangeFactoryInterface>
      */
     private array $factories = [];
 
-    /**
-     * Add exchange factory to registry
-     *
-     * @param string                   $key
-     * @param ExchangeFactoryInterface $exchangeFactory
-     */
     public function add(string $key, ExchangeFactoryInterface $exchangeFactory): void
     {
         $this->factories[$key] = $exchangeFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(string $key): ExchangeFactoryInterface
     {
         if (!\array_key_exists($key, $this->factories)) {

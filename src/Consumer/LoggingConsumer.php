@@ -17,34 +17,19 @@ use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareInterface;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
 use Psr\Log\LoggerInterface;
 
-/**
- * Decorate consumer for logging.
- */
 readonly class LoggingConsumer implements ConsumerInterface, MiddlewareAwareInterface
 {
-    /**
-     * Constructor.
-     *
-     * @param ConsumerInterface $decoratedConsumer
-     * @param LoggerInterface   $logger
-     */
     public function __construct(
         private ConsumerInterface $decoratedConsumer,
         private LoggerInterface   $logger
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getQueue(): QueueInterface
     {
         return $this->decoratedConsumer->getQueue();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function run(): void
     {
         $this->logger->info(\sprintf(
@@ -72,9 +57,6 @@ readonly class LoggingConsumer implements ConsumerInterface, MiddlewareAwareInte
         ));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function pushMiddleware(ConsumerMiddlewareInterface $middleware): void
     {
         if (!$this->decoratedConsumer instanceof MiddlewareAwareInterface) {

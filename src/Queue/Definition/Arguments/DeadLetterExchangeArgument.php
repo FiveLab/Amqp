@@ -15,16 +15,8 @@ namespace FiveLab\Component\Amqp\Queue\Definition\Arguments;
 
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 
-/**
- * Definition for "x-dead-letter-exchange" argument.
- */
 readonly class DeadLetterExchangeArgument extends ArgumentDefinition
 {
-    /**
-     * Constructor.
-     *
-     * @param string $exchangeName
-     */
     public function __construct(string $exchangeName)
     {
         parent::__construct('x-dead-letter-exchange', $exchangeName);

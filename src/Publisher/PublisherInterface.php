@@ -15,16 +15,7 @@ namespace FiveLab\Component\Amqp\Publisher;
 
 use FiveLab\Component\Amqp\Message\Message;
 
-/**
- * All publishers should implement this interface.
- */
 interface PublisherInterface
 {
-    /**
-     * Publish message
-     *
-     * @param Message            $message
-     * @param string|\BackedEnum $routingKey
-     */
     public function publish(Message $message, string|\BackedEnum $routingKey = ''): void;
 }

@@ -13,18 +13,8 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Message;
 
-/**
- * The message identifier
- */
 readonly class Identifier
 {
-    /**
-     * Constructor.
-     *
-     * @param string|null $id
-     * @param string|null $appId
-     * @param string|null $userId
-     */
     public function __construct(
         public ?string $id = null,
         public ?string $appId = null,

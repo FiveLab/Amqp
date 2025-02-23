@@ -15,16 +15,8 @@ namespace FiveLab\Component\Amqp\Queue\Definition\Arguments;
 
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 
-/**
- * Definition for "x-queue-master-locator" argument.
- */
 readonly class QueueMasterLocatorArgument extends ArgumentDefinition
 {
-    /**
-     * Constructor.
-     *
-     * @param string $masterLocator
-     */
     public function __construct(string $masterLocator)
     {
         $possibleMasterLocators = [

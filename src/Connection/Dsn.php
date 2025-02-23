@@ -14,8 +14,6 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Connection;
 
 /**
- * DSN for connect to RabbitMQ.
- *
  * @implements \IteratorAggregate<Dsn>
  */
 readonly class Dsn implements \IteratorAggregate, \Countable, \Stringable
@@ -32,9 +30,6 @@ readonly class Dsn implements \IteratorAggregate, \Countable, \Stringable
         'channel_rpc_timeout' => 'floatval',
     ];
 
-    /**
-     * @var string
-     */
     public string $host;
 
     /**
@@ -51,7 +46,7 @@ readonly class Dsn implements \IteratorAggregate, \Countable, \Stringable
      * @param string                   $vhost
      * @param string                   $username
      * @param string                   $password
-     * @param array<int|string, mixed> $options
+     * @param array<string|int, mixed> $options
      */
     public function __construct(
         public Driver $driver,
@@ -74,13 +69,6 @@ readonly class Dsn implements \IteratorAggregate, \Countable, \Stringable
         $this->hosts = $hosts;
     }
 
-    /**
-     * Make a DSN from string
-     *
-     * @param string $dsn
-     *
-     * @return self
-     */
     public static function fromDsn(string $dsn): self
     {
         $urlParts = \parse_url($dsn);
@@ -154,29 +142,16 @@ readonly class Dsn implements \IteratorAggregate, \Countable, \Stringable
         return new \ArrayIterator($dsns);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function count(): int
     {
         return \count($this->hosts);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __toString(): string
     {
         return $this->toString();
     }
 
-    /**
-     * Remove option by name
-     *
-     * @param string $option
-     *
-     * @return self
-     */
     public function removeOption(string $option): self
     {
         $options = $this->options;
@@ -194,13 +169,6 @@ readonly class Dsn implements \IteratorAggregate, \Countable, \Stringable
         );
     }
 
-    /**
-     * Convert DSN to string
-     *
-     * @param bool $hidePassword
-     *
-     * @return string
-     */
     public function toString(bool $hidePassword = true): string
     {
         $query = \count($this->options) ? '?'.\http_build_query($this->options) : '';

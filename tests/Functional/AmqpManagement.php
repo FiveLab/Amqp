@@ -15,28 +15,11 @@ namespace FiveLab\Component\Amqp\Tests\Functional;
 
 use GuzzleHttp\Client;
 
-class AmqpManagement
+readonly class AmqpManagement
 {
-    /**
-     * @var Client
-     */
     private Client $client;
 
-    /**
-     * @var string
-     */
-    private string $vhost;
-
-    /**
-     * Constructor.
-     *
-     * @param string $host
-     * @param int    $port
-     * @param string $login
-     * @param string $password
-     * @param string $vhost
-     */
-    public function __construct(string $host, int $port, string $login, string $password, string $vhost)
+    public function __construct(string $host, int $port, string $login, string $password, private string $vhost)
     {
         $this->client = new Client([
             'base_uri' => \sprintf('http://%s:%d', $host, $port),
@@ -44,16 +27,8 @@ class AmqpManagement
                 'Authorization' => \sprintf('Basic %s', \base64_encode($login.':'.$password)),
             ],
         ]);
-
-        $this->vhost = $vhost;
     }
 
-    /**
-     * Create queue
-     *
-     * @param string $name
-     * @param bool   $durable
-     */
     public function createQueue(string $name, bool $durable = true): void
     {
         $data = [
@@ -72,11 +47,6 @@ class AmqpManagement
         );
     }
 
-    /**
-     * List queues
-     *
-     * @return array
-     */
     public function queues(): array
     {
         $response = $this->client->get(\sprintf('/api/queues/%s', \urlencode($this->vhost)));
@@ -84,13 +54,6 @@ class AmqpManagement
         return \json_decode((string) $response->getBody(), true);
     }
 
-    /**
-     * Get the queue by name
-     *
-     * @param string $name
-     *
-     * @return array
-     */
     public function queueByName(string $name): array
     {
         $queues = $this->queues();
@@ -107,13 +70,6 @@ class AmqpManagement
         ));
     }
 
-    /**
-     * Get queue bindings
-     *
-     * @param string $name
-     *
-     * @return array
-     */
     public function queueBindings(string $name): array
     {
         $response = $this->client->get(\sprintf('/api/queues/%s/%s/bindings', \urlencode($this->vhost), \urlencode($name)));
@@ -121,13 +77,6 @@ class AmqpManagement
         return \json_decode((string) $response->getBody(), true);
     }
 
-    /**
-     * Bind queue
-     *
-     * @param string $queueName
-     * @param string $exchangeName
-     * @param string $routingKey
-     */
     public function queueBind(string $queueName, string $exchangeName, string $routingKey): void
     {
         $data = [
@@ -144,24 +93,11 @@ class AmqpManagement
         );
     }
 
-    /**
-     * Delete queue
-     *
-     * @param string $name
-     */
     public function deleteQueue(string $name): void
     {
         $this->client->delete(\sprintf('/api/queues/%s/%s', \urlencode($this->vhost), \urlencode($name)));
     }
 
-    /**
-     * Get last message
-     *
-     * @param string $name
-     * @param int    $count
-     *
-     * @return array
-     */
     public function queueGetMessages(string $name, int $count): array
     {
         $data = [
@@ -182,12 +118,6 @@ class AmqpManagement
         return \json_decode((string) $response->getBody(), true);
     }
 
-    /**
-     * Create exchange
-     *
-     * @param string $type
-     * @param string $name
-     */
     public function createExchange(string $type, string $name): void
     {
         $data = [
@@ -212,11 +142,6 @@ class AmqpManagement
         );
     }
 
-    /**
-     * List exchanges
-     *
-     * @return array
-     */
     public function exchanges(): array
     {
         $response = $this->client->get(\sprintf('/api/exchanges/%s', \urlencode($this->vhost)));
@@ -224,13 +149,6 @@ class AmqpManagement
         return \json_decode((string) $response->getBody(), true);
     }
 
-    /**
-     * Get exchange by name
-     *
-     * @param string $name
-     *
-     * @return array
-     */
     public function exchangeByName(string $name): array
     {
         $exchanges = $this->exchanges();
@@ -247,13 +165,6 @@ class AmqpManagement
         ));
     }
 
-    /**
-     * Get exchange bindings
-     *
-     * @param string $name
-     *
-     * @return array
-     */
     public function exchangeBindings(string $name): array
     {
         $response = $this->client->get(\sprintf('/api/exchanges/%s/%s/bindings/destination', \urlencode($this->vhost), $name));
@@ -261,23 +172,11 @@ class AmqpManagement
         return \json_decode((string) $response->getBody(), true);
     }
 
-    /**
-     * Delete exchange
-     *
-     * @param string $name
-     */
     public function deleteExchange(string $name): void
     {
         $this->client->delete(\sprintf('/api/exchanges/%s/%s', \urlencode($this->vhost), \urlencode($name)));
     }
 
-    /**
-     * Publish message to exchange
-     *
-     * @param string $exchangeName
-     * @param string $routingKey
-     * @param string $payload
-     */
     public function publishMessage(string $exchangeName, string $routingKey, string $payload): void
     {
         $data = [

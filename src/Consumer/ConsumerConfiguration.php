@@ -16,27 +16,14 @@ namespace FiveLab\Component\Amqp\Consumer;
 use FiveLab\Component\Amqp\Consumer\Tag\ConsumerTagGeneratorInterface;
 use FiveLab\Component\Amqp\Consumer\Tag\EmptyConsumerTagGenerator;
 
-/**
- * The default configuration for consumers.
- */
 readonly class ConsumerConfiguration
 {
-    /**
-     * @var ConsumerTagGeneratorInterface
-     */
     public ConsumerTagGeneratorInterface $tagGenerator;
 
-    /**
-     * Constructor.
-     *
-     * @param bool                               $requeueOnError
-     * @param int                                $prefetchCount
-     * @param ConsumerTagGeneratorInterface|null $tagGenerator
-     */
     public function __construct(
-        public bool                   $requeueOnError = true,
-        public int                    $prefetchCount = 3,
-        ConsumerTagGeneratorInterface $tagGenerator = null
+        public bool                    $requeueOnError = true,
+        public int                     $prefetchCount = 3,
+        ?ConsumerTagGeneratorInterface $tagGenerator = null
     ) {
         $this->tagGenerator = $tagGenerator ?: new EmptyConsumerTagGenerator();
     }

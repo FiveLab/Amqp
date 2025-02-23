@@ -23,18 +23,10 @@ class EventableConsumerStub implements ConsumerInterface, EventableConsumerInter
 {
     use EventableConsumerTrait;
 
-    /**
-     * Constructor.
-     *
-     * @param QueueInterface $queue
-     */
     public function __construct(private QueueInterface $queue)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function run(): void
     {
         $this->triggerEvent(Event::StopAfterNExecutes);
@@ -42,9 +34,6 @@ class EventableConsumerStub implements ConsumerInterface, EventableConsumerInter
         $this->triggerEvent(Event::ChangeConsumer, 'foo');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getQueue(): QueueInterface
     {
         return $this->queue;

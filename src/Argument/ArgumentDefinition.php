@@ -13,22 +13,10 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Argument;
 
-/**
- * Argument definition
- */
 readonly class ArgumentDefinition
 {
-    /**
-     * @var string
-     */
     public string $name;
 
-    /**
-     * Constructor.
-     *
-     * @param string|\BackedEnum $name
-     * @param mixed              $value
-     */
     public function __construct(string|\BackedEnum $name, public mixed $value)
     {
         if ($name instanceof \BackedEnum) {

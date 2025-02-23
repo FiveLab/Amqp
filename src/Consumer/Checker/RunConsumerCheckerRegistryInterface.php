@@ -15,9 +15,6 @@ namespace FiveLab\Component\Amqp\Consumer\Checker;
 
 use FiveLab\Component\Amqp\Exception\RunConsumerCheckerNotFoundException;
 
-/**
- * All run consumer checker registries should implement this interface.
- */
 interface RunConsumerCheckerRegistryInterface
 {
     /**

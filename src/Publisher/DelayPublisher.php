@@ -16,24 +16,12 @@ namespace FiveLab\Component\Amqp\Publisher;
 use FiveLab\Component\Amqp\Message\DelayMessage;
 use FiveLab\Component\Amqp\Message\Message;
 
-/**
- * Publisher for publish messages to delay system
- */
-class DelayPublisher implements DelayPublisherInterface
+readonly class DelayPublisher implements DelayPublisherInterface
 {
-    /**
-     * Constructor.
-     *
-     * @param PublisherInterface $publisher
-     * @param string             $landfillRoutingKey
-     */
     public function __construct(private PublisherInterface $publisher, private string $landfillRoutingKey)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function publish(Message $message, string|\BackedEnum $routingKey = ''): void
     {
         if (\count(\func_get_args()) > 1) {

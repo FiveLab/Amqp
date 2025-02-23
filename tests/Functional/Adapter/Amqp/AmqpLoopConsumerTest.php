@@ -24,9 +24,6 @@ use FiveLab\Component\Amqp\Tests\Functional\Adapter\LoopConsumerTestCase;
 
 class AmqpLoopConsumerTest extends LoopConsumerTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function createQueueFactory(QueueDefinition $definition): QueueFactoryInterface
     {
         $connectionFactory = new AmqpConnectionFactory($this->getRabbitMqDsn(Driver::AmqpExt));

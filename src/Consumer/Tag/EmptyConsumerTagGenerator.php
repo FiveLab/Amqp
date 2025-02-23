@@ -13,14 +13,8 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Consumer\Tag;
 
-/**
- * Generate empty consumer tag
- */
 readonly class EmptyConsumerTagGenerator implements ConsumerTagGeneratorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function generate(): string
     {
         return '';

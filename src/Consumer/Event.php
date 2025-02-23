@@ -13,9 +13,6 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Consumer;
 
-/**
- * Specific events for consumers
- */
 enum Event
 {
     /**

@@ -16,9 +16,6 @@ namespace FiveLab\Component\Amqp\Publisher\Registry;
 use FiveLab\Component\Amqp\Exception\PublisherNotFoundException;
 use FiveLab\Component\Amqp\Publisher\PublisherInterface;
 
-/**
- * All publisher registry should implement this interface.
- */
 interface PublisherRegistryInterface
 {
     /**

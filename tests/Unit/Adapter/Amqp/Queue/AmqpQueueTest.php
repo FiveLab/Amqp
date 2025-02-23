@@ -22,24 +22,10 @@ use PHPUnit\Framework\TestCase;
 
 class AmqpQueueTest extends TestCase
 {
-    /**
-     * @var \AMQPQueue
-     */
     private \AMQPQueue $originQueue;
-
-    /**
-     * @var AmqpChannel
-     */
     private AmqpChannel $originChannel;
-
-    /**
-     * @var AmqpQueue
-     */
     private AmqpQueue $queue;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->originQueue = $this->createMock(\AMQPQueue::class);

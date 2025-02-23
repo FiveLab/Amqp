@@ -15,9 +15,6 @@ namespace FiveLab\Component\Amqp\Consumer\Handler;
 
 use FiveLab\Component\Amqp\Message\ReceivedMessages;
 
-/**
- * All message handlers for flushed consumers should implement this interface.
- */
 interface FlushableMessageHandlerInterface extends MessageHandlerInterface
 {
     /**

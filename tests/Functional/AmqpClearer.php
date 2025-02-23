@@ -13,38 +13,18 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Functional;
 
-/**
- * The service for clear RabbitMQ
- */
-class AmqpClearer
+readonly class AmqpClearer
 {
-    /**
-     * @var AmqpManagement
-     */
-    private AmqpManagement $management;
-
-    /**
-     * Constructor.
-     *
-     * @param AmqpManagement $management
-     */
-    public function __construct(AmqpManagement $management)
+    public function __construct(private AmqpManagement $management)
     {
-        $this->management = $management;
     }
 
-    /**
-     * Clear the AMQP
-     */
     public function clear(): void
     {
         $this->deleteQueues();
         $this->deleteExchanges();
     }
 
-    /**
-     * Delete queues
-     */
     private function deleteQueues(): void
     {
         $queues = $this->management->queues();
@@ -56,9 +36,6 @@ class AmqpClearer
         }
     }
 
-    /**
-     * Delete exchanges
-     */
     private function deleteExchanges(): void
     {
         $exchanges = $this->management->exchanges();

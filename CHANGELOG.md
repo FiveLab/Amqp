@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+v2.1.2
+------
+
+* Add support PHP 8.4 (remove all deprecations).
+
 v2.1.1
 ------
 

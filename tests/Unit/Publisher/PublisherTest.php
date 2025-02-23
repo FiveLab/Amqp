@@ -25,29 +25,11 @@ use PHPUnit\Framework\TestCase;
 
 class PublisherTest extends TestCase
 {
-    /**
-     * @var ExchangeInterface
-     */
     private ExchangeInterface $exchange;
-
-    /**
-     * @var ExchangeFactoryInterface
-     */
     private ExchangeFactoryInterface $exchangeFactory;
-
-    /**
-     * @var PublisherMiddlewares
-     */
     private PublisherMiddlewares $middlewares;
-
-    /**
-     * @var Publisher
-     */
     private Publisher $publisher;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->exchange = $this->createMock(ExchangeInterface::class);

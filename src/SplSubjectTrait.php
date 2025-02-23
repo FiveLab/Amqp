@@ -13,21 +13,13 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp;
 
-/**
- * A helper trait for implement \SplSubject
- */
 trait SplSubjectTrait
 {
     /**
-     * @var \SplObserver[]
+     * @var array<\SplObserver>
      */
     private array $observers = [];
 
-    /**
-     * Attach observer to subject
-     *
-     * @param \SplObserver $observer
-     */
     public function attach(\SplObserver $observer): void
     {
         $hash = \spl_object_hash($observer);
@@ -37,19 +29,11 @@ trait SplSubjectTrait
         }
     }
 
-    /**
-     * Detach observer from subject
-     *
-     * @param \SplObserver $observer
-     */
     public function detach(\SplObserver $observer): void
     {
         unset($this->observers[\spl_object_hash($observer)]);
     }
 
-    /**
-     * Notify all observables
-     */
     public function notify(): void
     {
         foreach ($this->observers as $observer) {

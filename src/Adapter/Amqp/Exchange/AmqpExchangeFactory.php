@@ -20,31 +20,16 @@ use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
 use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
 use FiveLab\Component\Amqp\Exchange\ExchangeInterface;
 
-/**
- * The factory for create exchanges provided via php-amqp extension.
- */
 class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
 {
-    /**
-     * @var AmqpExchange|null
-     */
     private ?AmqpExchange $exchange = null;
 
-    /**
-     * Constructor.
-     *
-     * @param ChannelFactoryInterface $channelFactory
-     * @param ExchangeDefinition      $definition
-     */
     public function __construct(
         private readonly ChannelFactoryInterface $channelFactory,
         private readonly ExchangeDefinition      $definition
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(): ExchangeInterface
     {
         if ($this->exchange) {
@@ -91,19 +76,11 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
         return $this->exchange;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function update(\SplSubject $subject): void
     {
         $this->exchange = null;
     }
 
-    /**
-     * Calculate flags for exchange
-     *
-     * @return int
-     */
     private function calculateFlagsForExchange(): int
     {
         $flags = AMQP_NOPARAM;

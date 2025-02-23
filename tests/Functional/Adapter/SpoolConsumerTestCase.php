@@ -31,19 +31,9 @@ use PHPUnit\Framework\Attributes\Test;
 
 abstract class SpoolConsumerTestCase extends RabbitMqTestCase
 {
-    /**
-     * @var QueueFactoryInterface
-     */
     private QueueFactoryInterface $queueFactory;
-
-    /**
-     * @var MessageHandlerMock
-     */
     private MessageHandlerMock $messageHandler;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -61,13 +51,6 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         $this->messageHandler = new MessageHandlerMock('');
     }
 
-    /**
-     * Create the queue factory
-     *
-     * @param QueueDefinition $definition
-     *
-     * @return QueueFactoryInterface
-     */
     abstract protected function createQueueFactory(QueueDefinition $definition): QueueFactoryInterface;
 
     #[Test]
@@ -472,9 +455,6 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public static function providePrefetchAndMessageCount(): array
     {
         return [
@@ -485,11 +465,6 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         ];
     }
 
-    /**
-     * Publish more messages
-     *
-     * @param int $messages
-     */
     private function publishMessages(int $messages): void
     {
         for ($i = 1; $i <= $messages; $i++) {
@@ -497,11 +472,6 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         }
     }
 
-    /**
-     * Publish message to broker
-     *
-     * @param string $payload
-     */
     private function publishMessage(string $payload = 'some payload'): void
     {
         $this->management->publishMessage('ex-spool', '', $payload);

@@ -15,9 +15,6 @@ namespace FiveLab\Component\Amqp\Publisher;
 
 use FiveLab\Component\Amqp\Message\Message;
 
-/**
- * The publisher with support savepoint functionality.
- */
 class SavepointPublisherDecorator implements SavepointPublisherInterface
 {
     /**
@@ -25,23 +22,12 @@ class SavepointPublisherDecorator implements SavepointPublisherInterface
      */
     private array $savepoints = [];
 
-    /**
-     * @var string
-     */
     private string $activeSavepoint = '';
 
-    /**
-     * Constructor.
-     *
-     * @param PublisherInterface $publisher
-     */
     public function __construct(private readonly PublisherInterface $publisher)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function publish(Message $message, string|\BackedEnum $routingKey = ''): void
     {
         if ($routingKey instanceof \BackedEnum) {
@@ -55,9 +41,6 @@ class SavepointPublisherDecorator implements SavepointPublisherInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function start(string $savepoint): void
     {
         if (\array_key_exists($savepoint, $this->savepoints)) {
@@ -71,9 +54,6 @@ class SavepointPublisherDecorator implements SavepointPublisherInterface
         $this->activeSavepoint = $savepoint;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function commit(string $savepoint, string $parentSavepoint): void
     {
         if (!\array_key_exists($savepoint, $this->savepoints)) {
@@ -98,9 +78,6 @@ class SavepointPublisherDecorator implements SavepointPublisherInterface
         unset($this->savepoints[$savepoint]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rollback(string $savepoint): void
     {
         if (!\array_key_exists($savepoint, $this->savepoints)) {
@@ -128,9 +105,6 @@ class SavepointPublisherDecorator implements SavepointPublisherInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function flush(): void
     {
         foreach ($this->savepoints as $messages) {

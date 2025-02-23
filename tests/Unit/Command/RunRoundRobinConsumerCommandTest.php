@@ -22,14 +22,8 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 class RunRoundRobinConsumerCommandTest extends TestCase
 {
-    /**
-     * @var RoundRobinConsumer
-     */
     private RoundRobinConsumer $consumer;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->consumer = $this->createMock(RoundRobinConsumer::class);

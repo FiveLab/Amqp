@@ -13,27 +13,11 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Binding\Definition;
 
-/**
- * The definition for describe queue bindings.
- */
 readonly class BindingDefinition
 {
-    /**
-     * @var string
-     */
     public string $exchangeName;
-
-    /**
-     * @var string
-     */
     public string $routingKey;
 
-    /**
-     * Constructor.
-     *
-     * @param string|\BackedEnum $exchangeName
-     * @param string|\BackedEnum $routingKey
-     */
     public function __construct(string|\BackedEnum $exchangeName, string|\BackedEnum $routingKey)
     {
         if ($exchangeName instanceof \BackedEnum) {

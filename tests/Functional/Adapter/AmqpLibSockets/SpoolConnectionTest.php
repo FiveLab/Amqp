@@ -20,9 +20,6 @@ use FiveLab\Component\Amqp\Tests\Functional\Adapter\AmqpLib\SpoolConnectionTest 
 
 class SpoolConnectionTest extends SpoolSocketsConnectionTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function createConnectionFactory(): ConnectionFactoryInterface
     {
         return new AmqpSocketsConnectionFactory($this->getRabbitMqDsn(Driver::AmqpSockets));

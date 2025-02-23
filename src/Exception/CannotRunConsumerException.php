@@ -13,9 +13,6 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Exception;
 
-/**
- * Throw this error if consumer can't be runned.
- */
 class CannotRunConsumerException extends \Exception
 {
 }

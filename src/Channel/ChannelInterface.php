@@ -15,9 +15,6 @@ namespace FiveLab\Component\Amqp\Channel;
 
 use FiveLab\Component\Amqp\Connection\ConnectionInterface;
 
-/**
- * All channels should implement this interface.
- */
 interface ChannelInterface
 {
     /**

@@ -20,24 +20,10 @@ use PHPUnit\Framework\TestCase;
 
 class AmqpChannelTest extends TestCase
 {
-    /**
-     * @var AmqpConnection
-     */
     private AmqpConnection $connection;
-
-    /**
-     * @var \AMQPChannel
-     */
     private \AMQPChannel $amqpChannel;
-
-    /**
-     * @var AmqpChannel
-     */
     private AmqpChannel $channel;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->connection = $this->createMock(AmqpConnection::class);

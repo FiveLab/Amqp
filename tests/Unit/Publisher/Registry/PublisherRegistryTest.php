@@ -21,14 +21,8 @@ use PHPUnit\Framework\TestCase;
 
 class PublisherRegistryTest extends TestCase
 {
-    /**
-     * @var PublisherRegistry
-     */
     private PublisherRegistry $registry;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->registry = new PublisherRegistry();

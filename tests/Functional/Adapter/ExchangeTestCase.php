@@ -26,23 +26,10 @@ use PHPUnit\Framework\Attributes\Test;
 
 abstract class ExchangeTestCase extends RabbitMqTestCase
 {
-    /**
-     * @var ExchangeInterface
-     */
     private ExchangeInterface $exchange;
 
-    /**
-     * Create exchange factory for testing
-     *
-     * @param ExchangeDefinition $definition
-     *
-     * @return ExchangeFactoryInterface
-     */
     abstract protected function createExchangeFactory(ExchangeDefinition $definition): ExchangeFactoryInterface;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -176,13 +163,6 @@ abstract class ExchangeTestCase extends RabbitMqTestCase
         self::assertEquals('guest', $retrieveMessage['properties']['user_id']);
     }
 
-    /**
-     * Publish message
-     *
-     * @param Message $message
-     *
-     * @return array
-     */
     private function publishMessage(Message $message): array
     {
         $this->exchange->publish($message, 'some');

@@ -17,18 +17,8 @@ use FiveLab\Component\Amqp\Message\Generator\MessageIdGeneratorInterface;
 use FiveLab\Component\Amqp\Message\Identifier;
 use FiveLab\Component\Amqp\Message\Message;
 
-/**
- * The middleware for add identifier to message.
- */
 readonly class AddIdentifierToMessageMiddleware implements PublisherMiddlewareInterface
 {
-    /**
-     * Constructor.
-     *
-     * @param MessageIdGeneratorInterface|null $messageIdGenerator
-     * @param string|null                      $appId
-     * @param string|null                      $userId
-     */
     public function __construct(
         private ?MessageIdGeneratorInterface $messageIdGenerator = null,
         private ?string                      $appId = null,
@@ -36,9 +26,6 @@ readonly class AddIdentifierToMessageMiddleware implements PublisherMiddlewareIn
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function handle(Message $message, callable $next, string $routingKey = ''): void
     {
         $identifier = $message->identifier;

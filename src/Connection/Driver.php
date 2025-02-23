@@ -13,9 +13,6 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Connection;
 
-/**
- * Driver for connection to RabbitMQ.
- */
 enum Driver: string
 {
     case AmqpExt = 'amqp';

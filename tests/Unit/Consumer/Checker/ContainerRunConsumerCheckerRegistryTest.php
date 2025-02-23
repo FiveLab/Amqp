@@ -27,14 +27,8 @@ class ContainerRunConsumerCheckerRegistryTest extends TestCase
      */
     private array $checkers;
 
-    /**
-     * @var ContainerRunConsumerCheckerRegistry
-     */
     private ContainerRunConsumerCheckerRegistry $registry;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->checkers = [

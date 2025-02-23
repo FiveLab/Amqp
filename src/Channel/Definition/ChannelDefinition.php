@@ -13,9 +13,6 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Channel\Definition;
 
-/**
- * The definition for describe channel.
- */
 readonly class ChannelDefinition
 {
 }

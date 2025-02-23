@@ -94,7 +94,7 @@ class ExchangeDefinitionTest extends TestCase
 
     #[Test]
     #[DataProvider('provideInvalidParametersForDefaultExchange')]
-    public function shouldFailCreateDefaultExchange(\Throwable $expectedException, string $type, bool $durable, bool $passive, ArgumentDefinitions $arguments = null, BindingDefinitions $bindings = null, BindingDefinitions $unbindings = null): void
+    public function shouldFailCreateDefaultExchange(\Throwable $expectedException, string $type, bool $durable, bool $passive, ?ArgumentDefinitions $arguments = null, ?BindingDefinitions $bindings = null, ?BindingDefinitions $unbindings = null): void
     {
         $this->expectException(\get_class($expectedException));
         $this->expectExceptionMessage($expectedException->getMessage());
@@ -102,11 +102,6 @@ class ExchangeDefinitionTest extends TestCase
         new ExchangeDefinition('', $type, $durable, $passive, $arguments, $bindings, $unbindings);
     }
 
-    /**
-     * Provide types
-     *
-     * @return array
-     */
     public static function provideExchangeTypes(): array
     {
         $exchanges = [
@@ -121,11 +116,6 @@ class ExchangeDefinitionTest extends TestCase
         }, $exchanges);
     }
 
-    /**
-     * Provide invalid parameters for create default exchange
-     *
-     * @return array
-     */
     public static function provideInvalidParametersForDefaultExchange(): array
     {
         return [

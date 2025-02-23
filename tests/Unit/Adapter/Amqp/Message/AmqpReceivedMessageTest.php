@@ -24,14 +24,8 @@ use PHPUnit\Framework\TestCase;
 
 class AmqpReceivedMessageTest extends TestCase
 {
-    /**
-     * @var \AMQPQueue
-     */
     private \AMQPQueue $queue;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->queue = $this->createMock(\AMQPQueue::class);
@@ -201,24 +195,6 @@ class AmqpReceivedMessageTest extends TestCase
         $receivedMessage->ack();
     }
 
-    /**
-     * Make received message for test.
-     *
-     * @param string|false $body
-     * @param array        $headers
-     * @param string       $routingKey
-     * @param string       $exchangeName
-     * @param int          $deliveryTag
-     * @param string       $contentType
-     * @param string|null  $contentEncoding
-     * @param int          $deliveryMode
-     * @param int|null     $expiration
-     * @param string|null  $messageId
-     * @param string|null  $appId
-     * @param string|null  $userId
-     *
-     * @return AmqpReceivedMessage
-     */
     private function makeReceivedMessage(
         string|false $body = '',
         array        $headers = [],
@@ -226,12 +202,12 @@ class AmqpReceivedMessageTest extends TestCase
         string       $exchangeName = '',
         int          $deliveryTag = 1,
         string       $contentType = 'text/plain',
-        string       $contentEncoding = null,
+        ?string      $contentEncoding = null,
         int          $deliveryMode = 1,
-        int          $expiration = null,
-        string       $messageId = null,
-        string       $appId = null,
-        string       $userId = null
+        ?int         $expiration = null,
+        ?string      $messageId = null,
+        ?string      $appId = null,
+        ?string      $userId = null
     ): AmqpReceivedMessage {
         $envelope = AmqpAdapterHelper::makeEnvelope(
             $this,

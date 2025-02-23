@@ -16,25 +16,12 @@ namespace FiveLab\Component\Amqp\Command;
 use FiveLab\Component\Amqp\Consumer\Event;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * Event handler for write help messages to output.
- */
 readonly class OutputEventHandler
 {
-    /**
-     * Constructor.
-     *
-     * @param OutputInterface $output
-     */
     public function __construct(private OutputInterface $output)
     {
     }
 
-    /**
-     * Handle event
-     *
-     * @param Event $event
-     */
     public function __invoke(Event $event): void
     {
         if (Event::ConsumerTimeout === $event) {

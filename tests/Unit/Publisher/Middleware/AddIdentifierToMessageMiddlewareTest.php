@@ -25,14 +25,8 @@ use PHPUnit\Framework\TestCase;
 
 class AddIdentifierToMessageMiddlewareTest extends TestCase
 {
-    /**
-     * @var MessageIdGeneratorInterface
-     */
     private MessageIdGeneratorInterface $messageIdGenerator;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->messageIdGenerator = $this->createMock(MessageIdGeneratorInterface::class);
@@ -136,15 +130,6 @@ class AddIdentifierToMessageMiddlewareTest extends TestCase
         self::assertTrue($executed, 'The next callable don\'t called.');
     }
 
-    /**
-     * Create next callable
-     *
-     * @param string  $expectedRoutingKey
-     * @param Message $expectedMessage
-     * @param bool    $executed
-     *
-     * @return callable
-     */
     private function createNextCallable(string $expectedRoutingKey, Message $expectedMessage, bool &$executed): callable
     {
         return static function (Message $message, string $routingKey) use ($expectedRoutingKey, $expectedMessage, &$executed) {
@@ -155,16 +140,7 @@ class AddIdentifierToMessageMiddlewareTest extends TestCase
         };
     }
 
-    /**
-     * Create a message
-     *
-     * @param string|null $messageId
-     * @param string|null $appId
-     * @param string|null $userId
-     *
-     * @return Message
-     */
-    private function createMessage(string $messageId = null, string $appId = null, string $userId = null): Message
+    private function createMessage(?string $messageId = null, ?string $appId = null, ?string $userId = null): Message
     {
         return new Message(
             new Payload('some'),

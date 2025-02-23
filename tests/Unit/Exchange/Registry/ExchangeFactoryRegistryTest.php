@@ -65,11 +65,6 @@ class ExchangeFactoryRegistryTest extends TestCase
         $registry->get('foo');
     }
 
-    /**
-     * Create unique factory
-     *
-     * @return ExchangeFactoryInterface
-     */
     private function createUniqueFactory(): ExchangeFactoryInterface
     {
         return $this->createMock(ExchangeFactoryInterface::class);

@@ -15,16 +15,8 @@ namespace FiveLab\Component\Amqp\Queue\Definition\Arguments;
 
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 
-/**
- * Definition for "x-dead-letter-routing-key" argument.
- */
 readonly class DeadLetterRoutingKeyArgument extends ArgumentDefinition
 {
-    /**
-     * Constructor.
-     *
-     * @param string $routingKey
-     */
     public function __construct(string $routingKey)
     {
         parent::__construct('x-dead-letter-routing-key', $routingKey);

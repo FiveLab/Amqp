@@ -38,42 +38,14 @@ use PHPUnit\Framework\Attributes\Test;
 
 abstract class SingleConsumerTestCase extends RabbitMqTestCase
 {
-    /**
-     * @var QueueFactoryInterface
-     */
     private QueueFactoryInterface $queueFactory;
-
-    /**
-     * @var QueueFactoryInterface
-     */
     private QueueFactoryInterface $proxyQueueFactory;
-
-    /**
-     * @var ExchangeFactoryRegistryInterface
-     */
     private ExchangeFactoryRegistryInterface $exchangeRegistry;
 
-    /**
-     * Create the queue factory
-     *
-     * @param QueueDefinition $definition
-     *
-     * @return QueueFactoryInterface
-     */
     abstract protected function createQueueFactory(QueueDefinition $definition): QueueFactoryInterface;
 
-    /**
-     * Create the exchange factory
-     *
-     * @param ExchangeDefinition $definition
-     *
-     * @return ExchangeFactoryInterface
-     */
     abstract protected function createProxyExchangeFactory(ExchangeDefinition $definition): ExchangeFactoryInterface;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -284,11 +256,6 @@ abstract class SingleConsumerTestCase extends RabbitMqTestCase
         $consumer->run();
     }
 
-    /**
-     * Run consumer
-     *
-     * @param SingleConsumer $consumer
-     */
     private function runConsumer(SingleConsumer $consumer): void
     {
         $consumer->getQueue()->getChannel()->getConnection()->setReadTimeout(1);

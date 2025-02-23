@@ -16,9 +16,6 @@ namespace FiveLab\Component\Amqp\Connection;
 use FiveLab\Component\Amqp\Exception\BadCredentialsException;
 use FiveLab\Component\Amqp\Exception\ConnectionException;
 
-/**
- * All connections should implement this interface.
- */
 interface ConnectionInterface extends \SplSubject
 {
     /**

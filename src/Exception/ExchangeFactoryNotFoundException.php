@@ -13,9 +13,6 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Exception;
 
-/**
- * Throw this exception if you want to get the exchange but the exchange was not found.
- */
 class ExchangeFactoryNotFoundException extends \Exception
 {
 }

@@ -24,9 +24,6 @@ use FiveLab\Component\Amqp\Tests\Functional\Adapter\ExchangeTestCase;
 
 class AmqpExchangeTest extends ExchangeTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function createExchangeFactory(ExchangeDefinition $definition): ExchangeFactoryInterface
     {
         $connectionFactory = new AmqpSocketsConnectionFactory($this->getRabbitMqDsn(Driver::AmqpSockets));

@@ -16,25 +16,12 @@ namespace FiveLab\Component\Amqp\Consumer\Middleware;
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * The middleware for debug received messages in console output.
- */
 readonly class ConsoleOutputMiddleware implements ConsumerMiddlewareInterface
 {
-    /**
-     * Constructor.
-     *
-     * @param OutputInterface $output
-     */
     public function __construct(private OutputInterface $output)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws \Throwable
-     */
     public function handle(ReceivedMessage $message, callable $next): void
     {
         if ($this->output->isDebug()) {
@@ -46,14 +33,6 @@ readonly class ConsoleOutputMiddleware implements ConsumerMiddlewareInterface
         }
     }
 
-    /**
-     * Verbose received message
-     *
-     * @param ReceivedMessage $message
-     * @param callable        $next
-     *
-     * @throws \Throwable
-     */
     private function verboseReceivedMessage(ReceivedMessage $message, callable $next): void
     {
         try {
@@ -77,14 +56,6 @@ readonly class ConsoleOutputMiddleware implements ConsumerMiddlewareInterface
         ));
     }
 
-    /**
-     * Full debug received message
-     *
-     * @param ReceivedMessage $message
-     * @param callable        $next
-     *
-     * @throws \Throwable
-     */
     private function fullDebugReceivedMessage(ReceivedMessage $message, callable $next): void
     {
         $this->output->writeln([
@@ -117,13 +88,6 @@ readonly class ConsoleOutputMiddleware implements ConsumerMiddlewareInterface
         ]);
     }
 
-    /**
-     * Format memory
-     *
-     * @param int $memory
-     *
-     * @return string
-     */
     private function formatMemory(int $memory): string
     {
         return match (true) {

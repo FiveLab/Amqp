@@ -16,9 +16,6 @@ namespace FiveLab\Component\Amqp\Queue\Registry;
 use FiveLab\Component\Amqp\Exception\QueueFactoryNotFoundException;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 
-/**
- * All queue factory registries should implement this interface.
- */
 interface QueueFactoryRegistryInterface
 {
     /**

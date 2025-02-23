@@ -16,9 +16,6 @@ namespace FiveLab\Component\Amqp\Consumer\Registry;
 use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
 use FiveLab\Component\Amqp\Exception\ConsumerNotFoundException;
 
-/**
- * All consumer registries should implement this interface.
- */
 interface ConsumerRegistryInterface
 {
     /**

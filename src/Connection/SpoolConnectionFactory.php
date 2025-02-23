@@ -17,31 +17,16 @@ use FiveLab\Component\Amqp\Adapter\Amqp\Connection\AmqpConnectionFactory as Amqp
 use FiveLab\Component\Amqp\Adapter\AmqpLib\Connection\AmqpConnectionFactory as AmqpLibConnectionFactory;
 use FiveLab\Component\Amqp\Adapter\AmqpLib\Connection\AmqpSocketsConnectionFactory;
 
-/**
- * The factory for make a SpoolConnection.
- */
 class SpoolConnectionFactory implements ConnectionFactoryInterface
 {
     /**
-     * @var array|ConnectionFactoryInterface[]
+     * @var array<ConnectionFactoryInterface>
      */
     private array $factories;
 
-    /**
-     * @var SpoolConnection|null
-     */
     private ?SpoolConnection $connection = null;
-
-    /**
-     * @var bool
-     */
     private bool $shuffleBeforeConnect = false;
 
-    /**
-     * Constructor.
-     *
-     * @param ConnectionFactoryInterface ...$factories
-     */
     public function __construct(ConnectionFactoryInterface ...$factories)
     {
         if (!\count($factories)) {
@@ -51,21 +36,11 @@ class SpoolConnectionFactory implements ConnectionFactoryInterface
         $this->factories = $factories;
     }
 
-    /**
-     * Mark for should shuffle connections before connect.
-     */
     public function shuffleBeforeConnect(): void
     {
         $this->shuffleBeforeConnect = true;
     }
 
-    /**
-     * Make spool connection factory based on dns.
-     *
-     * @param Dsn $dsn
-     *
-     * @return self
-     */
     public static function fromDsn(Dsn $dsn): self
     {
         $connectionFactoryClass = match ($dsn->driver) {
@@ -91,9 +66,6 @@ class SpoolConnectionFactory implements ConnectionFactoryInterface
         return $factory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(): ConnectionInterface
     {
         if ($this->connection) {

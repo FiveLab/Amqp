@@ -20,14 +20,8 @@ use PHPUnit\Framework\TestCase;
 
 class EventableConsumerTraitTest extends TestCase
 {
-    /**
-     * @var EventableConsumerStub
-     */
     private EventableConsumerStub $consumer;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $queue = $this->createMock(QueueInterface::class);

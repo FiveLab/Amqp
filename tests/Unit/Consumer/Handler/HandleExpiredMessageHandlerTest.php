@@ -28,24 +28,10 @@ use PHPUnit\Framework\TestCase;
 
 class HandleExpiredMessageHandlerTest extends TestCase
 {
-    /**
-     * @var PublisherRegistryInterface
-     */
     private PublisherRegistryInterface $publisherRegistry;
-
-    /**
-     * @var PublisherInterface
-     */
     private PublisherInterface $delayPublisher;
-
-    /**
-     * @var HandleExpiredMessageHandler
-     */
     private HandleExpiredMessageHandler $handler;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->publisherRegistry = $this->createMock(PublisherRegistryInterface::class);

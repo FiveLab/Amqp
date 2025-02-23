@@ -27,9 +27,6 @@ use FiveLab\Component\Amqp\Tests\Functional\Adapter\SingleConsumerTestCase;
 
 class AmqpSingleSingleConsumerTest extends SingleConsumerTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function createQueueFactory(QueueDefinition $definition): QueueFactoryInterface
     {
         $connectionFactory = new AmqpConnectionFactory($this->getRabbitMqDsn(Driver::AmqpExt, ['read_timeout' => 1]));
@@ -39,9 +36,6 @@ class AmqpSingleSingleConsumerTest extends SingleConsumerTestCase
         return new AmqpQueueFactory($channelFactory, $definition);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function createProxyExchangeFactory(ExchangeDefinition $definition): ExchangeFactoryInterface
     {
         $connectionFactory = new AmqpConnectionFactory($this->getRabbitMqDsn(Driver::AmqpExt, ['read_timeout' => 1]));

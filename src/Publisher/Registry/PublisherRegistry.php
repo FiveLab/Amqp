@@ -16,30 +16,18 @@ namespace FiveLab\Component\Amqp\Publisher\Registry;
 use FiveLab\Component\Amqp\Exception\PublisherNotFoundException;
 use FiveLab\Component\Amqp\Publisher\PublisherInterface;
 
-/**
- * Default publisher registry
- */
 class PublisherRegistry implements PublisherRegistryInterface
 {
     /**
-     * @var array|PublisherInterface[]
+     * @var array<PublisherInterface>
      */
     private array $publishers = [];
 
-    /**
-     * Add publisher to registry
-     *
-     * @param string             $key
-     * @param PublisherInterface $publisher
-     */
     public function add(string $key, PublisherInterface $publisher): void
     {
         $this->publishers[$key] = $publisher;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(string $key): PublisherInterface
     {
         if (!\array_key_exists($key, $this->publishers)) {

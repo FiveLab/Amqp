@@ -16,10 +16,6 @@ namespace FiveLab\Component\Amqp\Transactional;
 use FiveLab\Component\Amqp\Publisher\SavepointPublisherInterface;
 use FiveLab\Component\Transactional\AbstractTransactional;
 
-/**
- * Transactional layer based on savepoint publisher.
- * Flush all message on success commit.
- */
 class FlushSavepointPublisherTransactional extends AbstractTransactional
 {
     /**
@@ -27,23 +23,12 @@ class FlushSavepointPublisherTransactional extends AbstractTransactional
      */
     private array $keys = [];
 
-    /**
-     * @var int
-     */
     private int $nestingLevel = 0;
 
-    /**
-     * Constructor.
-     *
-     * @param SavepointPublisherInterface $publisher
-     */
     public function __construct(private readonly SavepointPublisherInterface $publisher)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function begin(): void
     {
         $this->nestingLevel++;
@@ -54,9 +39,6 @@ class FlushSavepointPublisherTransactional extends AbstractTransactional
         $this->publisher->start($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function commit(): void
     {
         $this->nestingLevel--;
@@ -71,9 +53,6 @@ class FlushSavepointPublisherTransactional extends AbstractTransactional
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rollback(): void
     {
         $this->nestingLevel--;

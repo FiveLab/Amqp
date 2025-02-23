@@ -16,28 +16,14 @@ namespace FiveLab\Component\Amqp\Transactional;
 use FiveLab\Component\Amqp\Channel\ChannelFactoryInterface;
 use FiveLab\Component\Transactional\AbstractTransactional;
 
-/**
- * Implement transactional layer based on our channel factory.
- */
 class AmqpTransactional extends AbstractTransactional
 {
-    /**
-     * @var int
-     */
     private int $nestingLevel = 0;
 
-    /**
-     * Constructor.
-     *
-     * @param ChannelFactoryInterface $channelFactory
-     */
     public function __construct(private readonly ChannelFactoryInterface $channelFactory)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function begin(): void
     {
         if (0 === $this->nestingLevel) {
@@ -49,9 +35,6 @@ class AmqpTransactional extends AbstractTransactional
         $this->nestingLevel++;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function commit(): void
     {
         $this->nestingLevel--;
@@ -67,9 +50,6 @@ class AmqpTransactional extends AbstractTransactional
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rollback(): void
     {
         $this->nestingLevel--;

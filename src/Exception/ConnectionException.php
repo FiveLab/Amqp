@@ -13,9 +13,6 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Exception;
 
-/**
- * Throw this exception if we can't connect to RabbitMQ.
- */
 class ConnectionException extends \Exception
 {
 }

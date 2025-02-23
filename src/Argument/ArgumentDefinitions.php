@@ -14,22 +14,15 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Argument;
 
 /**
- * The collection for store all arguments.
- *
  * @implements \IteratorAggregate<ArgumentDefinition>
  */
 class ArgumentDefinitions implements \IteratorAggregate, \Countable
 {
     /**
-     * @var ArgumentDefinition[]
+     * @var array<ArgumentDefinition>
      */
     private array $arguments;
 
-    /**
-     * Constructor.
-     *
-     * @param ArgumentDefinition ...$arguments
-     */
     public function __construct(ArgumentDefinition ...$arguments)
     {
         $this->arguments = $arguments;
@@ -40,14 +33,11 @@ class ArgumentDefinitions implements \IteratorAggregate, \Countable
      *
      * @return \ArrayIterator<int, ArgumentDefinition>
      */
-    public function getIterator(): \Traversable
+    public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator($this->arguments);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function count(): int
     {
         return \count($this->arguments);

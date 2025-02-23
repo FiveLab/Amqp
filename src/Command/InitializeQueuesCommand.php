@@ -19,25 +19,11 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * The command for initialize queues.
- */
 #[AsCommand(name: 'event-broker:initialize:queues', description: 'Initialize queues.')]
 class InitializeQueuesCommand extends Command
 {
-    /**
-     * @var string
-     */
     protected static $defaultName = 'event-broker:initialize:queues';
-
-    /**
-     * @var string
-     */
     protected static $defaultDescription = 'Initialize queues.';
-
-    /**
-     * @var QueueFactoryRegistryInterface
-     */
     private QueueFactoryRegistryInterface $registry;
 
     /**
@@ -59,18 +45,12 @@ class InitializeQueuesCommand extends Command
         $this->queues = $queues;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this
             ->setDescription(self::$defaultDescription);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         foreach ($this->queues as $queue) {

@@ -20,42 +20,24 @@ use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
 
-/**
- * The queue provided via php-amqp extension.
- */
 readonly class AmqpQueue implements QueueInterface
 {
-    /**
-     * Constructor.
-     *
-     * @param AmqpChannel $channel
-     * @param \AMQPQueue  $queue
-     */
     public function __construct(
         private AmqpChannel $channel,
         private \AMQPQueue  $queue
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getChannel(): ChannelInterface
     {
         return $this->channel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
-        return $this->queue->getName();
+        return (string) $this->queue->getName();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function consume(\Closure $handler, string $tag = ''): void
     {
         try {
@@ -73,17 +55,11 @@ readonly class AmqpQueue implements QueueInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function cancelConsumer(string $tag): void
     {
         $this->queue->cancel($tag);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(): ?ReceivedMessage
     {
         $envelope = $this->queue->get();
@@ -95,25 +71,16 @@ readonly class AmqpQueue implements QueueInterface
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function purge(): void
     {
         $this->queue->purge();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function delete(): void
     {
         $this->queue->delete();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function countMessages(): int
     {
         return $this->queue->declareQueue();

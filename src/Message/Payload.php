@@ -13,18 +13,8 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Message;
 
-/**
- * The value object for store payload.
- */
-class Payload
+readonly class Payload
 {
-    /**
-     * Constructor.
-     *
-     * @param string      $data
-     * @param string      $contentType
-     * @param string|null $contentEncoding
-     */
     public function __construct(
         public string  $data,
         public string  $contentType = 'text/plain',

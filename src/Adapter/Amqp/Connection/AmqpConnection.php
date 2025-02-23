@@ -18,35 +18,19 @@ use FiveLab\Component\Amqp\Exception\BadCredentialsException;
 use FiveLab\Component\Amqp\Exception\ConnectionException;
 use FiveLab\Component\Amqp\SplSubjectTrait;
 
-/**
- * The connection provided via php-amqp extension.
- */
 class AmqpConnection implements ConnectionInterface
 {
     use SplSubjectTrait;
 
-    /**
-     * Constructor.
-     *
-     * @param \AMQPConnection $connection
-     */
     public function __construct(private readonly \AMQPConnection $connection)
     {
     }
 
-    /**
-     * Get original connection
-     *
-     * @return \AMQPConnection
-     */
     public function getConnection(): \AMQPConnection
     {
         return $this->connection;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function connect(): void
     {
         try {
@@ -60,17 +44,11 @@ class AmqpConnection implements ConnectionInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isConnected(): bool
     {
         return $this->connection->isConnected();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function disconnect(): void
     {
         $this->connection->disconnect();
@@ -78,27 +56,17 @@ class AmqpConnection implements ConnectionInterface
         $this->notify();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reconnect(): void
     {
         $this->disconnect();
         $this->connect();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setReadTimeout(float $timeout): void
     {
-        // @phpstan-ignore-next-line
         $this->connection->setReadTimeout($timeout);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getReadTimeout(): float
     {
         return $this->connection->getReadTimeout();

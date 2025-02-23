@@ -20,31 +20,16 @@ use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
 
-/**
- * The factory for create queues provided via php-amqplib library.
- */
 class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
 {
-    /**
-     * @var AmqpQueue|null
-     */
     private ?AmqpQueue $queue = null;
 
-    /**
-     * Constructor.
-     *
-     * @param ChannelFactoryInterface $channelFactory
-     * @param QueueDefinition         $definition
-     */
     public function __construct(
         private readonly ChannelFactoryInterface $channelFactory,
         private readonly QueueDefinition         $definition
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(): QueueInterface
     {
         if ($this->queue) {
@@ -80,20 +65,11 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
         return $this->queue;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function update(\SplSubject $subject): void
     {
         $this->queue = null;
     }
 
-    /**
-     * Bind queue to route
-     *
-     * @param string $exchangeName
-     * @param string $routingKey
-     */
     private function bind(string $exchangeName, string $routingKey): void
     {
         /** @var AmqpChannel $channel */
@@ -102,12 +78,6 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
         $channel->getChannel()->queue_bind($this->definition->name, $exchangeName, $routingKey);
     }
 
-    /**
-     * Unbind queue from route
-     *
-     * @param string $exchangeName
-     * @param string $routingKey
-     */
     private function unbind(string $exchangeName, string $routingKey): void
     {
         /** @var AmqpChannel $channel */

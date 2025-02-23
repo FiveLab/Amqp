@@ -21,19 +21,9 @@ use PHPUnit\Framework\TestCase;
 
 abstract class RabbitMqTestCase extends TestCase
 {
-    /**
-     * @var AmqpManagement|null
-     */
     protected ?AmqpManagement $management = null;
-
-    /**
-     * @var AmqpClearer|null
-     */
     protected ?AmqpClearer $clearer = null;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         if (!$this->getRabbitMqHost()) {
@@ -51,9 +41,6 @@ abstract class RabbitMqTestCase extends TestCase
         $this->clearer = new AmqpClearer($this->management);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown(): void
     {
         $this->clearer->clear();
@@ -62,15 +49,7 @@ abstract class RabbitMqTestCase extends TestCase
         $this->clearer = null;
     }
 
-    /**
-     * Get RabbitMQ DSN
-     *
-     * @param Driver                    $driver
-     * @param array<string, mixed>|null $options
-     *
-     * @return Dsn
-     */
-    protected function getRabbitMqDsn(Driver $driver, array $options = null): Dsn
+    protected function getRabbitMqDsn(Driver $driver, ?array $options = null): Dsn
     {
         return new Dsn(
             $driver,
@@ -83,71 +62,36 @@ abstract class RabbitMqTestCase extends TestCase
         );
     }
 
-    /**
-     * Get the AMQP host
-     *
-     * @return string|null
-     */
     protected function getRabbitMqHost(): ?string
     {
         return \getenv('RABBITMQ_HOST') ?: null;
     }
 
-    /**
-     * Get rabbitmq port
-     *
-     * @return int
-     */
     protected function getRabbitMqPort(): int
     {
         return \getenv('RABBITMQ_PORT') ? (int) \getenv('RABBITMQ_PORT') : 5672;
     }
 
-    /**
-     * Get management port
-     *
-     * @return int
-     */
     protected function getRabbitMqManagementPort(): int
     {
         return \getenv('RABBITMQ_MANAGEMENT_PORT') ? (int) \getenv('RABBITMQ_MANAGEMENT_PORT') : 15672;
     }
 
-    /**
-     * Get rabbitmq vhost
-     *
-     * @return string
-     */
     protected function getRabbitMqVhost(): string
     {
         return \getenv('RABBITMQ_VHOST') ?: '/';
     }
 
-    /**
-     * Get rabbitmq login
-     *
-     * @return string
-     */
     protected function getRabbitMqLogin(): string
     {
         return \getenv('RABBITMQ_LOGIN') ?: 'guest';
     }
 
-    /**
-     * Get password for connect to rabbitmq
-     *
-     * @return string
-     */
     protected function getRabbitMqPassword(): string
     {
         return \getenv('RABBITMQ_PASSWORD') ?: 'guest';
     }
 
-    /**
-     * Assert what the queue is empty
-     *
-     * @param QueueFactoryInterface $queueFactory
-     */
     protected static function assertQueueEmpty(QueueFactoryInterface $queueFactory): void
     {
         $queue = $queueFactory->create();
@@ -156,12 +100,6 @@ abstract class RabbitMqTestCase extends TestCase
         self::assertNull($lastMessage, \sprintf('The queue %s is not empty.', $queue->getName()));
     }
 
-    /**
-     * Asset what the queue contain N messages
-     *
-     * @param QueueFactoryInterface $queueFactory
-     * @param int                   $countMessages
-     */
     protected static function assertQueueContainsCountMessages(QueueFactoryInterface $queueFactory, int $countMessages): void
     {
         $queue = $queueFactory->create();
@@ -180,13 +118,6 @@ abstract class RabbitMqTestCase extends TestCase
         ));
     }
 
-    /**
-     * Get all messages from queue
-     *
-     * @param QueueFactoryInterface $queueFactory
-     *
-     * @return array|ReceivedMessage[]
-     */
     protected function getAllMessagesFromQueue(QueueFactoryInterface $queueFactory): array
     {
         $queue = $queueFactory->create();
@@ -200,13 +131,6 @@ abstract class RabbitMqTestCase extends TestCase
         return $messages;
     }
 
-    /**
-     * Get last message from queue
-     *
-     * @param QueueFactoryInterface $queueFactory
-     *
-     * @return ReceivedMessage
-     */
     public function getLastMessageFromQueue(QueueFactoryInterface $queueFactory): ReceivedMessage
     {
         $queue = $queueFactory->create();
@@ -223,13 +147,6 @@ abstract class RabbitMqTestCase extends TestCase
         return $lastMessage;
     }
 
-    /**
-     * Assert what the queue has bindings
-     *
-     * @param array  $bindingsInfo
-     * @param string $expectedExchangeName
-     * @param string $expectedRoutingKey
-     */
     protected static function assertQueueBindingExists(array $bindingsInfo, string $expectedExchangeName, string $expectedRoutingKey): void
     {
         $entry = null;

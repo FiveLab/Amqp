@@ -13,9 +13,6 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Consumer\Tag;
 
-/**
- * All consumer tag generators should implement this interface.
- */
 interface ConsumerTagGeneratorInterface
 {
     /**

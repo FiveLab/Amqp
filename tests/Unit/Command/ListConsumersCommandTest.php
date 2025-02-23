@@ -21,19 +21,9 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 class ListConsumersCommandTest extends TestCase
 {
-    /**
-     * @var ArrayInput
-     */
     private ArrayInput $input;
-
-    /**
-     * @var BufferedOutput
-     */
     private BufferedOutput $output;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->input = new ArrayInput([]);

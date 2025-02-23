@@ -15,9 +15,6 @@ namespace FiveLab\Component\Amqp\Consumer\Middleware;
 
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
 
-/**
- * All middleware should implement this interface.
- */
 interface ConsumerMiddlewareInterface
 {
     /**

@@ -27,14 +27,8 @@ class ContainerConsumerRegistryTest extends TestCase
      */
     private array $consumers;
 
-    /**
-     * @var ContainerConsumerRegistry
-     */
     private ContainerConsumerRegistry $registry;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->consumers = [

@@ -23,19 +23,9 @@ use PHPUnit\Framework\TestCase;
 
 class SavepointPublisherTest extends TestCase
 {
-    /**
-     * @var PublisherInterface
-     */
     private PublisherInterface $originalPublisher;
-
-    /**
-     * @var SavepointPublisherDecorator
-     */
     private SavepointPublisherDecorator $publisher;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->originalPublisher = $this->createMock(PublisherInterface::class);

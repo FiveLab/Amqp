@@ -13,9 +13,6 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Exception;
 
-/**
- * Throw this exception if you want to getting the consumer from registry but the consumer was not found.
- */
 class ConsumerNotFoundException extends \Exception
 {
 }

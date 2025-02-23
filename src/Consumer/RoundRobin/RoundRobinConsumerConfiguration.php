@@ -13,18 +13,8 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Consumer\RoundRobin;
 
-/**
- * The model for configuration of round robin consumer.
- */
 readonly class RoundRobinConsumerConfiguration
 {
-    /**
-     * Constructor.
-     *
-     * @param int   $executesMessagesPerConsumer
-     * @param float $timeoutBetweenConsumers
-     * @param int   $timeout
-     */
     public function __construct(
         public int   $executesMessagesPerConsumer = 100,
         public float $timeoutBetweenConsumers = 10.0,

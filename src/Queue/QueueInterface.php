@@ -17,9 +17,6 @@ use FiveLab\Component\Amqp\Channel\ChannelInterface;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
 
-/**
- * All queues should implement this interface.
- */
 interface QueueInterface
 {
     /**

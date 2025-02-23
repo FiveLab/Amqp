@@ -20,18 +20,8 @@ use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Publisher\PublisherInterface;
 use FiveLab\Component\Amqp\Publisher\Registry\PublisherRegistryInterface;
 
-/**
- * The message handler for handle expired messages and retry or publish to target
- */
 readonly class HandleExpiredMessageHandler implements ThrowableMessageHandlerInterface
 {
-    /**
-     * Constructor.
-     *
-     * @param PublisherRegistryInterface $publisherRegistry
-     * @param PublisherInterface         $delayPublisher
-     * @param string                     $landfillRoutingKey
-     */
     public function __construct(
         private PublisherRegistryInterface $publisherRegistry,
         private PublisherInterface         $delayPublisher,
@@ -39,9 +29,6 @@ readonly class HandleExpiredMessageHandler implements ThrowableMessageHandlerInt
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(ReceivedMessage $message): bool
     {
         $headers = $message->headers;
@@ -70,9 +57,6 @@ readonly class HandleExpiredMessageHandler implements ThrowableMessageHandlerInt
         return $landfillRoutingKey === $this->landfillRoutingKey;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function handle(ReceivedMessage $message): void
     {
         $payload = $message->payload;
@@ -106,9 +90,6 @@ readonly class HandleExpiredMessageHandler implements ThrowableMessageHandlerInt
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function catchError(ReceivedMessage $message, \Throwable $error): void
     {
         // @todo: publish message to fallback

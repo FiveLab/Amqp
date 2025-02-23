@@ -14,22 +14,15 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Binding\Definition;
 
 /**
- * Collection for store all queue bindings.
- *
  * @implements \IteratorAggregate<BindingDefinition>
  */
 class BindingDefinitions implements \IteratorAggregate, \Countable
 {
     /**
-     * @var array|BindingDefinition[]
+     * @var array<BindingDefinition>
      */
     private array $bindings;
 
-    /**
-     * Constructor.
-     *
-     * @param BindingDefinition ...$bindings
-     */
     public function __construct(BindingDefinition ...$bindings)
     {
         $this->bindings = $bindings;
@@ -45,9 +38,6 @@ class BindingDefinitions implements \IteratorAggregate, \Countable
         return new \ArrayIterator($this->bindings);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function count(): int
     {
         return \count($this->bindings);

@@ -13,9 +13,6 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Channel;
 
-/**
- * All channels factories should implement this interface.
- */
 interface ChannelFactoryInterface
 {
     /**

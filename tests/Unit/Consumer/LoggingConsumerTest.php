@@ -24,24 +24,10 @@ use Psr\Log\LoggerInterface;
 
 class LoggingConsumerTest extends TestCase
 {
-    /**
-     * @var LoggerInterface
-     */
     private LoggerInterface $logger;
-
-    /**
-     * @var ConsumerInterface
-     */
     private ConsumerInterface $decoratedConsumer;
-
-    /**
-     * @var LoggingConsumer
-     */
     private LoggingConsumer $loggingConsumer;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $queue = $this->createMock(QueueInterface::class);

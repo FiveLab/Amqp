@@ -17,23 +17,12 @@ use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
 use FiveLab\Component\Amqp\Exception\ConsumerNotFoundException;
 use Psr\Container\ContainerInterface;
 
-/**
- * Consumer registry based on PSR container.
- */
 readonly class ContainerConsumerRegistry implements ConsumerRegistryInterface
 {
-    /**
-     * Constructor.
-     *
-     * @param ContainerInterface $container
-     */
     public function __construct(private ContainerInterface $container)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(string $key): ConsumerInterface
     {
         if (!$this->container->has($key)) {

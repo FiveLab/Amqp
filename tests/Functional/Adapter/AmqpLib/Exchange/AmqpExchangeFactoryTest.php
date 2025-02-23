@@ -26,9 +26,6 @@ use PHPUnit\Framework\Attributes\Test;
 
 class AmqpExchangeFactoryTest extends ExchangeFactoryTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function createExchangeFactory(ExchangeDefinition $definition): ExchangeFactoryInterface
     {
         $connectionFactory = new AmqpConnectionFactory($this->getRabbitMqDsn(Driver::AmqpLib));

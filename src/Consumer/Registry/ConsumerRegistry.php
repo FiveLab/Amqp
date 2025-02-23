@@ -16,30 +16,18 @@ namespace FiveLab\Component\Amqp\Consumer\Registry;
 use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
 use FiveLab\Component\Amqp\Exception\ConsumerNotFoundException;
 
-/**
- * Simple consumer registry
- */
 class ConsumerRegistry implements ConsumerRegistryInterface
 {
     /**
-     * @var array|ConsumerInterface[]
+     * @var array<ConsumerInterface>
      */
     private array $consumers = [];
 
-    /**
-     * Add consumer to registry
-     *
-     * @param string            $key
-     * @param ConsumerInterface $consumer
-     */
     public function add(string $key, ConsumerInterface $consumer): void
     {
         $this->consumers[$key] = $consumer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(string $key): ConsumerInterface
     {
         if (\array_key_exists($key, $this->consumers)) {

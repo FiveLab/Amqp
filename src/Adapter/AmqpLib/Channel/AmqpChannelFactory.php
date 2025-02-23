@@ -20,31 +20,16 @@ use FiveLab\Component\Amqp\Channel\Definition\ChannelDefinition;
 use FiveLab\Component\Amqp\Connection\ConnectionFactoryInterface;
 use FiveLab\Component\Amqp\Connection\SpoolConnection;
 
-/**
- * The factory for create channel provided via php-amqplib library.
- */
 class AmqpChannelFactory implements ChannelFactoryInterface, \SplObserver
 {
-    /**
-     * @var AmqpChannel|null
-     */
     private ?AmqpChannel $channel = null;
 
-    /**
-     * Constructor.
-     *
-     * @param ConnectionFactoryInterface $connectionFactory
-     * @param ChannelDefinition          $definition
-     */
     public function __construct(
         private readonly ConnectionFactoryInterface $connectionFactory,
         private readonly ChannelDefinition          $definition // @phpstan-ignore-line
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(): ChannelInterface
     {
         if ($this->channel) {
@@ -74,9 +59,6 @@ class AmqpChannelFactory implements ChannelFactoryInterface, \SplObserver
         return $this->channel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function update(\SplSubject $subject): void
     {
         $this->channel = null;

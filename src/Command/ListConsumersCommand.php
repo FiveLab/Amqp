@@ -18,20 +18,10 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * The command for list possible consumers.
- */
 #[AsCommand(name: 'event-broker:consumer:list', description: 'List of possible consumers.')]
 class ListConsumersCommand extends Command
 {
-    /**
-     * @var string
-     */
     protected static $defaultName = 'event-broker:consumer:list';
-
-    /**
-     * @var string
-     */
     protected static $defaultDescription = 'List of possible consumers.';
 
     /**
@@ -51,18 +41,12 @@ class ListConsumersCommand extends Command
         $this->consumers = $consumers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this
             ->setDescription(self::$defaultDescription);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('Possible consumers are:');

@@ -15,16 +15,8 @@ namespace FiveLab\Component\Amqp\Queue\Definition\Arguments;
 
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 
-/**
- * Definition for "x-max-priority" argument.
- */
 readonly class MaxPriorityArgument extends ArgumentDefinition
 {
-    /**
-     * Constructor.
-     *
-     * @param int $maxPriority
-     */
     public function __construct(int $maxPriority)
     {
         parent::__construct('x-max-priority', $maxPriority);

@@ -21,31 +21,16 @@ use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
 use FiveLab\Component\Amqp\Exchange\ExchangeInterface;
 use PhpAmqpLib\Wire\AMQPTable;
 
-/**
- * The factory for create exchanges provided via php-amqplib library.
- */
 class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
 {
-    /**
-     * @var AmqpExchange|null
-     */
     private ?AmqpExchange $exchange = null;
 
-    /**
-     * Constructor.
-     *
-     * @param ChannelFactoryInterface $channelFactory
-     * @param ExchangeDefinition      $definition
-     */
     public function __construct(
         private readonly ChannelFactoryInterface $channelFactory,
         private readonly ExchangeDefinition      $definition
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(): ExchangeInterface
     {
         if ($this->exchange) {
@@ -82,17 +67,11 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
         return $this->exchange;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function update(\SplSubject $subject): void
     {
         $this->exchange = null;
     }
 
-    /**
-     * Declares exchange (creates or validates existing one)
-     */
     private function declare(): void
     {
         $name = $this->definition->name;
@@ -123,12 +102,6 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
         );
     }
 
-    /**
-     * Bind to route key.
-     *
-     * @param string $exchangeName
-     * @param string $routingKey
-     */
     private function bind(string $exchangeName, string $routingKey): void
     {
         /** @var AmqpChannel $channel */
@@ -137,12 +110,6 @@ class AmqpExchangeFactory implements ExchangeFactoryInterface, \SplObserver
         $channel->getChannel()->exchange_bind($this->definition->name, $exchangeName, $routingKey);
     }
 
-    /**
-     * Unbind from route key.
-     *
-     * @param string $exchangeName
-     * @param string $routingKey
-     */
     private function unbind(string $exchangeName, string $routingKey): void
     {
         /** @var AmqpChannel $channel */

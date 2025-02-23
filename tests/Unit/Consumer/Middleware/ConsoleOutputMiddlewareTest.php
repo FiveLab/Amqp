@@ -187,16 +187,7 @@ EXPECTED;
         self::assertStringContainsString($expectedOutput, $actualOutput);
     }
 
-    /**
-     * Create received message
-     *
-     * @param string|null  $routingKey
-     * @param int|null     $deliveryTag
-     * @param Payload|null $payload
-     *
-     * @return ReceivedMessage
-     */
-    private function createMessage(string $routingKey = null, int $deliveryTag = null, Payload $payload = null): ReceivedMessage
+    private function createMessage(?string $routingKey = null, ?int $deliveryTag = null, ?Payload $payload = null): ReceivedMessage
     {
         return new ReceivedMessageStub(
             $payload ?: new Payload(''),

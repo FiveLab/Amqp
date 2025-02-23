@@ -13,9 +13,6 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Exception;
 
-/**
- * Throw this exception if you want get the queue factory but the factory was not found.
- */
 class QueueFactoryNotFoundException extends \Exception
 {
 }

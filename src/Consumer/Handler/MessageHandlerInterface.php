@@ -15,9 +15,6 @@ namespace FiveLab\Component\Amqp\Consumer\Handler;
 
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
 
-/**
- * All message handlers should implement this interface.
- */
 interface MessageHandlerInterface
 {
     /**

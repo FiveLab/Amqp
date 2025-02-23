@@ -18,29 +18,11 @@ use FiveLab\Component\Amqp\Message\ReceivedMessage;
 
 class ThrowableMessageHandlerMock extends MessageHandlerMock implements ThrowableMessageHandlerInterface
 {
-    /**
-     * @var \Throwable|null
-     */
     private ?\Throwable $shouldThrowException = null;
-
-    /**
-     * @var ReceivedMessage|null
-     */
     private ?ReceivedMessage $catchReceivedMessage = null;
-
-    /**
-     * @var \Throwable|null
-     */
     private ?\Throwable $catchError = null;
-
-    /**
-     * @var \Closure|null
-     */
     private ?\Closure $catchHandler = null;
 
-    /**
-     * {@inheritdoc}
-     */
     public function handle(ReceivedMessage $message): void
     {
         parent::handle($message);
@@ -50,9 +32,6 @@ class ThrowableMessageHandlerMock extends MessageHandlerMock implements Throwabl
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function catchError(ReceivedMessage $message, \Throwable $error): void
     {
         $this->catchError = $error;
@@ -63,41 +42,21 @@ class ThrowableMessageHandlerMock extends MessageHandlerMock implements Throwabl
         }
     }
 
-    /**
-     * Set exception
-     *
-     * @param \Throwable|null $exception
-     */
-    public function shouldThrowException(\Throwable $exception = null): void
+    public function shouldThrowException(?\Throwable $exception = null): void
     {
         $this->shouldThrowException = $exception;
     }
 
-    /**
-     * Add callback for catch error
-     *
-     * @param \Closure $closure
-     */
-    public function onCatchError(\Closure $closure): void
+    public function onCatchError(?\Closure $closure): void
     {
         $this->catchHandler = $closure;
     }
 
-    /**
-     * Get catch received message
-     *
-     * @return ReceivedMessage
-     */
     public function getCatchReceivedMessage(): ?ReceivedMessage
     {
         return $this->catchReceivedMessage;
     }
 
-    /**
-     * Get catch error
-     *
-     * @return \Throwable
-     */
     public function getCatchError(): ?\Throwable
     {
         return $this->catchError;

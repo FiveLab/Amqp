@@ -13,9 +13,6 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Exchange;
 
-/**
- * All exchange factories should implement this interface.
- */
 interface ExchangeFactoryInterface
 {
     /**

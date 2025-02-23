@@ -24,34 +24,19 @@ use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 
-/**
- * The queue provided via php-amqplib library.
- */
 readonly class AmqpQueue implements QueueInterface
 {
-    /**
-     * Constructor.
-     *
-     * @param AmqpChannel     $channel
-     * @param QueueDefinition $definition
-     */
     public function __construct(
         private AmqpChannel     $channel,
         private QueueDefinition $definition
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getChannel(): ChannelInterface
     {
         return $this->channel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function consume(\Closure $handler, string $tag = ''): void
     {
         $amqplibChannel = $this->channel->getChannel();
@@ -86,17 +71,11 @@ readonly class AmqpQueue implements QueueInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function cancelConsumer(string $tag): void
     {
         $this->channel->getChannel()->basic_cancel($tag);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(): ?ReceivedMessage
     {
         $message = $this->channel->getChannel()->basic_get($this->getName());
@@ -108,35 +87,21 @@ readonly class AmqpQueue implements QueueInterface
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function purge(): void
     {
         $this->channel->getChannel()->queue_purge($this->getName());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function delete(): void
     {
         $this->channel->getChannel()->queue_delete($this->getName());
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * Declares queue as a side-effect
-     */
     public function countMessages(): int
     {
         return $this->declare()[1] ?? 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return $this->definition->name;

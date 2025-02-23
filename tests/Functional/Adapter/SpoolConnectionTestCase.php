@@ -27,18 +27,8 @@ abstract class SpoolConnectionTestCase extends RabbitMqTestCase
     protected const EXCHANGE_CLASS = 'ExchangeClass';
     protected const QUEUE_CLASS    = 'QueueClass';
 
-    /**
-     * Create connection factory
-     *
-     * @return ConnectionFactoryInterface
-     */
     abstract protected function createConnectionFactory(): ConnectionFactoryInterface;
 
-    /**
-     * Get classes for make factories
-     *
-     * @return array
-     */
     abstract protected function getClasses(): array;
 
     #[Test]
@@ -99,11 +89,6 @@ abstract class SpoolConnectionTestCase extends RabbitMqTestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * Make spool connection factory
-     *
-     * @return SpoolConnectionFactory
-     */
     private function makeSpoolConnectionFactory(): SpoolConnectionFactory
     {
         return new SpoolConnectionFactory($this->createConnectionFactory());

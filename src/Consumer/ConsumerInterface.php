@@ -15,9 +15,6 @@ namespace FiveLab\Component\Amqp\Consumer;
 
 use FiveLab\Component\Amqp\Queue\QueueInterface;
 
-/**
- * All consumers should implement this interface.
- */
 interface ConsumerInterface
 {
     /**

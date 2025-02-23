@@ -20,31 +20,16 @@ use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
 
-/**
- * The factory for create queues provided via php-amqp extension.
- */
 class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
 {
-    /**
-     * @var AmqpQueue|null
-     */
     private ?AmqpQueue $queue = null;
 
-    /**
-     * Constructor.
-     *
-     * @param ChannelFactoryInterface $channelFactory
-     * @param QueueDefinition         $definition
-     */
     public function __construct(
         private readonly ChannelFactoryInterface $channelFactory,
         private readonly QueueDefinition         $definition
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(): QueueInterface
     {
         if ($this->queue) {
@@ -87,19 +72,11 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
         return $this->queue;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function update(\SplSubject $subject): void
     {
         $this->queue = null;
     }
 
-    /**
-     * Calculate flags for queue
-     *
-     * @return int
-     */
     private function calculateFlagsForQueue(): int
     {
         $flags = AMQP_NOPARAM;

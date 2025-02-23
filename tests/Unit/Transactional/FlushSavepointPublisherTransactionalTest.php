@@ -20,19 +20,9 @@ use PHPUnit\Framework\TestCase;
 
 class FlushSavepointPublisherTransactionalTest extends TestCase
 {
-    /**
-     * @var SavepointPublisherInterface
-     */
     private SavepointPublisherInterface $publisher;
-
-    /**
-     * @var FlushSavepointPublisherTransactional
-     */
     private FlushSavepointPublisherTransactional $transactional;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->publisher = $this->createMock(SavepointPublisherInterface::class);

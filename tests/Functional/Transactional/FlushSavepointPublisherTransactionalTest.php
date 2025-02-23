@@ -34,24 +34,10 @@ use PHPUnit\Framework\Attributes\Test;
 
 class FlushSavepointPublisherTransactionalTest extends RabbitMqTestCase
 {
-    /**
-     * @var AmqpQueueFactory
-     */
     private AmqpQueueFactory $queueFactory;
-
-    /**
-     * @var FlushSavepointPublisherTransactional
-     */
     private FlushSavepointPublisherTransactional $transactional;
-
-    /**
-     * @var SavepointPublisherDecorator
-     */
     private SavepointPublisherDecorator $savepointPublisher;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();

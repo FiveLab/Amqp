@@ -16,9 +16,6 @@ namespace FiveLab\Component\Amqp\Exchange\Registry;
 use FiveLab\Component\Amqp\Exception\ExchangeFactoryNotFoundException;
 use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
 
-/**
- * All exchange factory registries should implement this interface.
- */
 interface ExchangeFactoryRegistryInterface
 {
     /**

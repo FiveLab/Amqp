@@ -15,9 +15,6 @@ namespace FiveLab\Component\Amqp\Message;
 
 use FiveLab\Component\Amqp\Exception\HeaderNotFoundException;
 
-/**
- * Header collection.
- */
 readonly class Headers
 {
     /**
@@ -29,27 +26,11 @@ readonly class Headers
     {
     }
 
-    /**
-     * Has header?
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
     public function has(string $key): bool
     {
         return \array_key_exists($key, $this->headers);
     }
 
-    /**
-     * Get header
-     *
-     * @param string $key
-     *
-     * @return mixed
-     *
-     * @throws HeaderNotFoundException
-     */
     public function get(string $key): mixed
     {
         if (!\array_key_exists($key, $this->headers)) {

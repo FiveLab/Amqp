@@ -15,16 +15,8 @@ namespace FiveLab\Component\Amqp\Queue\Definition\Arguments;
 
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 
-/**
- * Definition for "x-queue-type" argument.
- */
 readonly class QueueTypeArgument extends ArgumentDefinition
 {
-    /**
-     * Constructor.
-     *
-     * @param string $type
-     */
     public function __construct(string $type)
     {
         $possibleTypes = [

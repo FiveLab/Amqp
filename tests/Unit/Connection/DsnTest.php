@@ -106,11 +106,6 @@ class DsnTest extends TestCase
         ], $dsn->options);
     }
 
-    /**
-     * Provide DSN for testing
-     *
-     * @return array
-     */
     public static function provideDsn(): array
     {
         return [

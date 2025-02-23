@@ -24,9 +24,6 @@ use FiveLab\Component\Amqp\Tests\Functional\Adapter\SpoolConsumerTestCase;
 
 class AmqpSpoolConsumerTest extends SpoolConsumerTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function createQueueFactory(QueueDefinition $definition): QueueFactoryInterface
     {
         $connectionFactory = new AmqpConnectionFactory($this->getRabbitMqDsn(Driver::AmqpLib));

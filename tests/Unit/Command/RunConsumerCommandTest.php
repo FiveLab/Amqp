@@ -37,34 +37,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class RunConsumerCommandTest extends TestCase
 {
-    /**
-     * @var ConsumerRegistryInterface
-     */
     private ConsumerRegistryInterface $registry;
-
-    /**
-     * @var RunConsumerCheckerRegistryInterface
-     */
     private RunConsumerCheckerRegistryInterface $checkerRegistry;
-
-    /**
-     * @var ConnectionInterface
-     */
     private ConnectionInterface $connection;
-
-    /**
-     * @var ChannelInterface
-     */
     private ChannelInterface $channel;
-
-    /**
-     * @var QueueInterface
-     */
     private QueueInterface $queue;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ConsumerRegistryInterface::class);

@@ -15,16 +15,8 @@ namespace FiveLab\Component\Amqp\Queue\Definition\Arguments;
 
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 
-/**
- * Definition for "x-max-length-bytes" argument.
- */
 readonly class MaxLengthBytesArgument extends ArgumentDefinition
 {
-    /**
-     * Constructor.
-     *
-     * @param int $size
-     */
     public function __construct(int $size)
     {
         parent::__construct('x-max-length-bytes', $size);

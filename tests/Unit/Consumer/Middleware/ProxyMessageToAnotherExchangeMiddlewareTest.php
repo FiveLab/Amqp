@@ -24,29 +24,11 @@ use PHPUnit\Framework\TestCase;
 
 class ProxyMessageToAnotherExchangeMiddlewareTest extends TestCase
 {
-    /**
-     * @var ExchangeFactoryRegistryInterface
-     */
     private ExchangeFactoryRegistryInterface $exchangeFactoryRegistry;
-
-    /**
-     * @var ExchangeFactoryInterface
-     */
     private ExchangeFactoryInterface $exchangeFactory;
-
-    /**
-     * @var ExchangeInterface
-     */
     private ExchangeInterface $exchange;
-
-    /**
-     * @var ProxyMessageToAnotherExchangeMiddleware
-     */
     private ProxyMessageToAnotherExchangeMiddleware $middleware;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->exchangeFactoryRegistry = $this->createMock(ExchangeFactoryRegistryInterface::class);

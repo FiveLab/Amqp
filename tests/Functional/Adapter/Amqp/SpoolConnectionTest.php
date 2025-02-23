@@ -23,17 +23,11 @@ use FiveLab\Component\Amqp\Tests\Functional\Adapter\SpoolConnectionTestCase;
 
 class SpoolConnectionTest extends SpoolConnectionTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function createConnectionFactory(): ConnectionFactoryInterface
     {
         return new AmqpConnectionFactory($this->getRabbitMqDsn(Driver::AmqpExt));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getClasses(): array
     {
         return [

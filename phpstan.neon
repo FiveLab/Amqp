@@ -2,3 +2,8 @@ parameters:
     level: 8
     paths:
         - src
+
+    ignoreErrors:
+        -
+            message: '#^Property FiveLab\\Component\\Amqp\\Command\\.+::\$(defaultName|defaultDescription) has no type specified.$#'
+            path: src/

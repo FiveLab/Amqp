@@ -26,9 +26,6 @@ use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Exception\StopAfterNExecutesException;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
 
-/**
- * Round robin consumer
- */
 class RoundRobinConsumer implements EventableConsumerInterface
 {
     use EventableConsumerTrait;
@@ -47,17 +44,11 @@ class RoundRobinConsumer implements EventableConsumerInterface
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getQueue(): QueueInterface
     {
         throw new \BadMethodCallException('Not supported in round robin.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function run(): void
     {
         $readTimeout = $this->configuration->timeoutBetweenConsumers;
@@ -69,7 +60,7 @@ class RoundRobinConsumer implements EventableConsumerInterface
         }, $this->consumers);
 
         foreach ($allConsumers as $consumer) {
-            if (!$consumer instanceof MiddlewareAwareInterface) {
+            if (!$consumer instanceof MiddlewareAwareInterface) { // @phpstan-ignore-line
                 throw new \InvalidArgumentException(\sprintf(
                     'All consumers in round robin should implement %s.',
                     MiddlewareAwareInterface::class

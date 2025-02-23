@@ -29,45 +29,22 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * The command for run consumer.
- */
 #[AsCommand(name: 'event-broker:consumer:run', description: 'Run consumer.')]
 class RunConsumerCommand extends Command
 {
-    /**
-     * @var string
-     */
     protected static $defaultName = 'event-broker:consumer:run';
-
-    /**
-     * @var string
-     */
     protected static $defaultDescription = 'Run consumer.';
-
-    /**
-     * @var RunConsumerCheckerRegistryInterface
-     */
     private readonly RunConsumerCheckerRegistryInterface $runCheckerRegistry;
 
-    /**
-     * Constructor.
-     *
-     * @param ConsumerRegistryInterface                $consumerRegistry
-     * @param RunConsumerCheckerRegistryInterface|null $runCheckerRegistry
-     */
     public function __construct(
         private readonly ConsumerRegistryInterface $consumerRegistry,
-        RunConsumerCheckerRegistryInterface        $runCheckerRegistry = null
+        ?RunConsumerCheckerRegistryInterface       $runCheckerRegistry = null
     ) {
         parent::__construct();
 
         $this->runCheckerRegistry = $runCheckerRegistry ?: new RunConsumerCheckerRegistry();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this
@@ -79,9 +56,6 @@ class RunConsumerCommand extends Command
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Check if consumer can be run.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $consumerKey = (string) $input->getArgument('key');
@@ -141,12 +115,6 @@ class RunConsumerCommand extends Command
         return 0;
     }
 
-    /**
-     * Run consumer in loop.
-     *
-     * @param ConsumerInterface $consumer
-     * @param OutputInterface   $output
-     */
     private function runInLoop(ConsumerInterface $consumer, OutputInterface $output): void
     {
         while (true) { // @phpstan-ignore-line
