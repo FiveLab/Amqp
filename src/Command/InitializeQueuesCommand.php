@@ -22,8 +22,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'event-broker:initialize:queues', description: 'Initialize queues.')]
 class InitializeQueuesCommand extends Command
 {
-    protected static $defaultName = 'event-broker:initialize:queues';
-    protected static $defaultDescription = 'Initialize queues.';
     private QueueFactoryRegistryInterface $registry;
 
     /**
@@ -43,12 +41,6 @@ class InitializeQueuesCommand extends Command
 
         $this->registry = $registry;
         $this->queues = $queues;
-    }
-
-    protected function configure(): void
-    {
-        $this
-            ->setDescription(self::$defaultDescription);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

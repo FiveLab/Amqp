@@ -30,6 +30,11 @@ readonly class LoggingConsumer implements ConsumerInterface, MiddlewareAwareInte
         return $this->decoratedConsumer->getQueue();
     }
 
+    public function stop(): void
+    {
+        $this->decoratedConsumer->stop();
+    }
+
     public function run(): void
     {
         $this->logger->info(\sprintf(

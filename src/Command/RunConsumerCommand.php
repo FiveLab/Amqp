@@ -20,21 +20,20 @@ use FiveLab\Component\Amqp\Consumer\EventableConsumerInterface;
 use FiveLab\Component\Amqp\Consumer\Middleware\StopAfterNExecutesMiddleware;
 use FiveLab\Component\Amqp\Consumer\MiddlewareAwareInterface;
 use FiveLab\Component\Amqp\Consumer\Registry\ConsumerRegistryInterface;
-use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Exception\RunConsumerCheckerNotFoundException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(name: 'event-broker:consumer:run', description: 'Run consumer.')]
-class RunConsumerCommand extends Command
+class RunConsumerCommand extends Command implements SignalableCommandInterface
 {
-    protected static $defaultName = 'event-broker:consumer:run';
-    protected static $defaultDescription = 'Run consumer.';
     private readonly RunConsumerCheckerRegistryInterface $runCheckerRegistry;
+    private ?ConsumerInterface $consumer = null;
 
     public function __construct(
         private readonly ConsumerRegistryInterface $consumerRegistry,
@@ -45,13 +44,32 @@ class RunConsumerCommand extends Command
         $this->runCheckerRegistry = $runCheckerRegistry ?: new RunConsumerCheckerRegistry();
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return array<int>
+     */
+    public function getSubscribedSignals(): array
+    {
+        if (!\function_exists('pcntl_signal')) {
+            return [];
+        }
+
+        return [SIGINT, SIGTERM];
+    }
+
+    public function handleSignal(int $signal, false|int $previousExitCode = 0): int|false
+    {
+        $this->consumer?->stop();
+
+        return false;
+    }
+
     protected function configure(): void
     {
         $this
-            ->setDescription(self::$defaultDescription)
             ->addArgument('key', InputArgument::REQUIRED, 'The key of consumer.')
             ->addOption('read-timeout', null, InputOption::VALUE_REQUIRED, 'Set the read timeout for RabbitMQ.')
-            ->addOption('loop', null, InputOption::VALUE_NONE, 'Loop consume (used only with read-timeout).')
             ->addOption('messages', null, InputOption::VALUE_REQUIRED, 'After process number of messages process be normal exits.')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Check if consumer can be run.');
     }
@@ -74,62 +92,35 @@ class RunConsumerCommand extends Command
             // Normal flow. Checker not found.
         }
 
-        $consumer = $this->consumerRegistry->get($consumerKey);
+        $this->consumer = $this->consumerRegistry->get($consumerKey);
 
-        if ($consumer instanceof EventableConsumerInterface) {
+        if ($this->consumer instanceof EventableConsumerInterface) {
             $closure = (new OutputEventHandler($output))(...);
 
-            $consumer->addEventHandler($closure);
-        }
-
-        // Verify input parameters
-        if ($input->getOption('loop') && !$input->getOption('read-timeout')) {
-            throw new \InvalidArgumentException('The "read-timeout" is required for loop consume.');
+            $this->consumer->addEventHandler($closure);
         }
 
         if ($input->getOption('messages')) {
-            if (!$consumer instanceof MiddlewareAwareInterface) {
+            if (!$this->consumer instanceof MiddlewareAwareInterface) {
                 throw new \InvalidArgumentException(\sprintf(
                     'For set number of messages customer must implement "%s", but "%s" given.',
                     MiddlewareAwareInterface::class,
-                    \get_class($consumer)
+                    \get_class($this->consumer)
                 ));
             }
 
-            $consumer->pushMiddleware(new StopAfterNExecutesMiddleware((int) $input->getOption('messages')));
+            $this->consumer->pushMiddleware(new StopAfterNExecutesMiddleware((int) $input->getOption('messages')));
         }
 
         if ($input->getOption('read-timeout')) {
             $readTimeout = (int) $input->getOption('read-timeout');
 
-            $consumer->getQueue()->getChannel()->getConnection()
+            $this->consumer->getQueue()->getChannel()->getConnection()
                 ->setReadTimeout($readTimeout);
-
-            if ($input->getOption('loop')) {
-                $this->runInLoop($consumer, $output);
-            }
         }
 
-        $consumer->run();
+        $this->consumer->run();
 
         return 0;
-    }
-
-    private function runInLoop(ConsumerInterface $consumer, OutputInterface $output): void
-    {
-        while (true) { // @phpstan-ignore-line
-            try {
-                $consumer->run();
-            } catch (ConsumerTimeoutExceedException) {
-                // Reconnect
-                $connection = $consumer->getQueue()->getChannel()->getConnection();
-                $connection->reconnect();
-
-                $output->writeln(
-                    '<error>Receive consumer timeout exceed error.</error> Run in loop mode <comment>--read-timeout --loop</comment>, reconnect...',
-                    OutputInterface::VERBOSITY_VERBOSE
-                );
-            }
-        }
     }
 }

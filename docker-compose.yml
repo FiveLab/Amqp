@@ -1,0 +1,26 @@
+services:
+    rabbitmq:
+        image: rabbitmq:management
+        container_name: fivelab-amqp-rabbitmq
+        ports:
+            - '15672:15672'
+        networks:
+            - amqp
+
+    amqp:
+        build:
+            dockerfile: Dockerfile
+            context: .
+        container_name: fivelab-amqp-php
+        tty: true
+        volumes:
+            - './:/code'
+        environment:
+            RABBITMQ_HOST: fivelab-amqp-rabbitmq
+        networks:
+            - amqp
+
+networks:
+    amqp:
+        name: fivelab-amqp
+        driver: bridge

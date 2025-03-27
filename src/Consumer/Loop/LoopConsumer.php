@@ -22,8 +22,10 @@ use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlers;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareInterface;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
 use FiveLab\Component\Amqp\Consumer\MiddlewareAwareInterface;
+use FiveLab\Component\Amqp\Consumer\Strategy\DefaultConsumeStrategy;
+use FiveLab\Component\Amqp\Consumer\Strategy\ConsumeStrategyInterface;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
-use FiveLab\Component\Amqp\Exception\StopAfterNExecutesException;
+use FiveLab\Component\Amqp\Exception\StopConsumingException;
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
@@ -33,15 +35,19 @@ class LoopConsumer implements EventableConsumerInterface, MiddlewareAwareInterfa
     use EventableConsumerTrait;
 
     private readonly MessageHandlers $messageHandler;
+    private readonly ConsumeStrategyInterface $strategy;
     private bool $throwConsumerTimeoutExceededException = false;
+    private bool $stopConsuming = false;
 
     public function __construct(
         private readonly QueueFactoryInterface     $queueFactory,
         MessageHandlerInterface                    $messageHandler,
         private readonly ConsumerMiddlewares       $middlewares,
-        private readonly LoopConsumerConfiguration $configuration
+        private readonly LoopConsumerConfiguration $configuration,
+        ?ConsumeStrategyInterface                  $strategy = null
     ) {
         $this->messageHandler = $messageHandler instanceof MessageHandlers ? $messageHandler : new MessageHandlers($messageHandler);
+        $this->strategy = $strategy ?: new DefaultConsumeStrategy();
     }
 
     public function throwExceptionOnConsumerTimeoutExceed(): void
@@ -59,19 +65,30 @@ class LoopConsumer implements EventableConsumerInterface, MiddlewareAwareInterfa
         return $this->queueFactory->create();
     }
 
+    public function stop(): void
+    {
+        $this->stopConsuming = true;
+
+        $this->strategy->stopConsume();
+    }
+
     public function run(): void
     {
         $executable = $this->middlewares->createExecutable(function (ReceivedMessage $message) {
             $this->messageHandler->handle($message);
         });
 
-        while (true) {
+        $this->stopConsuming = false;
+
+        while (!$this->stopConsuming) {
             $channel = $this->queueFactory->create()->getChannel();
 
             $this->configureBeforeConsume($channel);
 
             try {
-                $this->queueFactory->create()->consume(function (ReceivedMessage $message) use ($executable) {
+                $queue = $this->queueFactory->create();
+
+                $this->strategy->consume($queue, function (ReceivedMessage $message) use ($executable) {
                     try {
                         $executable($message);
                     } catch (ConsumerTimeoutExceedException $error) {
@@ -80,7 +97,7 @@ class LoopConsumer implements EventableConsumerInterface, MiddlewareAwareInterfa
                         $message->ack();
 
                         throw $error;
-                    } catch (StopAfterNExecutesException $error) {
+                    } catch (StopConsumingException $error) {
                         // We must stop after N executes. In this case we success process message.
                         if (!$message->isAnswered()) {
                             $message->ack();
@@ -111,11 +128,11 @@ class LoopConsumer implements EventableConsumerInterface, MiddlewareAwareInterfa
                 if ($this->throwConsumerTimeoutExceededException) {
                     throw $e;
                 }
-            } catch (StopAfterNExecutesException $error) {
+            } catch (StopConsumingException) {
                 // Disconnect, because inner system can has buffer for sending to amqp service.
                 $channel->getConnection()->disconnect();
 
-                $this->triggerEvent(Event::StopAfterNExecutes);
+                $this->triggerEvent(Event::StopConsuming);
 
                 return;
             } catch (\Throwable $e) {

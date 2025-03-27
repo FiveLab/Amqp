@@ -28,4 +28,9 @@ interface ConsumerInterface
      * Run consumer.
      */
     public function run(): void;
+
+    /**
+     * Stop consumer.
+     */
+    public function stop(): void;
 }

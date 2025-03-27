@@ -21,9 +21,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'event-broker:consumer:list', description: 'List of possible consumers.')]
 class ListConsumersCommand extends Command
 {
-    protected static $defaultName = 'event-broker:consumer:list';
-    protected static $defaultDescription = 'List of possible consumers.';
-
     /**
      * @var array<string>
      */
@@ -39,12 +36,6 @@ class ListConsumersCommand extends Command
         parent::__construct();
 
         $this->consumers = $consumers;
-    }
-
-    protected function configure(): void
-    {
-        $this
-            ->setDescription(self::$defaultDescription);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

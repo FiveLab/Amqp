@@ -24,18 +24,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'event-broker:consumer:round-robin', description: 'Run round robin consumer.')]
 class RunRoundRobinConsumerCommand extends Command
 {
-    protected static $defaultName = 'event-broker:consumer:round-robin';
-    protected static $defaultDescription = 'Run round robin consumer.';
-
     public function __construct(private readonly RoundRobinConsumer $consumer)
     {
         parent::__construct();
-    }
-
-    protected function configure(): void
-    {
-        $this
-            ->setDescription(self::$defaultDescription);
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output): void

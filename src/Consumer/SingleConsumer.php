@@ -17,7 +17,9 @@ use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlerInterface;
 use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlers;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareInterface;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
-use FiveLab\Component\Amqp\Exception\StopAfterNExecutesException;
+use FiveLab\Component\Amqp\Consumer\Strategy\DefaultConsumeStrategy;
+use FiveLab\Component\Amqp\Consumer\Strategy\ConsumeStrategyInterface;
+use FiveLab\Component\Amqp\Exception\StopConsumingException;
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
@@ -27,14 +29,17 @@ class SingleConsumer implements EventableConsumerInterface, MiddlewareAwareInter
     use EventableConsumerTrait;
 
     private readonly MessageHandlers $messageHandler;
+    private readonly ConsumeStrategyInterface $strategy;
 
     public function __construct(
         private readonly QueueFactoryInterface $queueFactory,
         MessageHandlerInterface                $messageHandler,
         private readonly ConsumerMiddlewares   $middlewares,
-        private readonly ConsumerConfiguration $configuration
+        private readonly ConsumerConfiguration $configuration,
+        ?ConsumeStrategyInterface              $strategy = null
     ) {
         $this->messageHandler = $messageHandler instanceof MessageHandlers ? $messageHandler : new MessageHandlers($messageHandler);
+        $this->strategy = $strategy ?: new DefaultConsumeStrategy();
     }
 
     public function getQueue(): QueueInterface
@@ -45,6 +50,11 @@ class SingleConsumer implements EventableConsumerInterface, MiddlewareAwareInter
     public function pushMiddleware(ConsumerMiddlewareInterface $middleware): void
     {
         $this->middlewares->push($middleware);
+    }
+
+    public function stop(): void
+    {
+        $this->strategy->stopConsume();
     }
 
     public function run(): void
@@ -58,10 +68,10 @@ class SingleConsumer implements EventableConsumerInterface, MiddlewareAwareInter
         });
 
         try {
-            $queue->consume(function (ReceivedMessage $message) use ($executable) {
+            $this->strategy->consume($queue, function (ReceivedMessage $message) use ($executable) {
                 try {
                     $executable($message);
-                } catch (StopAfterNExecutesException $error) {
+                } catch (StopConsumingException $error) {
                     // We must stop after N executes. In this case we ack message and exit from loop.
                     if (!$message->isAnswered()) {
                         $message->ack();
@@ -79,10 +89,10 @@ class SingleConsumer implements EventableConsumerInterface, MiddlewareAwareInter
                     $message->ack();
                 }
             }, $this->configuration->tagGenerator->generate());
-        } catch (StopAfterNExecutesException) {
+        } catch (StopConsumingException) {
             $queue->getChannel()->getConnection()->disconnect();
 
-            $this->triggerEvent(Event::StopAfterNExecutes);
+            $this->triggerEvent(Event::StopConsuming);
 
             // Normal flow. Exit from loop.
             return;

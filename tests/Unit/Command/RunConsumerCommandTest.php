@@ -25,7 +25,6 @@ use FiveLab\Component\Amqp\Consumer\EventableConsumerInterface;
 use FiveLab\Component\Amqp\Consumer\Middleware\StopAfterNExecutesMiddleware;
 use FiveLab\Component\Amqp\Consumer\Registry\ConsumerRegistryInterface;
 use FiveLab\Component\Amqp\Exception\CannotRunConsumerException;
-use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Exception\RunConsumerCheckerNotFoundException;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
 use PHPUnit\Framework\Attributes\Test;
@@ -61,31 +60,23 @@ class RunConsumerCommandTest extends TestCase
     }
 
     #[Test]
-    public function shouldFailRunIfLoopPassedWithoutReadTimeout(): void
+    public function shouldSuccessGetSubscribedSignals(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "read-timeout" is required for loop consume.');
-
-        $consumer = $this->createMock(ConsumerInterface::class);
-
-        $this->registry->expects(self::once())
-            ->method('get')
-            ->with('some')
-            ->willReturn($consumer);
-
-        $consumer->expects(self::never())
-            ->method('run');
-
         $command = new RunConsumerCommand($this->registry);
 
-        $input = new ArrayInput([
-            'key'    => 'some',
-            '--loop' => true,
-        ]);
+        $signals = $command->getSubscribedSignals();
 
-        $output = new BufferedOutput();
+        self::assertEquals([\SIGINT, \SIGTERM], $signals);
+    }
 
-        $command->run($input, $output);
+    #[Test]
+    public function shouldSuccessHandleSignal(): void
+    {
+        $command = new RunConsumerCommand($this->registry);
+
+        $result = $command->handleSignal(\SIGINT);
+
+        self::assertFalse($result);
     }
 
     #[Test]
@@ -102,10 +93,10 @@ class RunConsumerCommandTest extends TestCase
     {
         $consumer = $this->createMock(ConsumerInterface::class);
 
-        $consumer->expects(self::once())
+        $consumer->expects($this->once())
             ->method('run');
 
-        $this->registry->expects(self::once())
+        $this->registry->expects($this->once())
             ->method('get')
             ->with('some')
             ->willReturn($consumer);
@@ -128,21 +119,21 @@ class RunConsumerCommandTest extends TestCase
     {
         $consumer = $this->createMock(EventableConsumerInterface::class);
 
-        $consumer->expects(self::once())
+        $consumer->expects($this->once())
             ->method('addEventHandler')
             ->with(self::callback(function (mixed $arg) {
                 self::assertInstanceOf(\Closure::class, $arg);
 
                 $arg(Event::ConsumerTimeout);
-                $arg(Event::StopAfterNExecutes);
+                $arg(Event::StopConsuming);
 
                 return true;
             }));
 
-        $consumer->expects(self::once())
+        $consumer->expects($this->once())
             ->method('run');
 
-        $this->registry->expects(self::once())
+        $this->registry->expects($this->once())
             ->method('get')
             ->with('some')
             ->willReturn($consumer);
@@ -172,18 +163,18 @@ class RunConsumerCommandTest extends TestCase
     {
         $consumer = $this->createMock(ConsumerInterface::class);
 
-        $consumer->expects(self::once())
+        $consumer->expects($this->once())
             ->method('run');
 
-        $consumer->expects(self::once())
+        $consumer->expects($this->once())
             ->method('getQueue')
             ->willReturn($this->queue);
 
-        $this->connection->expects(self::once())
+        $this->connection->expects($this->once())
             ->method('setReadTimeout')
             ->with(5);
 
-        $this->registry->expects(self::once())
+        $this->registry->expects($this->once())
             ->method('get')
             ->with('some')
             ->willReturn($consumer);
@@ -203,14 +194,14 @@ class RunConsumerCommandTest extends TestCase
     {
         $consumer = $this->createMock(ConsumerWithMiddlewaresInterface::class);
 
-        $consumer->expects(self::once())
+        $consumer->expects($this->once())
             ->method('run');
 
-        $consumer->expects(self::once())
+        $consumer->expects($this->once())
             ->method('pushMiddleware')
             ->with(new StopAfterNExecutesMiddleware(10));
 
-        $this->registry->expects(self::once())
+        $this->registry->expects($this->once())
             ->method('get')
             ->with('some')
             ->willReturn($consumer);
@@ -223,65 +214,6 @@ class RunConsumerCommandTest extends TestCase
         ]);
 
         $command->run($input, new BufferedOutput());
-    }
-
-    #[Test]
-    #[TestWith([true])]
-    #[TestWith([false])]
-    public function shouldSuccessExecuteInLoopWithReadTimeout(bool $verbose): void
-    {
-        $consumer = $this->createMock(ConsumerInterface::class);
-
-        $executes = 0;
-
-        $consumer->expects(self::exactly(3))
-            ->method('run')
-            ->willReturnCallback(function () use (&$executes) {
-                $executes++;
-
-                if (3 === $executes) {
-                    throw new \RuntimeException('some');
-                }
-
-                throw new ConsumerTimeoutExceedException();
-            });
-
-        $consumer->expects(self::any())
-            ->method('getQueue')
-            ->willReturn($this->queue);
-
-        $this->connection->expects(self::once())
-            ->method('setReadTimeout')
-            ->with(5);
-
-        $this->registry->expects(self::once())
-            ->method('get')
-            ->with('some')
-            ->willReturn($consumer);
-
-        $command = new RunConsumerCommand($this->registry);
-
-        $input = new ArrayInput([
-            'key'            => 'some',
-            '--read-timeout' => 5,
-            '--loop'         => true,
-        ]);
-
-        $output = new BufferedOutput($verbose ? OutputInterface::VERBOSITY_VERBOSE : OutputInterface::VERBOSITY_NORMAL);
-
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('some');
-
-        try {
-            $command->run($input, $output);
-        } catch (\Throwable $error) {
-            if ($verbose) {
-                $expectedBuffer = \str_repeat('Receive consumer timeout exceed error. Run in loop mode --read-timeout --loop, reconnect...'.PHP_EOL, 2);
-                self::assertEquals($expectedBuffer, $output->fetch());
-            }
-
-            throw $error;
-        }
     }
 
     #[Test]
@@ -373,7 +305,7 @@ class RunConsumerCommandTest extends TestCase
     {
         $checker = $this->createMock(RunConsumerCheckerInterface::class);
 
-        $matcher = $checker->expects(self::once())
+        $matcher = $checker->expects($this->once())
             ->method('checkBeforeRun')
             ->with($key);
 
@@ -381,7 +313,7 @@ class RunConsumerCommandTest extends TestCase
             $matcher->willThrowException($error);
         }
 
-        $this->checkerRegistry->expects(self::once())
+        $this->checkerRegistry->expects($this->once())
             ->method('get')
             ->with($key)
             ->willReturn($checker);

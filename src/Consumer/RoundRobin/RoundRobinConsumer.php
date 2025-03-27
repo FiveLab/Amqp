@@ -23,12 +23,14 @@ use FiveLab\Component\Amqp\Consumer\MiddlewareAwareInterface;
 use FiveLab\Component\Amqp\Consumer\Registry\ConsumerRegistryInterface;
 use FiveLab\Component\Amqp\Consumer\Spool\SpoolConsumer;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
-use FiveLab\Component\Amqp\Exception\StopAfterNExecutesException;
+use FiveLab\Component\Amqp\Exception\StopConsumingException;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
 
 class RoundRobinConsumer implements EventableConsumerInterface
 {
     use EventableConsumerTrait;
+
+    private bool $stopConsuming = false;
 
     /**
      * Constructor.
@@ -47,6 +49,17 @@ class RoundRobinConsumer implements EventableConsumerInterface
     public function getQueue(): QueueInterface
     {
         throw new \BadMethodCallException('Not supported in round robin.');
+    }
+
+    public function stop(): void
+    {
+        $this->stopConsuming = true;
+
+        foreach ($this->consumers as $consumerName) {
+            $consumer = $this->consumerRegistry->get($consumerName);
+
+            $consumer->stop();
+        }
     }
 
     public function run(): void
@@ -87,12 +100,12 @@ class RoundRobinConsumer implements EventableConsumerInterface
             $consumers = $allConsumers;
 
             /** @var ConsumerInterface $consumer */
-            while ($consumer = \array_shift($consumers)) {
+            while (!$this->stopConsuming && $consumer = \array_shift($consumers)) {
                 $this->triggerEvent(Event::ChangeConsumer, $consumer);
 
                 try {
                     $consumer->run();
-                } catch (StopAfterNExecutesException|ConsumerTimeoutExceedException $e) {
+                } catch (StopConsumingException|ConsumerTimeoutExceedException $e) {
                     // Normal flow. We should run next consumer.
                 }
 

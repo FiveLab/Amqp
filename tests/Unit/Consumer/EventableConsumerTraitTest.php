@@ -48,7 +48,7 @@ class EventableConsumerTraitTest extends TestCase
         $this->consumer->run();
 
         self::assertEquals([
-            [Event::StopAfterNExecutes, []],
+            [Event::StopConsuming, []],
             [Event::ConsumerTimeout, []],
             [Event::ChangeConsumer, ['foo']],
         ], $calls);
@@ -71,13 +71,13 @@ class EventableConsumerTraitTest extends TestCase
         $this->consumer->run();
 
         self::assertEquals([
-            [Event::StopAfterNExecutes, []],
+            [Event::StopConsuming, []],
             [Event::ConsumerTimeout, []],
             [Event::ChangeConsumer, ['foo']],
         ], $firstCalls);
 
         self::assertEquals([
-            [Event::StopAfterNExecutes, []],
+            [Event::StopConsuming, []],
             [Event::ConsumerTimeout, []],
             [Event::ChangeConsumer, ['foo']],
         ], $secondCalls);
@@ -102,7 +102,7 @@ class EventableConsumerTraitTest extends TestCase
         self::assertEquals([], $firstCalls);
 
         self::assertEquals([
-            [Event::StopAfterNExecutes, []],
+            [Event::StopConsuming, []],
             [Event::ConsumerTimeout, []],
             [Event::ChangeConsumer, ['foo']],
         ], $secondCalls);
@@ -122,7 +122,7 @@ class EventableConsumerTraitTest extends TestCase
         $this->consumer->run();
 
         self::assertEquals([
-            [Event::StopAfterNExecutes, []],
+            [Event::StopConsuming, []],
             [Event::ConsumerTimeout, []],
             [Event::ChangeConsumer, ['foo']],
         ], $calls);

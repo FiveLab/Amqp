@@ -18,11 +18,14 @@ use FiveLab\Component\Amqp\Consumer\Event;
 use FiveLab\Component\Amqp\Consumer\EventableConsumerInterface;
 use FiveLab\Component\Amqp\Consumer\EventableConsumerTrait;
 use FiveLab\Component\Amqp\Consumer\Handler\FlushableMessageHandlerInterface;
+use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlers;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareInterface;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
 use FiveLab\Component\Amqp\Consumer\MiddlewareAwareInterface;
+use FiveLab\Component\Amqp\Consumer\Strategy\DefaultConsumeStrategy;
+use FiveLab\Component\Amqp\Consumer\Strategy\ConsumeStrategyInterface;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
-use FiveLab\Component\Amqp\Exception\StopAfterNExecutesException;
+use FiveLab\Component\Amqp\Exception\StopConsumingException;
 use FiveLab\Component\Amqp\Message\MutableReceivedMessages;
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
@@ -37,14 +40,20 @@ class SpoolConsumer implements EventableConsumerInterface, MiddlewareAwareInterf
 {
     use EventableConsumerTrait;
 
+    private readonly FlushableMessageHandlerInterface $messageHandler;
+    private readonly ConsumeStrategyInterface $strategy;
     private bool $throwConsumerTimeoutExceededException = false;
+    private bool $stopConsuming = false;
 
     public function __construct(
-        private readonly QueueFactoryInterface            $queueFactory,
-        private readonly FlushableMessageHandlerInterface $messageHandler,
-        private readonly ConsumerMiddlewares              $middlewares,
-        private readonly SpoolConsumerConfiguration       $configuration
+        private readonly QueueFactoryInterface      $queueFactory,
+        FlushableMessageHandlerInterface            $messageHandler,
+        private readonly ConsumerMiddlewares        $middlewares,
+        private readonly SpoolConsumerConfiguration $configuration,
+        ?ConsumeStrategyInterface                   $strategy = null
     ) {
+        $this->messageHandler = $messageHandler instanceof MessageHandlers ? $messageHandler : new MessageHandlers($messageHandler);
+        $this->strategy = $strategy ?: new DefaultConsumeStrategy();
     }
 
     public function throwExceptionOnConsumerTimeoutExceed(): void
@@ -62,13 +71,22 @@ class SpoolConsumer implements EventableConsumerInterface, MiddlewareAwareInterf
         return $this->queueFactory->create();
     }
 
+    public function stop(): void
+    {
+        $this->stopConsuming = true;
+
+        $this->strategy->stopConsume();
+    }
+
     public function run(): void
     {
         $executable = $this->middlewares->createExecutable(function (ReceivedMessage $message) {
             $this->messageHandler->handle($message);
         });
 
-        while (true) {
+        $this->stopConsuming = false;
+
+        while (!$this->stopConsuming) {
             $channel = $this->queueFactory->create()->getChannel();
 
             $this->configureBeforeConsume($channel);
@@ -79,7 +97,7 @@ class SpoolConsumer implements EventableConsumerInterface, MiddlewareAwareInterf
             try {
                 $countOfProcessedMessages = 0;
 
-                $this->queueFactory->create()->consume(function (ReceivedMessage $message) use ($executable, $receivedMessages, &$endTime, &$countOfProcessedMessages) {
+                $this->strategy->consume($this->queueFactory->create(), function (ReceivedMessage $message) use ($executable, $receivedMessages, &$endTime, &$countOfProcessedMessages) {
                     try {
                         $executable($message);
                     } catch (ConsumerTimeoutExceedException $error) {
@@ -90,8 +108,8 @@ class SpoolConsumer implements EventableConsumerInterface, MiddlewareAwareInterf
                         $receivedMessages->push($message);
 
                         throw $error;
-                    } catch (StopAfterNExecutesException $error) {
-                        // We must stop after N executes. In this case we flush all messages and exit from loop.
+                    } catch (StopConsumingException $error) {
+                        // Stop executing. In this case we flush all messages and exit from loop.
                         $receivedMessages->push($message);
 
                         throw $error;
@@ -130,7 +148,16 @@ class SpoolConsumer implements EventableConsumerInterface, MiddlewareAwareInterf
                         $this->flushMessages($receivedMessages);
                         $endTime = \microtime(true) + $this->configuration->timeout;
                     }
+
+                    if ($this->stopConsuming) {
+                        throw new StopConsumingException();
+                    }
                 }, $this->configuration->tagGenerator->generate());
+
+                // Maybe stop consuming
+                if (\count($receivedMessages)) {
+                    $this->flushMessages($receivedMessages);
+                }
             } catch (ConsumerTimeoutExceedException $e) {
                 $this->flushMessages($receivedMessages);
 
@@ -146,14 +173,14 @@ class SpoolConsumer implements EventableConsumerInterface, MiddlewareAwareInterf
                 if ($this->throwConsumerTimeoutExceededException) {
                     throw $e;
                 }
-            } catch (StopAfterNExecutesException) {
+            } catch (StopConsumingException) {
                 // We must stop next loop.
                 $this->flushMessages($receivedMessages);
 
                 // We must reconnect to broker because client don't return messages to queue on failed.
                 $channel->getConnection()->disconnect();
 
-                $this->triggerEvent(Event::StopAfterNExecutes);
+                $this->triggerEvent(Event::StopConsuming);
 
                 return;
             } catch (\Throwable $e) {

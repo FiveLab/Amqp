@@ -44,7 +44,7 @@ readonly class AmqpQueue implements QueueInterface
             $this->queue->consume(function (\AMQPEnvelope $envelope) use ($handler) {
                 $receivedMessage = new AmqpReceivedMessage($this->queue, $envelope);
 
-                $handler($receivedMessage);
+                return $handler($receivedMessage);
             }, AMQP_NOPARAM, $tag);
         } catch (\AMQPQueueException $e) {
             if (false !== \stripos($e->getMessage(), 'consumer timeout exceed')) {

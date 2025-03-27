@@ -29,7 +29,7 @@ class EventableConsumerStub implements ConsumerInterface, EventableConsumerInter
 
     public function run(): void
     {
-        $this->triggerEvent(Event::StopAfterNExecutes);
+        $this->triggerEvent(Event::StopConsuming);
         $this->triggerEvent(Event::ConsumerTimeout);
         $this->triggerEvent(Event::ChangeConsumer, 'foo');
     }
@@ -37,5 +37,10 @@ class EventableConsumerStub implements ConsumerInterface, EventableConsumerInter
     public function getQueue(): QueueInterface
     {
         return $this->queue;
+    }
+
+    public function stop(): void
+    {
+        // TODO: Implement stop() method.
     }
 }

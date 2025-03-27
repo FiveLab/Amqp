@@ -13,6 +13,6 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Exception;
 
-class StopAfterNExecutesException extends StopConsumingException
+class StopConsumingException extends \Exception
 {
 }

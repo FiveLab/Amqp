@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
 <ruleset name="FiveLab Tests code standard">
+    <exclude-pattern>tests/Consumers/*</exclude-pattern>
+
     <rule ref="../src/phpcs-ruleset.xml">
         <exclude name="Zend.NamingConventions.ValidVariableName.MemberVarContainsNumbers"/>
 

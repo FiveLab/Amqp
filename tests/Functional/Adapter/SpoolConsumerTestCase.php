@@ -279,7 +279,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         $consumer->throwExceptionOnConsumerTimeoutExceed();
 
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('The message handler "FiveLab\Component\Amqp\Tests\Functional\Consumer\Handler\MessageHandlerMock" is flushable and can\'t directly answering to broker on handle message.');
+        $this->expectExceptionMessage('The message handler "FiveLab\Component\Amqp\Consumer\Handler\MessageHandlers" is flushable and can\'t directly answering to broker on handle message.');
 
         try {
             $consumer->run();

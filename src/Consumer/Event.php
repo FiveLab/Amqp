@@ -21,9 +21,9 @@ enum Event
     case ConsumerTimeout;
 
     /**
-     * Use in all consumers and handle after we stop consumer after N executes.
+     * Use in all consumers and handle after we stop consumer after N executes or stop consuming.
      */
-    case StopAfterNExecutes;
+    case StopConsuming;
 
     /**
      * Use in round-robin consumer.

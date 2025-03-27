@@ -33,7 +33,7 @@ class OutputEventHandlerTest extends TestCase
 
     #[Test]
     #[TestWith([Event::ConsumerTimeout, '<error>Receive consumer timeout exceed error.</error>'])]
-    #[TestWith([Event::StopAfterNExecutes, '<error>Stop consumer after N executes.</error>'])]
+    #[TestWith([Event::StopConsuming, '<error>Stop consumer after N executes.</error>'])]
     #[TestWith([Event::ChangeConsumer, false])]
     public function shouldSuccessInvoke(Event $event, string|false $expectedStr): void
     {

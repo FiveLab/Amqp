@@ -22,8 +22,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'event-broker:initialize:exchanges', description: 'Initialize exchanges.')]
 class InitializeExchangesCommand extends Command
 {
-    protected static $defaultName = 'event-broker:initialize:exchanges';
-    protected static $defaultDescription = 'Initialize exchanges.';
     private ExchangeFactoryRegistryInterface $registry;
 
     /**
@@ -43,12 +41,6 @@ class InitializeExchangesCommand extends Command
 
         $this->registry = $registry;
         $this->exchanges = $exchanges;
-    }
-
-    protected function configure(): void
-    {
-        $this
-            ->setDescription(self::$defaultDescription);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

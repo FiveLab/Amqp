@@ -1,6 +1,6 @@
 FROM php:8.4-cli
 
-MAINTAINER Vitalii Zhuk <v.zhuk@fivelab.org>
+LABEL org.opencontainers.image.authors="Vitalii Zhuk <v.zhuk@fivelab.org>"
 
 ARG XDEBUG_REMOTE_HOST='host.docker.internal'
 ARG XDEBUG_REMOTE_PORT=9000
@@ -19,7 +19,7 @@ RUN \
         librabbitmq-dev && \
     printf '\n' | pecl install amqp && \
     yes | pecl install xdebug && \
-    docker-php-ext-install sockets && \
+    docker-php-ext-install sockets pcntl && \
     docker-php-ext-enable amqp xdebug
 
 # Configure XDebug

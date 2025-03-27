@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+Next release
+------------
+
+* Set minimum Symfony version to 6.4
+* Remove `--loop` option. Use `LoopConsumer` instead.
+* Add consume strategy (`Default` and `Loop`).
+
 v2.1.3
 ------
 
@@ -15,7 +22,7 @@ v2.1.1
 ------
 
 * Add queue name to `ReceivedMessage`.
-* Add method `ReceivedMessage::isDirectPublisher` for check, is message direct published to queue (via default exchange).
+* Add method `ReceivedMessage::isDirectPublished` for check, is message direct published to queue (via default exchange).
 
 v2.1.0
 ------
