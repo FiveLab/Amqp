@@ -37,6 +37,10 @@ class RunRoundRobinConsumerCommand extends Command implements SignalableCommandI
      */
     public function getSubscribedSignals(): array
     {
+        if (!\function_exists('pcntl_signal')) {
+            return [];
+        }
+
         return [
             \SIGINT,
             \SIGTERM,
