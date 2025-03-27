@@ -1,8 +1,8 @@
 CHANGELOG
 =========
 
-Next release
-------------
+v2.2.0
+------
 
 * Set minimum Symfony version to 6.4
 * Remove `--loop` option. Use `LoopConsumer` instead.
