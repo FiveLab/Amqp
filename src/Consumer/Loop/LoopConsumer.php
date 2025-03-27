@@ -18,6 +18,7 @@ use FiveLab\Component\Amqp\Consumer\Event;
 use FiveLab\Component\Amqp\Consumer\EventableConsumerInterface;
 use FiveLab\Component\Amqp\Consumer\EventableConsumerTrait;
 use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlerInterface;
+use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlers;
 use FiveLab\Component\Amqp\Consumer\Handler\ThrowableMessageHandlerInterface;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareInterface;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
@@ -32,14 +33,16 @@ class LoopConsumer implements EventableConsumerInterface, MiddlewareAwareInterfa
 {
     use EventableConsumerTrait;
 
+    private readonly MessageHandlers $messageHandler;
     private bool $throwConsumerTimeoutExceededException = false;
 
     public function __construct(
         private readonly QueueFactoryInterface     $queueFactory,
-        private readonly MessageHandlerInterface   $messageHandler,
+        MessageHandlerInterface                    $messageHandler,
         private readonly ConsumerMiddlewares       $middlewares,
         private readonly LoopConsumerConfiguration $configuration
     ) {
+        $this->messageHandler = $messageHandler instanceof MessageHandlers ? $messageHandler : new MessageHandlers($messageHandler);
     }
 
     public function throwExceptionOnConsumerTimeoutExceed(): void
@@ -86,17 +89,6 @@ class LoopConsumer implements EventableConsumerInterface, MiddlewareAwareInterfa
 
                         throw $error;
                     } catch (\Throwable $e) {
-                        if ($this->messageHandler instanceof ThrowableMessageHandlerInterface) {
-                            $this->messageHandler->catchError($message, $e);
-
-                            if (!$message->isAnswered()) {
-                                // The error handler can manually answered to broker.
-                                $message->ack();
-                            }
-
-                            return;
-                        }
-
                         $message->nack($this->configuration->requeueOnError);
 
                         throw $e;

@@ -18,7 +18,7 @@ use FiveLab\Component\Amqp\Message\ReceivedMessage;
 
 /**
  * Middleware for stop execution after N iteration.
- * Critical: consumer must ack to nack received message.
+ * Critical: consumer must confirm or not confirm received message.
  */
 class StopAfterNExecutesMiddleware implements ConsumerMiddlewareInterface
 {

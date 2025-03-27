@@ -225,6 +225,7 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
         self::assertEquals([
             'x-queue-master-locator' => 'random',
             'x-queue-mode'           => 'default',
+            'x-queue-type'           => 'classic',
         ], $arguments);
     }
 

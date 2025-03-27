@@ -246,12 +246,12 @@ abstract class SingleConsumerTestCase extends RabbitMqTestCase
     public function shouldThrowExceptionIfMessageHandlerNotSupported(): void
     {
         $this->expectException(MessageHandlerNotSupportedException::class);
-        $this->expectExceptionMessage('Not found supported message handler.');
+        $this->expectExceptionMessage('Not any message handler supports for message in queue "some" from "test.direct" exchange by "test" routing key.');
 
         $handler = new MessageHandlerMock('foo-bar');
-        $chainHandler = new MessageHandlers($handler);
+        $handlers = new MessageHandlers($handler);
 
-        $consumer = new SingleConsumer($this->queueFactory, $chainHandler, new ConsumerMiddlewares(), new ConsumerConfiguration());
+        $consumer = new SingleConsumer($this->queueFactory, $handlers, new ConsumerMiddlewares(), new ConsumerConfiguration());
 
         $consumer->run();
     }

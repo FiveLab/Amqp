@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Consumer;
 
 use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlerInterface;
+use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlers;
 use FiveLab\Component\Amqp\Consumer\Handler\ThrowableMessageHandlerInterface;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareInterface;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
@@ -26,12 +27,15 @@ class SingleConsumer implements EventableConsumerInterface, MiddlewareAwareInter
 {
     use EventableConsumerTrait;
 
+    private readonly MessageHandlers $messageHandler;
+
     public function __construct(
-        private readonly QueueFactoryInterface   $queueFactory,
-        private readonly MessageHandlerInterface $messageHandler,
-        private readonly ConsumerMiddlewares     $middlewares,
-        private readonly ConsumerConfiguration   $configuration
+        private readonly QueueFactoryInterface $queueFactory,
+        MessageHandlerInterface                $messageHandler,
+        private readonly ConsumerMiddlewares   $middlewares,
+        private readonly ConsumerConfiguration $configuration
     ) {
+        $this->messageHandler = $messageHandler instanceof MessageHandlers ? $messageHandler : new MessageHandlers($messageHandler);
     }
 
     public function getQueue(): QueueInterface
@@ -66,24 +70,13 @@ class SingleConsumer implements EventableConsumerInterface, MiddlewareAwareInter
 
                     throw $error;
                 } catch (\Throwable $e) {
-                    if ($this->messageHandler instanceof ThrowableMessageHandlerInterface) {
-                        $this->messageHandler->catchError($message, $e);
-
-                        if (!$message->isAnswered()) {
-                            // The error handler can manually answered to broker.
-                            $message->ack();
-                        }
-
-                        return;
-                    }
-
                     $message->nack($this->configuration->requeueOnError);
 
                     throw $e;
                 }
 
                 if (!$message->isAnswered()) {
-                    // The message handler can manually answered to broker.
+                    // The message handler can manually answer to broker.
                     $message->ack();
                 }
             }, $this->configuration->tagGenerator->generate());

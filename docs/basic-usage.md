@@ -83,17 +83,11 @@ use FiveLab\Component\Amqp\Message\ReceivedMessage;
 
 class MyMessageHandler implements MessageHandlerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function supports(ReceivedMessage $message): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function handle(ReceivedMessage $message): void
     {
         // You logic here.

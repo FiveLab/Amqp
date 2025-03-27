@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+v2.1.3
+------
+
+* Add possible to execute two and more message handler per one consumer (if message handler support message).
+
 v2.1.2
 ------
 

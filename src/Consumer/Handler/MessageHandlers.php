@@ -31,20 +31,50 @@ readonly class MessageHandlers implements MessageHandlerInterface, FlushableMess
 
     public function supports(ReceivedMessage $message): bool
     {
-        try {
-            $this->getMessageHandlerForMessage($message);
-
-            return true;
-        } catch (MessageHandlerNotSupportedException $e) {
-            return false;
+        foreach ($this->handlers as $handler) {
+            if ($handler->supports($message)) {
+                return true;
+            }
         }
+
+        return false;
     }
 
     public function handle(ReceivedMessage $message): void
     {
-        $handler = $this->getMessageHandlerForMessage($message);
+        $supported = false;
 
-        $handler->handle($message);
+        foreach ($this->handlers as $handler) {
+            if ($handler->supports($message)) {
+                $supported = true;
+
+                try {
+                    $handler->handle($message);
+                } catch (\Throwable $error) {
+                    if ($handler instanceof ThrowableMessageHandlerInterface) {
+                        $handler->catchError($message, $error);
+
+                        if (!$message->isAnswered()) {
+                            // The error handler can manually answer to broker.
+                            $message->ack();
+                        }
+
+                        continue;
+                    }
+
+                    throw $error;
+                }
+            }
+        }
+
+        if (!$supported) {
+            throw new MessageHandlerNotSupportedException(\sprintf(
+                'Not any message handler supports for message in queue "%s" from "%s" exchange by "%s" routing key.',
+                $message->queueName,
+                $message->exchangeName,
+                $message->routingKey
+            ));
+        }
     }
 
     public function flush(ReceivedMessages $receivedMessages): void
@@ -63,23 +93,6 @@ readonly class MessageHandlers implements MessageHandlerInterface, FlushableMess
 
     public function catchError(ReceivedMessage $message, \Throwable $error): void
     {
-        $handler = $this->getMessageHandlerForMessage($message);
-
-        if ($handler instanceof ThrowableMessageHandlerInterface) {
-            $handler->catchError($message, $error);
-        } else {
-            throw $error;
-        }
-    }
-
-    private function getMessageHandlerForMessage(ReceivedMessage $message): MessageHandlerInterface
-    {
-        foreach ($this->handlers as $handler) {
-            if ($handler->supports($message)) {
-                return $handler;
-            }
-        }
-
-        throw new MessageHandlerNotSupportedException('Not found supported message handler.');
+        // Nothing to do, because we catch error inside handling.
     }
 }

@@ -16,8 +16,12 @@ namespace FiveLab\Component\Amqp\Tests\Unit\Consumer\Handler;
 use FiveLab\Component\Amqp\Consumer\Handler\FlushableMessageHandlerInterface;
 use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlerInterface;
 use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlers;
+use FiveLab\Component\Amqp\Consumer\Handler\ThrowableMessageHandlerInterface;
+use FiveLab\Component\Amqp\Exception\MessageHandlerNotSupportedException;
+use FiveLab\Component\Amqp\Message\Payload;
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Message\ReceivedMessages;
+use FiveLab\Component\Amqp\Tests\Unit\Message\ReceivedMessageStub;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -26,23 +30,23 @@ class MessageHandlersTest extends TestCase
     #[Test]
     public function shouldSuccessSupports(): void
     {
-        $message = self::createMock(ReceivedMessage::class);
+        $message = $this->createMock(ReceivedMessage::class);
 
-        $handler1 = self::createMock(MessageHandlerInterface::class);
-        $handler2 = self::createMock(MessageHandlerInterface::class);
-        $handler3 = self::createMock(MessageHandlerInterface::class);
+        $handler1 = $this->createMock(MessageHandlerInterface::class);
+        $handler2 = $this->createMock(MessageHandlerInterface::class);
+        $handler3 = $this->createMock(MessageHandlerInterface::class);
 
-        $handler1->expects(self::once())
+        $handler1->expects($this->once())
             ->method('supports')
             ->with($message)
             ->willReturn(false);
 
-        $handler2->expects(self::once())
+        $handler2->expects($this->once())
             ->method('supports')
             ->with($message)
             ->willReturn(true);
 
-        $handler3->expects(self::never())
+        $handler3->expects($this->never())
             ->method('supports');
 
         $handlers = new MessageHandlers($handler1, $handler2, $handler3);
@@ -54,17 +58,17 @@ class MessageHandlersTest extends TestCase
     #[Test]
     public function shouldSuccessNotSupports(): void
     {
-        $message = self::createMock(ReceivedMessage::class);
+        $message = $this->createMock(ReceivedMessage::class);
 
-        $handler1 = self::createMock(MessageHandlerInterface::class);
-        $handler2 = self::createMock(MessageHandlerInterface::class);
+        $handler1 = $this->createMock(MessageHandlerInterface::class);
+        $handler2 = $this->createMock(MessageHandlerInterface::class);
 
-        $handler1->expects(self::once())
+        $handler1->expects($this->once())
             ->method('supports')
             ->with($message)
             ->willReturn(false);
 
-        $handler2->expects(self::once())
+        $handler2->expects($this->once())
             ->method('supports')
             ->with($message)
             ->willReturn(false);
@@ -78,16 +82,16 @@ class MessageHandlersTest extends TestCase
     #[Test]
     public function shouldSuccessFlush(): void
     {
-        $messages = self::createMock(ReceivedMessages::class);
+        $messages = $this->createMock(ReceivedMessages::class);
 
-        $handler1 = self::createMock(FlushableMessageHandlerInterface::class);
-        $handler2 = self::createMock(FlushableMessageHandlerInterface::class);
+        $handler1 = $this->createMock(FlushableMessageHandlerInterface::class);
+        $handler2 = $this->createMock(FlushableMessageHandlerInterface::class);
 
-        $handler1->expects(self::once())
+        $handler1->expects($this->once())
             ->method('flush')
             ->with($messages);
 
-        $handler2->expects(self::once())
+        $handler2->expects($this->once())
             ->method('flush')
             ->with($messages);
 
@@ -99,10 +103,10 @@ class MessageHandlersTest extends TestCase
     #[Test]
     public function shouldThrowExceptionOnFlushIfHandlerNotFlushable(): void
     {
-        $messages = self::createMock(ReceivedMessages::class);
+        $messages = $this->createMock(ReceivedMessages::class);
 
-        $handler1 = self::createMock(FlushableMessageHandlerInterface::class);
-        $handler2 = self::createMock(MessageHandlerInterface::class);
+        $handler1 = $this->createMock(FlushableMessageHandlerInterface::class);
+        $handler2 = $this->createMock(MessageHandlerInterface::class);
 
         $handlers = new MessageHandlers($handler1, $handler2);
 
@@ -117,68 +121,168 @@ class MessageHandlersTest extends TestCase
     }
 
     #[Test]
-    public function shouldExecuteMultipleHandlers(): void
+    public function shouldSuccessHandleWithMultipleHandlers(): void
     {
-        $message = self::createMock(ReceivedMessage::class);
+        $message = $this->createMock(ReceivedMessage::class);
 
-        $handlers = [];
-        $handlersCount = 1;
+        $handler1 = $this->createMock(MessageHandlerInterface::class);
+        $handler2 = $this->createMock(MessageHandlerInterface::class);
+        $handler3 = $this->createMock(MessageHandlerInterface::class);
 
-        for ($i = 1; $i <= $handlersCount; $i++) {
-            $handler = self::createMock(MessageHandlerInterface::class);
-            $handler->expects(self::once())->method('handle')->with($message);
-            $handler->method('supports')->willReturn(true);
-            $handlers[] = $handler;
-        }
+        $handler1->expects($this->once())
+            ->method('supports')
+            ->with($message)
+            ->willReturn(true);
 
-        $chainHandler = new MessageHandlers(...$handlers);
-        $chainHandler->handle($message);
-    }
-
-    #[Test]
-    public function shouldThrowExceptionOnCatchErrorIfHandlerDoesNotSupportCatching(): void
-    {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('some');
-
-        $message = self::createMock(ReceivedMessage::class);
-
-        $handler1 = self::createMock(MessageHandlerInterface::class);
-        $handler2 = self::createMock(MessageHandlerInterface::class);
-
-        $handler1->expects(self::once())
+        $handler2->expects($this->once())
             ->method('supports')
             ->with($message)
             ->willReturn(false);
 
-        $handler2->expects(self::once())
+        $handler3->expects($this->once())
             ->method('supports')
             ->with($message)
             ->willReturn(true);
 
-        $chainHandler = new MessageHandlers($handler1, $handler2);
-        $chainHandler->catchError($message, new \Exception('some'));
+        $handler1->expects($this->once())
+            ->method('handle')
+            ->with($message);
+
+        $handler2->expects($this->never())
+            ->method('handle');
+
+        $handler3->expects($this->once())
+            ->method('handle')
+            ->with($message);
+
+        $handlers = new MessageHandlers($handler1, $handler2, $handler3);
+        $handlers->handle($message);
     }
 
     #[Test]
-    public function shouldSuccessCatchErrorIfHandlerSupportCatching(): void
+    public function shouldThrowErrorIfNotAnyHandlerSupportsToHandle(): void
     {
-        $error = new \RuntimeException('some');
+        $message = new ReceivedMessageStub(
+            new Payload(''),
+            1,
+            'queue-name',
+            'bla-bla',
+            'exchange-name',
+        );
 
-        $message = self::createMock(ReceivedMessage::class);
+        $handler = $this->createMock(MessageHandlerInterface::class);;
 
-        $handler = self::createMock(MessageHandlers::class);
+        $handler->expects($this->once())
+            ->method('supports')
+            ->with($message)
+            ->willReturn(false);
 
-        $handler->expects(self::once())
+        $this->expectException(MessageHandlerNotSupportedException::class);
+        $this->expectExceptionMessage('Not any message handler supports for message in queue "queue-name" from "exchange-name" exchange by "bla-bla" routing key.');
+
+        $handlers = new MessageHandlers($handler);
+        $handlers->handle($message);
+    }
+
+    #[Test]
+    public function shouldSuccessCorrectCatchErrorForMultipleHandlers(): void
+    {
+        $message = $this->createMock(ReceivedMessage::class);
+
+        $error = new \Exception('bla-bla');
+
+        $handler1 = $this->createMock(ThrowableMessageHandlerInterface::class);
+        $handler2 = $this->createMock(ThrowableMessageHandlerInterface::class);
+        $handler3 = $this->createMock(ThrowableMessageHandlerInterface::class);
+
+        $handler1->expects($this->once())
             ->method('supports')
             ->with($message)
             ->willReturn(true);
 
-        $handler->expects(self::once())
+        $handler1->expects($this->once())
+            ->method('handle')
+            ->with($message);
+
+        $handler1->expects($this->never())
+            ->method('catchError');
+
+        $handler2->expects($this->once())
+            ->method('supports')
+            ->with($message)
+            ->willReturn(false);
+
+        $handler2->expects($this->never())
+            ->method('handle');
+
+        $handler2->expects($this->never())
+            ->method('catchError');
+
+        $handler3->expects($this->once())
+            ->method('supports')
+            ->with($message)
+            ->willReturn(true);
+
+        $handler3->expects($this->once())
+            ->method('handle')
+            ->with($message)
+            ->willThrowException($error);
+
+        $handler3->expects($this->once())
             ->method('catchError')
             ->with($message, $error);
 
-        $handlers = new MessageHandlers($handler);
-        $handlers->catchError($message, $error);
+        $handlers = new MessageHandlers($handler1, $handler2, $handler3);
+        $handlers->handle($message);
+    }
+
+    #[Test]
+    public function shouldNotCatchErrorIfAllHandlersNotThrowable(): void
+    {
+        $error = new \RuntimeException('bla bla');
+
+        $message = $this->createMock(ReceivedMessage::class);
+
+        $handler1 = $this->createMock(MessageHandlerInterface::class);
+        $handler2 = $this->createMock(MessageHandlerInterface::class);
+
+        $handler1->expects($this->once())
+            ->method('supports')
+            ->with($message)
+            ->willReturn(false);
+
+        $handler2->expects($this->once())
+            ->method('supports')
+            ->with($message)
+            ->willReturn(true);
+
+        $handler2->expects($this->once())
+            ->method('handle')
+            ->with($message)
+            ->willThrowException($error);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('bla bla');
+
+        $handlers = new MessageHandlers($handler1, $handler2);
+        $handlers->handle($message);
+    }
+
+    #[Test]
+    public function shouldNotAnyExecutionOnCatchError(): void
+    {
+        $message = $this->createMock(ReceivedMessage::class);
+
+        $handler1 = $this->createMock(ThrowableMessageHandlerInterface::class);
+        $handler2 = $this->createMock(ThrowableMessageHandlerInterface::class);
+
+        $handler1->expects($this->never())
+            ->method('catchError');
+
+        $handler2->expects($this->never())
+            ->method('catchError');
+
+        $chainHandler = new MessageHandlers($handler1, $handler2);
+        $chainHandler->catchError($message, new \Exception('some'));
     }
 }
