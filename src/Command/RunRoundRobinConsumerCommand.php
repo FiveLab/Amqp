@@ -18,15 +18,36 @@ use FiveLab\Component\Amqp\Consumer\Event;
 use FiveLab\Component\Amqp\Consumer\RoundRobin\RoundRobinConsumer;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(name: 'event-broker:consumer:round-robin', description: 'Run round robin consumer.')]
-class RunRoundRobinConsumerCommand extends Command
+class RunRoundRobinConsumerCommand extends Command implements SignalableCommandInterface
 {
     public function __construct(private readonly RoundRobinConsumer $consumer)
     {
         parent::__construct();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return array<int>
+     */
+    public function getSubscribedSignals(): array
+    {
+        return [
+            \SIGINT,
+            \SIGTERM,
+        ];
+    }
+
+    public function handleSignal(int $signal, false|int $previousExitCode = 0): int|false
+    {
+        $this->consumer->stop();
+
+        return false;
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output): void

@@ -48,6 +48,8 @@ class LoopConsumeStrategy implements ConsumeStrategyInterface
         $tickTimer = 0;
         $idleReadTimer = 0;
 
+        $this->stopConsuming = false;
+
         while (!$this->stopConsuming) {
             if ($readTimeout && $readTimeout < $idleReadTimer) {
                 throw new ConsumerTimeoutExceedException('Consumer timeout exceed.');

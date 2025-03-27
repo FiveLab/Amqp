@@ -93,10 +93,12 @@ class RoundRobinConsumer implements EventableConsumerInterface
             }
         }
 
+        $this->stopConsuming = false;
+
         $time = \microtime(true);
         $endOfTime = $this->configuration->timeout ? $time + $this->configuration->timeout : 0;
 
-        while (true) {
+        while (!$this->stopConsuming) {
             $consumers = $allConsumers;
 
             /** @var ConsumerInterface $consumer */
@@ -105,7 +107,7 @@ class RoundRobinConsumer implements EventableConsumerInterface
 
                 try {
                     $consumer->run();
-                } catch (StopConsumingException|ConsumerTimeoutExceedException $e) {
+                } catch (StopConsumingException|ConsumerTimeoutExceedException) {
                     // Normal flow. We should run next consumer.
                 }
 
