@@ -19,7 +19,6 @@ use FiveLab\Component\Amqp\Consumer\EventableConsumerInterface;
 use FiveLab\Component\Amqp\Consumer\EventableConsumerTrait;
 use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlerInterface;
 use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlers;
-use FiveLab\Component\Amqp\Consumer\Handler\ThrowableMessageHandlerInterface;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewareInterface;
 use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
 use FiveLab\Component\Amqp\Consumer\MiddlewareAwareInterface;

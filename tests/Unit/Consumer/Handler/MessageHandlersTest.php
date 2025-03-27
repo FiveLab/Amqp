@@ -170,7 +170,7 @@ class MessageHandlersTest extends TestCase
             'exchange-name',
         );
 
-        $handler = $this->createMock(MessageHandlerInterface::class);;
+        $handler = $this->createMock(MessageHandlerInterface::class);
 
         $handler->expects($this->once())
             ->method('supports')

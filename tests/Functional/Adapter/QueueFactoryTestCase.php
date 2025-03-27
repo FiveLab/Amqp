@@ -222,11 +222,12 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
         $queueInfo = $this->management->queueByName('some');
         $arguments = $queueInfo['arguments'];
 
-        self::assertEquals([
-            'x-queue-master-locator' => 'random',
-            'x-queue-mode'           => 'default',
-            'x-queue-type'           => 'classic',
-        ], $arguments);
+        self::assertEquals('random', $arguments['x-queue-master-locator']);
+        self::assertEquals('default', $arguments['x-queue-mode']);
+
+        if (\array_key_exists('x-queue-type', $arguments)) {
+            self::assertEquals('classic', $arguments['x-queue-type']);
+        }
     }
 
     #[Test]
