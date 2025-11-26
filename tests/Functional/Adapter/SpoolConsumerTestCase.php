@@ -358,7 +358,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
 
         $consumer = new SpoolConsumer($this->queueFactory, $this->messageHandler, new SpoolConsumerConfiguration(100, 1));
         $consumer->setEventDispatcher($eventDispatcher = new EventDispatcher());
-        $eventDispatcher->addListener(ProcessedMessageEvent::class, new StopAfterNExecutesListener($eventDispatcher, 5)->onProcessedMessage(...));
+        $eventDispatcher->addListener(ProcessedMessageEvent::class, (new StopAfterNExecutesListener($eventDispatcher, 5))->onProcessedMessage(...));
 
         $this->runConsumer($consumer);
 

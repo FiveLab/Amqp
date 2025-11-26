@@ -1,4 +1,4 @@
-FROM php:8.4-cli
+FROM php:8.2-cli
 
 LABEL org.opencontainers.image.authors="Vitalii Zhuk <v.zhuk@fivelab.org>"
 

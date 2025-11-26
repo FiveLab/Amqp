@@ -243,7 +243,7 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
 
         $consumer = new LoopConsumer($this->queueFactory, $this->messageHandler, new LoopConsumerConfiguration(1));
         $consumer->setEventDispatcher($eventDispatcher = new EventDispatcher());
-        $eventDispatcher->addListener(ProcessedMessageEvent::class, new StopAfterNExecutesListener($eventDispatcher, 5)->onProcessedMessage(...));
+        $eventDispatcher->addListener(ProcessedMessageEvent::class, (new StopAfterNExecutesListener($eventDispatcher, 5))->onProcessedMessage(...));
 
         $this->runConsumer($consumer);
 

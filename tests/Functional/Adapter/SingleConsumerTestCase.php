@@ -117,7 +117,7 @@ abstract class SingleConsumerTestCase extends RabbitMqTestCase
 
         $consumer = new SingleConsumer($this->queueFactory, $handler, new ConsumerConfiguration());
         $consumer->setEventDispatcher($eventDispatcher = new EventDispatcher());
-        $eventDispatcher->addListener(ProcessedMessageEvent::class, new StopAfterNExecutesListener($eventDispatcher, 2)->onProcessedMessage(...));
+        $eventDispatcher->addListener(ProcessedMessageEvent::class, (new StopAfterNExecutesListener($eventDispatcher, 2))->onProcessedMessage(...));
 
         $this->runConsumer($consumer);
 
