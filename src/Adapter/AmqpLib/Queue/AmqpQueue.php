@@ -42,6 +42,7 @@ readonly class AmqpQueue implements QueueInterface
         $amqplibChannel = $this->channel->getChannel();
 
         $queueName = $this->getName();
+        $stopConsuming = false;
 
         try {
             $amqplibChannel->basic_consume(
@@ -51,15 +52,19 @@ readonly class AmqpQueue implements QueueInterface
                 false,
                 $this->definition->exclusive,
                 false,
-                function (AMQPMessage $message) use ($handler, $queueName) {
+                function (AMQPMessage $message) use ($handler, $queueName, &$stopConsuming): void {
                     $receivedMessage = new AmqpReceivedMessage($message, $queueName);
 
-                    $handler($receivedMessage);
+                    $result = $handler($receivedMessage);
+
+                    if (false === $result) {
+                        $stopConsuming = true;
+                    }
                 }
             );
 
             // Loop as long as the channel has callbacks registered
-            while ($amqplibChannel->is_consuming()) {
+            while (!$stopConsuming && $amqplibChannel->is_consuming()) {
                 $amqplibChannel->wait(null, false, $this->getChannel()->getConnection()->getReadTimeout());
             }
         } catch (\Throwable $e) {

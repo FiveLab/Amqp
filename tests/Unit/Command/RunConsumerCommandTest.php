@@ -19,23 +19,23 @@ use FiveLab\Component\Amqp\Connection\ConnectionInterface;
 use FiveLab\Component\Amqp\Consumer\Checker\RunConsumerCheckerInterface;
 use FiveLab\Component\Amqp\Consumer\Checker\RunConsumerCheckerRegistryInterface;
 use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
-use FiveLab\Component\Amqp\Consumer\ConsumerWithMiddlewaresInterface;
-use FiveLab\Component\Amqp\Consumer\Event;
 use FiveLab\Component\Amqp\Consumer\EventableConsumerInterface;
-use FiveLab\Component\Amqp\Consumer\Middleware\StopAfterNExecutesMiddleware;
 use FiveLab\Component\Amqp\Consumer\Registry\ConsumerRegistryInterface;
+use FiveLab\Component\Amqp\Event\ProcessedMessageEvent;
 use FiveLab\Component\Amqp\Exception\CannotRunConsumerException;
 use FiveLab\Component\Amqp\Exception\RunConsumerCheckerNotFoundException;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
+use FiveLab\Component\Amqp\Tests\Unit\Consumer\EventableConsumerStub;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class RunConsumerCommandTest extends TestCase
 {
+    private EventDispatcherInterface $eventDispatcher;
     private ConsumerRegistryInterface $registry;
     private RunConsumerCheckerRegistryInterface $checkerRegistry;
     private ConnectionInterface $connection;
@@ -44,6 +44,7 @@ class RunConsumerCommandTest extends TestCase
 
     protected function setUp(): void
     {
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->registry = $this->createMock(ConsumerRegistryInterface::class);
         $this->checkerRegistry = $this->createMock(RunConsumerCheckerRegistryInterface::class);
         $this->connection = $this->createMock(ConnectionInterface::class);
@@ -113,22 +114,13 @@ class RunConsumerCommandTest extends TestCase
     }
 
     #[Test]
-    #[TestWith([true])]
-    #[TestWith([false])]
-    public function shouldSuccessExecuteWithEventableConsumer(bool $verbose): void
+    public function shouldSuccessExecuteWithEventableConsumer(): void
     {
         $consumer = $this->createMock(EventableConsumerInterface::class);
 
         $consumer->expects($this->once())
-            ->method('addEventHandler')
-            ->with(self::callback(function (mixed $arg) {
-                self::assertInstanceOf(\Closure::class, $arg);
-
-                $arg(Event::ConsumerTimeout);
-                $arg(Event::StopConsuming);
-
-                return true;
-            }));
+            ->method('setEventDispatcher')
+            ->with($this->eventDispatcher);
 
         $consumer->expects($this->once())
             ->method('run');
@@ -138,24 +130,15 @@ class RunConsumerCommandTest extends TestCase
             ->with('some')
             ->willReturn($consumer);
 
-        $command = new RunConsumerCommand($this->registry);
+        $command = new RunConsumerCommand($this->registry, eventDispatcher: $this->eventDispatcher);
 
         $input = new ArrayInput([
             'key' => 'some',
         ]);
 
-        $output = new BufferedOutput($verbose ? OutputInterface::VERBOSITY_VERBOSE : OutputInterface::VERBOSITY_NORMAL);
+        $output = new BufferedOutput(OutputInterface::VERBOSITY_NORMAL);
 
         $command->run($input, $output);
-
-        if ($verbose) {
-            $expectedOutput = [
-                'Receive consumer timeout exceed error.',
-                'Stop consumer after N executes.',
-            ];
-
-            self::assertEquals(\implode(PHP_EOL, $expectedOutput).PHP_EOL, $output->fetch());
-        }
     }
 
     #[Test]
@@ -192,21 +175,18 @@ class RunConsumerCommandTest extends TestCase
     #[Test]
     public function shouldSuccessExecuteWithCountMessages(): void
     {
-        $consumer = $this->createMock(ConsumerWithMiddlewaresInterface::class);
-
-        $consumer->expects($this->once())
-            ->method('run');
-
-        $consumer->expects($this->once())
-            ->method('pushMiddleware')
-            ->with(new StopAfterNExecutesMiddleware(10));
+        $consumer = new EventableConsumerStub($this->createMock(QueueInterface::class));
 
         $this->registry->expects($this->once())
             ->method('get')
             ->with('some')
             ->willReturn($consumer);
 
-        $command = new RunConsumerCommand($this->registry);
+        $this->eventDispatcher->expects($this->once())
+            ->method('addListener')
+            ->with(ProcessedMessageEvent::class, self::isInstanceOf(\Closure::class));
+
+        $command = new RunConsumerCommand($this->registry, eventDispatcher: $this->eventDispatcher);
 
         $input = new ArrayInput([
             'key'        => 'some',

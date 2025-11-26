@@ -37,7 +37,7 @@ readonly class PublisherMiddlewares implements \IteratorAggregate
      */
     public function getIterator(): \ArrayIterator
     {
-        return new \ArrayIterator($this->middlewares);
+        return new \ArrayIterator(\array_values($this->middlewares));
     }
 
     public function createExecutable(\Closure $lastExecutable): \Closure

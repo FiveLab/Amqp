@@ -14,23 +14,19 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Consumer\RoundRobin;
 
 use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
-use FiveLab\Component\Amqp\Consumer\Event;
+use FiveLab\Component\Amqp\Consumer\ConsumerStoppedReason;
 use FiveLab\Component\Amqp\Consumer\EventableConsumerInterface;
-use FiveLab\Component\Amqp\Consumer\EventableConsumerTrait;
-use FiveLab\Component\Amqp\Consumer\Loop\LoopConsumer;
-use FiveLab\Component\Amqp\Consumer\Middleware\StopAfterNExecutesMiddleware;
-use FiveLab\Component\Amqp\Consumer\MiddlewareAwareInterface;
 use FiveLab\Component\Amqp\Consumer\Registry\ConsumerRegistryInterface;
-use FiveLab\Component\Amqp\Consumer\Spool\SpoolConsumer;
+use FiveLab\Component\Amqp\Event\ConsumerStoppedEvent;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
-use FiveLab\Component\Amqp\Exception\StopConsumingException;
+use FiveLab\Component\Amqp\Listener\StopAfterNExecutesListener;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class RoundRobinConsumer implements EventableConsumerInterface
 {
-    use EventableConsumerTrait;
-
     private bool $stopConsuming = false;
+    private ?EventDispatcherInterface $eventDispatcher = null;
 
     /**
      * Constructor.
@@ -44,6 +40,16 @@ class RoundRobinConsumer implements EventableConsumerInterface
         private readonly ConsumerRegistryInterface       $consumerRegistry,
         private readonly array                           $consumers
     ) {
+    }
+
+    public function setEventDispatcher(?EventDispatcherInterface $eventDispatcher): void
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
+    public function getEventDispatcher(): ?EventDispatcherInterface
+    {
+        return $this->eventDispatcher;
     }
 
     public function getQueue(): QueueInterface
@@ -64,60 +70,52 @@ class RoundRobinConsumer implements EventableConsumerInterface
 
     public function run(): void
     {
-        $readTimeout = $this->configuration->timeoutBetweenConsumers;
-        $stopAfterNExecutes = $this->configuration->executesMessagesPerConsumer;
+        $eventDispatcher = $this->getEventDispatcher();
 
-        /** @var (ConsumerInterface & MiddlewareAwareInterface)[] $allConsumers */
-        $allConsumers = \array_map(function (string $consumerKey) {
-            return $this->consumerRegistry->get($consumerKey);
-        }, $this->consumers);
-
-        foreach ($allConsumers as $consumer) {
-            if (!$consumer instanceof MiddlewareAwareInterface) { // @phpstan-ignore-line
-                throw new \InvalidArgumentException(\sprintf(
-                    'All consumers in round robin should implement %s.',
-                    MiddlewareAwareInterface::class
-                ));
-            }
+        if (!$eventDispatcher) {
+            throw new \LogicException('Can\'t run round-robin consumer without event dispatcher.');
         }
+
+        $eventDispatcher->addSubscriber(new StopAfterNExecutesListener($eventDispatcher, $this->configuration->executesMessagesPerConsumer));
+
+        $eventDispatcher->addListener(ConsumerStoppedEvent::class, static function (ConsumerStoppedEvent $event): void {
+            if ($event->reason === ConsumerStoppedReason::Timeout) {
+                $event->consumer->stop();
+            }
+        });
+
+        $readTimeout = $this->configuration->timeoutBetweenConsumers;
+        $allConsumers = \array_map(fn(string $key) => $this->consumerRegistry->get($key), $this->consumers);
 
         // Prepare consumers
         foreach ($allConsumers as $consumer) {
             $connection = $consumer->getQueue()->getChannel()->getConnection();
             $connection->setReadTimeout($readTimeout);
-
-            $consumer->pushMiddleware(new StopAfterNExecutesMiddleware($stopAfterNExecutes));
-
-            if ($consumer instanceof SpoolConsumer || $consumer instanceof LoopConsumer) {
-                $consumer->throwExceptionOnConsumerTimeoutExceed();
-            }
         }
 
         $this->stopConsuming = false;
 
-        $time = \microtime(true);
-        $endOfTime = $this->configuration->timeout ? $time + $this->configuration->timeout : 0;
-
-        while (!$this->stopConsuming) {
+        while (!$this->stopConsuming) { // @phpstan-ignore-line booleanNot.alwaysTrue
             $consumers = $allConsumers;
 
             /** @var ConsumerInterface $consumer */
-            while (!$this->stopConsuming && $consumer = \array_shift($consumers)) {
-                $this->triggerEvent(Event::ChangeConsumer, $consumer);
+            while (!$this->stopConsuming && $consumer = \array_shift($consumers)) { // @phpstan-ignore-line booleanNot.alwaysTrue
+                $event = new ConsumerStoppedEvent($this, ConsumerStoppedReason::ChangeConsumer, [
+                    'next_consumer'       => $consumer,
+                    'remaining_consumers' => $consumers,
+                ]);
+
+                $this->getEventDispatcher()?->dispatch($event);
 
                 try {
                     $consumer->run();
-                } catch (StopConsumingException|ConsumerTimeoutExceedException) {
-                    // Normal flow. We should run next consumer.
+                } catch (ConsumerTimeoutExceedException) {
+                    // Normal flow.
                 }
 
                 // We should reconnect for flush all rejected and non-ack messages from client to broker.
                 $connection = $consumer->getQueue()->getChannel()->getConnection();
                 $connection->reconnect();
-
-                if ($endOfTime && \microtime(true) > $endOfTime) {
-                    throw new ConsumerTimeoutExceedException('Round robin consumer timeout exceed.');
-                }
             }
         }
     }

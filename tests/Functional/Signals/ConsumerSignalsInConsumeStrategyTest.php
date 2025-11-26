@@ -54,7 +54,6 @@ class ConsumerSignalsInConsumeStrategyTest extends RabbitMqTestCase
         $expectedOutput = <<<OUTPUT
 bla 0
 handle signal: 2
-bla 1
 
 OUTPUT;
 
@@ -83,7 +82,6 @@ OUTPUT;
         $expectedOutput = <<<OUTPUT
 bla 0
 handle signal: 15
-bla 1
 
 OUTPUT;
 
@@ -112,7 +110,6 @@ OUTPUT;
         $expectedOutput = <<<OUTPUT
 bla 0
 handle signal: 15
-bla 1
 flush messages
 
 OUTPUT;

@@ -8,7 +8,6 @@ use FiveLab\Component\Amqp\Connection\Driver;
 use FiveLab\Component\Amqp\Connection\Dsn;
 use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
 use FiveLab\Component\Amqp\Consumer\Handler\FlushableMessageHandlerInterface;
-use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlerInterface;
 use FiveLab\Component\Amqp\Consumer\Strategy\DefaultConsumeStrategy;
 use FiveLab\Component\Amqp\Consumer\Strategy\ConsumeStrategyInterface;
 use FiveLab\Component\Amqp\Consumer\Strategy\LoopConsumeStrategy;
@@ -52,23 +51,13 @@ function createMessageHandler(): FlushableMessageHandlerInterface
         {
             \usleep(10000);
             print $message->payload->data.PHP_EOL;
+            \usleep(10000);
         }
 
         public function flush(ReceivedMessages $receivedMessages): void
         {
             print 'flush messages'.PHP_EOL;
         }
-    };
-}
-
-function createTickHandler(): callable
-{
-    $counter = 0;
-
-    return static function () use (&$counter) {
-        $counter++;
-
-        print 'tick '.$counter.PHP_EOL;
     };
 }
 

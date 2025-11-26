@@ -30,7 +30,9 @@ class DefaultConsumeStrategy implements ConsumeStrategyInterface
 
     public function consume(QueueInterface $queue, \Closure $handler, string $tag = ''): void
     {
-        $queue->consume(function () use ($handler) {
+        $this->stopConsuming = false;
+
+        $queue->consume(function () use ($handler): bool {
             \call_user_func_array($handler, \func_get_args());
 
             if ($this->stopConsuming) {

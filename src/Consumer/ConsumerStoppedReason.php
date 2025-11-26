@@ -13,19 +13,12 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Consumer;
 
-enum Event
+enum ConsumerStoppedReason
 {
-    /**
-     * Use in all consumers.
-     */
-    case ConsumerTimeout;
-
-    /**
-     * Use in all consumers and handle after we stop consumer after N executes or stop consuming.
-     */
+    case Timeout;
     case StopConsuming;
 
-    /**
+    /*
      * Use in round-robin consumer.
      */
     case ChangeConsumer;

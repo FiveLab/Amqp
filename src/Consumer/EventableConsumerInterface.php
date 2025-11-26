@@ -15,19 +15,11 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Consumer;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 interface EventableConsumerInterface extends ConsumerInterface
 {
-    /**
-     * Set event handler. This method replace old event handler.
-     *
-     * @param \Closure(Event $event): void|null $eventHandler
-     */
-    public function setEventHandler(?\Closure $eventHandler): void;
+    public function setEventDispatcher(?EventDispatcherInterface $eventDispatcher): void;
 
-    /**
-     * Add event handler.
-     *
-     * @param \Closure(Event $event): void $eventHandler
-     */
-    public function addEventHandler(\Closure $eventHandler): void;
+    public function getEventDispatcher(): ?EventDispatcherInterface;
 }

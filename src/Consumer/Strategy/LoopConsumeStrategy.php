@@ -73,7 +73,7 @@ class LoopConsumeStrategy implements ConsumeStrategyInterface
             if ($this->tickHandler && $tickTimer >= 1) {
                 $tickTimer = 0;
 
-                ($this->tickHandler)($queue->getName(), $tag);
+                ($this->tickHandler)($queue, $tag);
             }
         }
     }

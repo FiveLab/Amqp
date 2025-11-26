@@ -14,24 +14,35 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Unit\Consumer;
 
 use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
-use FiveLab\Component\Amqp\Consumer\Event;
+use FiveLab\Component\Amqp\Consumer\ConsumerStoppedReason;
 use FiveLab\Component\Amqp\Consumer\EventableConsumerInterface;
-use FiveLab\Component\Amqp\Consumer\EventableConsumerTrait;
+use FiveLab\Component\Amqp\Event\ConsumerStoppedEvent;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EventableConsumerStub implements ConsumerInterface, EventableConsumerInterface
 {
-    use EventableConsumerTrait;
+    private ?EventDispatcherInterface $eventDispatcher = null;
 
     public function __construct(private QueueInterface $queue)
     {
     }
 
+    public function setEventDispatcher(?EventDispatcherInterface $eventDispatcher): void
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
+    public function getEventDispatcher(): ?EventDispatcherInterface
+    {
+        return $this->eventDispatcher;
+    }
+
     public function run(): void
     {
-        $this->triggerEvent(Event::StopConsuming);
-        $this->triggerEvent(Event::ConsumerTimeout);
-        $this->triggerEvent(Event::ChangeConsumer, 'foo');
+        $this->getEventDispatcher()->dispatch(new ConsumerStoppedEvent($this, ConsumerStoppedReason::StopConsuming));
+        $this->getEventDispatcher()->dispatch(new ConsumerStoppedEvent($this, ConsumerStoppedReason::Timeout));
+        $this->getEventDispatcher()->dispatch(new ConsumerStoppedEvent($this, ConsumerStoppedReason::ChangeConsumer));
     }
 
     public function getQueue(): QueueInterface

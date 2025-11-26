@@ -9,7 +9,6 @@ include_once __DIR__.'/utils.php';
 
 use FiveLab\Component\Amqp\AmqpBuilder;
 use FiveLab\Component\Amqp\Consumer\ConsumerConfiguration;
-use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
 use FiveLab\Component\Amqp\Consumer\SingleConsumer;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 
@@ -21,7 +20,6 @@ $queue = (new AmqpBuilder(createDsn()))
 $consumer = new SingleConsumer(
     $queue,
     createMessageHandler(),
-    new ConsumerMiddlewares(),
     new ConsumerConfiguration(),
     createStrategy($strategy)
 );

@@ -17,10 +17,10 @@ use FiveLab\Component\Amqp\Consumer\Checker\RunConsumerCheckerRegistry;
 use FiveLab\Component\Amqp\Consumer\Checker\RunConsumerCheckerRegistryInterface;
 use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
 use FiveLab\Component\Amqp\Consumer\EventableConsumerInterface;
-use FiveLab\Component\Amqp\Consumer\Middleware\StopAfterNExecutesMiddleware;
-use FiveLab\Component\Amqp\Consumer\MiddlewareAwareInterface;
 use FiveLab\Component\Amqp\Consumer\Registry\ConsumerRegistryInterface;
+use FiveLab\Component\Amqp\Event\ProcessedMessageEvent;
 use FiveLab\Component\Amqp\Exception\RunConsumerCheckerNotFoundException;
+use FiveLab\Component\Amqp\Listener\StopAfterNExecutesListener;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
@@ -28,6 +28,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 #[AsCommand(name: 'event-broker:consumer:run', description: 'Run consumer.')]
 class RunConsumerCommand extends Command implements SignalableCommandInterface
@@ -37,7 +38,8 @@ class RunConsumerCommand extends Command implements SignalableCommandInterface
 
     public function __construct(
         private readonly ConsumerRegistryInterface $consumerRegistry,
-        ?RunConsumerCheckerRegistryInterface       $runCheckerRegistry = null
+        ?RunConsumerCheckerRegistryInterface       $runCheckerRegistry = null,
+        private readonly ?EventDispatcherInterface $eventDispatcher = null
     ) {
         parent::__construct();
 
@@ -95,21 +97,24 @@ class RunConsumerCommand extends Command implements SignalableCommandInterface
         $this->consumer = $this->consumerRegistry->get($consumerKey);
 
         if ($this->consumer instanceof EventableConsumerInterface) {
-            $closure = (new OutputEventHandler($output))(...);
-
-            $this->consumer->addEventHandler($closure);
+            $this->consumer->setEventDispatcher($this->eventDispatcher);
         }
 
         if ($input->getOption('messages')) {
-            if (!$this->consumer instanceof MiddlewareAwareInterface) {
+            if (!$this->consumer instanceof EventableConsumerInterface) {
                 throw new \InvalidArgumentException(\sprintf(
                     'For set number of messages customer must implement "%s", but "%s" given.',
-                    MiddlewareAwareInterface::class,
+                    EventableConsumerInterface::class,
                     \get_class($this->consumer)
                 ));
             }
 
-            $this->consumer->pushMiddleware(new StopAfterNExecutesMiddleware((int) $input->getOption('messages')));
+            if (!$this->eventDispatcher) {
+                throw new \RuntimeException('A message limit can\'t be applied, since the command has no access to the event dispatcher.');
+            }
+
+            $listener = new StopAfterNExecutesListener($this->eventDispatcher, (int) $input->getOption('messages'));
+            $this->consumer->getEventDispatcher()?->addListener(ProcessedMessageEvent::class, $listener->onProcessedMessage(...));
         }
 
         if ($input->getOption('read-timeout')) {

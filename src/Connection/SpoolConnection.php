@@ -78,7 +78,6 @@ class SpoolConnection implements ConnectionInterface
             }
         }
 
-        // @phpstan-ignore-next-line
         throw $firstException;
     }
 

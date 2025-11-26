@@ -21,16 +21,17 @@ use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Channel\Definition\ChannelDefinition;
 use FiveLab\Component\Amqp\Connection\Driver;
 use FiveLab\Component\Amqp\Consumer\ConsumerConfiguration;
-use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
+use FiveLab\Component\Amqp\Consumer\ConsumerStoppedReason;
 use FiveLab\Component\Amqp\Consumer\Registry\ConsumerRegistry;
 use FiveLab\Component\Amqp\Consumer\RoundRobin\RoundRobinConsumer;
 use FiveLab\Component\Amqp\Consumer\RoundRobin\RoundRobinConsumerConfiguration;
 use FiveLab\Component\Amqp\Consumer\SingleConsumer;
-use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
+use FiveLab\Component\Amqp\Event\ConsumerStoppedEvent;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Tests\Functional\Consumer\Handler\MessageHandlerMock;
 use FiveLab\Component\Amqp\Tests\Functional\RabbitMqTestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class RoundRobinConsumerTest extends RabbitMqTestCase
 {
@@ -76,8 +77,8 @@ class RoundRobinConsumerTest extends RabbitMqTestCase
         $this->management->publishMessage('exchange2', 'foo2', 'queue2-message-1');
         $this->management->publishMessage('exchange2', 'foo2', 'queue2-message-2');
 
-        $consumer1 = new SingleConsumer($this->queueFactory1, $this->handler1, new ConsumerMiddlewares(), new ConsumerConfiguration());
-        $consumer2 = new SingleConsumer($this->queueFactory2, $this->handler2, new ConsumerMiddlewares(), new ConsumerConfiguration());
+        $consumer1 = new SingleConsumer($this->queueFactory1, $this->handler1, new ConsumerConfiguration());
+        $consumer2 = new SingleConsumer($this->queueFactory2, $this->handler2, new ConsumerConfiguration());
 
         $consumerRegistry = new ConsumerRegistry();
         $consumerRegistry->add('c1', $consumer1);
@@ -86,14 +87,15 @@ class RoundRobinConsumerTest extends RabbitMqTestCase
         $configuration = new RoundRobinConsumerConfiguration(1, 1, 5);
 
         $roundRobin = new RoundRobinConsumer($configuration, $consumerRegistry, ['c1', 'c2']);
+        $roundRobin->setEventDispatcher($eventDispatcher = new EventDispatcher());
 
-        try {
-            $roundRobin->run();
-        } catch (ConsumerTimeoutExceedException $e) {
-            if ($e->getMessage() !== 'Round robin consumer timeout exceed.') {
-                throw $e;
+        $eventDispatcher->addListener(ConsumerStoppedEvent::class, static function (ConsumerStoppedEvent $event): void {
+            if ($event->reason === ConsumerStoppedReason::ChangeConsumer && !\count($event->options['remaining_consumers'])) {
+                $event->consumer->stop();
             }
-        }
+        });
+
+        $roundRobin->run();
 
         $messagesFromHandler1 = $this->handler1->getReceivedMessages();
 

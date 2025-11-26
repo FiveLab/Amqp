@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Consumer\Strategy;
 
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
-use FiveLab\Component\Amqp\Exception\StopConsumingException;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
 
 interface ConsumeStrategyInterface
@@ -29,7 +28,6 @@ interface ConsumeStrategyInterface
      * @param string         $tag
      *
      * @throws ConsumerTimeoutExceedException
-     * @throws StopConsumingException
      */
     public function consume(QueueInterface $queue, \Closure $handler, string $tag = ''): void;
 }

@@ -51,26 +51,10 @@ Development
 
 For easy development you can use the `Docker`.
 
-> **Note:** We use internal network for link the our library with rabbitmq for testing
-  and development.
-
 ```bash
-docker network create --driver bridge amqp
-docker run -d --rm \
-    --network amqp \
-    --name amqp-rabbitmq \
-    rabbitmq:management
-docker build -t amqp .
-docker run -it --rm \
-    --name amqp \
-    -v $(pwd):/code \
-    --network amqp \
-    -e "RABBITMQ_HOST=amqp-rabbitmq" \
-    amqp bash
-
-```
-
-> **Note** for debugging you can expose 15672 port for access to management plugin. 
+docker compose up
+docker compose exec amqp bash
+``` 
 
 After success run and attach to container you must install vendors:
 

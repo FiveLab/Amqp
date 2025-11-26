@@ -15,11 +15,13 @@ namespace FiveLab\Component\Amqp\Tests\Functional\Adapter;
 
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
+use FiveLab\Component\Amqp\Consumer\ConsumerStoppedReason;
 use FiveLab\Component\Amqp\Consumer\Loop\LoopConsumer;
 use FiveLab\Component\Amqp\Consumer\Loop\LoopConsumerConfiguration;
-use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
-use FiveLab\Component\Amqp\Consumer\Middleware\StopAfterNExecutesMiddleware;
+use FiveLab\Component\Amqp\Event\ConsumerStoppedEvent;
+use FiveLab\Component\Amqp\Event\ProcessedMessageEvent;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
+use FiveLab\Component\Amqp\Listener\StopAfterNExecutesListener;
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
@@ -27,6 +29,7 @@ use FiveLab\Component\Amqp\Tests\Functional\Consumer\Handler\MessageHandlerMock;
 use FiveLab\Component\Amqp\Tests\Functional\Consumer\Handler\ThrowableMessageHandlerMock;
 use FiveLab\Component\Amqp\Tests\Functional\RabbitMqTestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 abstract class LoopConsumerTestCase extends RabbitMqTestCase
 {
@@ -62,7 +65,6 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
         $consumer = new LoopConsumer(
             $this->queueFactory,
             $this->messageHandler,
-            new ConsumerMiddlewares(),
             new LoopConsumerConfiguration(1)
         );
 
@@ -80,7 +82,6 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
         $consumer = new LoopConsumer(
             $this->queueFactory,
             $this->throwableMessageHandler,
-            new ConsumerMiddlewares(),
             new LoopConsumerConfiguration(1)
         );
 
@@ -96,14 +97,10 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
     {
         $this->publishMessages(1);
 
-        $consumer = new LoopConsumer(
-            $this->queueFactory,
-            $this->throwableMessageHandler,
-            new ConsumerMiddlewares(),
-            new LoopConsumerConfiguration(1)
-        );
+        $consumer = new LoopConsumer($this->queueFactory, $this->throwableMessageHandler, new LoopConsumerConfiguration(1));
 
         $this->throwableMessageHandler->shouldThrowException(new \RuntimeException('some'));
+
         $this->throwableMessageHandler->onCatchError(static function (ReceivedMessage $message) {
             $message->ack();
         });
@@ -118,14 +115,10 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
     {
         $this->publishMessages(1);
 
-        $consumer = new LoopConsumer(
-            $this->queueFactory,
-            $this->throwableMessageHandler,
-            new ConsumerMiddlewares(),
-            new LoopConsumerConfiguration(1)
-        );
+        $consumer = new LoopConsumer($this->queueFactory, $this->throwableMessageHandler, new LoopConsumerConfiguration(1));
 
         $this->throwableMessageHandler->shouldThrowException(new \RuntimeException('some'));
+
         $this->throwableMessageHandler->onCatchError(static function (ReceivedMessage $message) {
             $message->nack(false);
         });
@@ -143,14 +136,11 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
         $consumer = new LoopConsumer(
             $this->queueFactory,
             $this->throwableMessageHandler,
-            new ConsumerMiddlewares(),
             new LoopConsumerConfiguration(1)
         );
 
         $this->throwableMessageHandler->shouldThrowException(new \RuntimeException('some'));
-        $this->throwableMessageHandler->onCatchError(static function (ReceivedMessage $message, \Throwable $error) {
-            throw $error;
-        });
+        $this->throwableMessageHandler->onCatchError(static fn(ReceivedMessage $message, \Throwable $error) => throw $error);
 
         try {
             $this->runConsumer($consumer);
@@ -179,37 +169,34 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
         $consumer = new LoopConsumer(
             $this->queueFactory,
             $this->messageHandler,
-            new ConsumerMiddlewares(),
             new LoopConsumerConfiguration(1)
         );
 
-        $this->messageHandler->setHandlerCallback(static function () use (&$handledMessages, $consumer) {
+        $this->messageHandler->setHandlerCallback(function (ReceivedMessage $message) use (&$handledMessages, $consumer) {
             $handledMessages++;
 
             if ($handledMessages >= 3) {
-                $consumer->throwExceptionOnConsumerTimeoutExceed();
+                $this->registerTimeoutListenerForStop($consumer);
             }
+
+            $message->ack();
 
             throw new ConsumerTimeoutExceedException();
         });
 
-        try {
-            $consumer->run();
+        $this->runConsumer($consumer, false, false);
 
-            self::fail('must throw exception');
-        } catch (ConsumerTimeoutExceedException) {
-            $receivedMessages = \array_map(static function (ReceivedMessage $receivedMessage) {
-                return $receivedMessage->payload->data;
-            }, $this->messageHandler->getReceivedMessages());
+        $receivedMessages = \array_map(static function (ReceivedMessage $receivedMessage) {
+            return $receivedMessage->payload->data;
+        }, $this->messageHandler->getReceivedMessages());
 
-            self::assertEquals([
-                'message #1',
-                'message #2',
-                'message #3',
-            ], $receivedMessages);
+        self::assertEquals([
+            'message #1',
+            'message #2',
+            'message #3',
+        ], $receivedMessages);
 
-            self::assertQueueEmpty($this->queueFactory);
-        }
+        self::assertQueueEmpty($this->queueFactory);
     }
 
     #[Test]
@@ -222,11 +209,10 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
         $consumer = new LoopConsumer(
             $this->queueFactory,
             $this->messageHandler,
-            new ConsumerMiddlewares(),
             new LoopConsumerConfiguration(1, true, 5)
         );
 
-        $this->messageHandler->setHandlerCallback(function () use (&$handledMessages, $consumer) {
+        $this->messageHandler->setHandlerCallback(function (ReceivedMessage $message) use (&$handledMessages, $consumer) {
             $channel = $this->queueFactory->create()->getChannel();
             $connection = $channel->getConnection();
 
@@ -236,20 +222,18 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
             $handledMessages++;
 
             if ($handledMessages >= 3) {
-                $consumer->throwExceptionOnConsumerTimeoutExceed();
+                $this->registerTimeoutListenerForStop($consumer);
             }
+
+            $message->ack();
 
             throw new ConsumerTimeoutExceedException();
         });
 
-        try {
-            $consumer->run();
+        $this->runConsumer($consumer, false, false);
 
-            self::fail('must throw exception');
-        } catch (ConsumerTimeoutExceedException) {
-            self::assertCount(3, $this->messageHandler->getReceivedMessages());
-            self::assertQueueEmpty($this->queueFactory);
-        }
+        self::assertCount(3, $this->messageHandler->getReceivedMessages());
+        self::assertQueueEmpty($this->queueFactory);
     }
 
     #[Test]
@@ -257,31 +241,40 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
     {
         $this->publishMessages(12);
 
-        $consumer = new LoopConsumer(
-            $this->queueFactory,
-            $this->messageHandler,
-            new ConsumerMiddlewares(new StopAfterNExecutesMiddleware(5)),
-            new LoopConsumerConfiguration(1)
-        );
+        $consumer = new LoopConsumer($this->queueFactory, $this->messageHandler, new LoopConsumerConfiguration(1));
+        $consumer->setEventDispatcher($eventDispatcher = new EventDispatcher());
+        $eventDispatcher->addListener(ProcessedMessageEvent::class, new StopAfterNExecutesListener($eventDispatcher, 5)->onProcessedMessage(...));
 
-        $consumer->throwExceptionOnConsumerTimeoutExceed();
-
-        $consumer->run();
+        $this->runConsumer($consumer);
 
         self::assertCount(5, $this->messageHandler->getReceivedMessages());
         self::assertQueueContainsCountMessages($this->queueFactory, 7);
     }
 
-    private function runConsumer(LoopConsumer $consumer): void
+    private function runConsumer(LoopConsumer $consumer, bool $changeReadTimeout = true, bool $registerTimeoutListener = true): void
     {
-        $consumer->throwExceptionOnConsumerTimeoutExceed();
-        $consumer->getQueue()->getChannel()->getConnection()->setReadTimeout(1);
-
-        try {
-            $consumer->run();
-        } catch (ConsumerTimeoutExceedException) {
-            // Normal flow
+        if (!$consumer->getEventDispatcher()) {
+            $consumer->setEventDispatcher(new EventDispatcher());
         }
+
+        if ($registerTimeoutListener) {
+            $this->registerTimeoutListenerForStop($consumer);
+        }
+
+        if ($changeReadTimeout) {
+            $consumer->getQueue()->getChannel()->getConnection()->setReadTimeout(0.2);
+        }
+
+        $consumer->run();
+    }
+
+    private function registerTimeoutListenerForStop(LoopConsumer $consumer): void
+    {
+        $consumer->getEventDispatcher()->addListener(ConsumerStoppedEvent::class, static function (ConsumerStoppedEvent $event): void {
+            if ($event->reason === ConsumerStoppedReason::Timeout) {
+                $event->consumer->stop();
+            }
+        });
     }
 
     private function publishMessages(int $messages): void

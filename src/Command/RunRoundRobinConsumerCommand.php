@@ -13,8 +13,6 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Command;
 
-use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
-use FiveLab\Component\Amqp\Consumer\Event;
 use FiveLab\Component\Amqp\Consumer\RoundRobin\RoundRobinConsumer;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -41,10 +39,7 @@ class RunRoundRobinConsumerCommand extends Command implements SignalableCommandI
             return [];
         }
 
-        return [
-            \SIGINT,
-            \SIGTERM,
-        ];
+        return [\SIGINT, \SIGTERM];
     }
 
     public function handleSignal(int $signal, false|int $previousExitCode = 0): int|false
@@ -52,21 +47,6 @@ class RunRoundRobinConsumerCommand extends Command implements SignalableCommandI
         $this->consumer->stop();
 
         return false;
-    }
-
-    protected function initialize(InputInterface $input, OutputInterface $output): void
-    {
-        $this->consumer->addEventHandler(static function (Event $event, mixed ...$args) use ($output) {
-            if (Event::ChangeConsumer === $event) {
-                /** @var ConsumerInterface $consumer */
-                $consumer = $args[0];
-
-                $output->writeln(\sprintf(
-                    'Select next consumer with queue <comment>%s</comment>.',
-                    $consumer->getQueue()->getName()
-                ), OutputInterface::VERBOSITY_VERBOSE);
-            }
-        });
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

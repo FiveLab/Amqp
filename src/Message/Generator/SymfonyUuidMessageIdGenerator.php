@@ -13,12 +13,12 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Message\Generator;
 
-use Ramsey\Uuid\Uuid;
+use Symfony\Component\Uid\Uuid;
 
-readonly class RamseyUuidMessageIdGenerator implements MessageIdGeneratorInterface
+readonly class SymfonyUuidMessageIdGenerator implements MessageIdGeneratorInterface
 {
     public function generate(): string
     {
-        return Uuid::uuid4()->toString();
+        return Uuid::v4()->toRfc4122();
     }
 }

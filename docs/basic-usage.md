@@ -102,13 +102,11 @@ And you can create and run consumer:
 <?php
 
 use FiveLab\Component\Amqp\Consumer\SingleConsumer;
-use FiveLab\Component\Amqp\Consumer\Middleware\ConsumerMiddlewares;
 use FiveLab\Component\Amqp\Consumer\ConsumerConfiguration;
 
 $consumer = new SingleConsumer(
     $queueFactory,
     new MyMessageHandler(),
-    new ConsumerMiddlewares(),
     new ConsumerConfiguration()
 );
 

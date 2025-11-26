@@ -15,12 +15,9 @@ namespace FiveLab\Component\Amqp\Tests\Functional\Adapter\AmqpLibSockets;
 
 use FiveLab\Component\Amqp\Adapter\AmqpLib\Channel\AmqpChannelFactory;
 use FiveLab\Component\Amqp\Adapter\AmqpLib\Connection\AmqpSocketsConnectionFactory;
-use FiveLab\Component\Amqp\Adapter\AmqpLib\Exchange\AmqpExchangeFactory;
 use FiveLab\Component\Amqp\Adapter\AmqpLib\Queue\AmqpQueueFactory;
 use FiveLab\Component\Amqp\Channel\Definition\ChannelDefinition;
 use FiveLab\Component\Amqp\Connection\Driver;
-use FiveLab\Component\Amqp\Exchange\Definition\ExchangeDefinition;
-use FiveLab\Component\Amqp\Exchange\ExchangeFactoryInterface;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Tests\Functional\Adapter\SingleConsumerTestCase;
@@ -34,14 +31,5 @@ class AmqpSingleSingleConsumerTest extends SingleConsumerTestCase
         $channelFactory = new AmqpChannelFactory($connectionFactory, new ChannelDefinition());
 
         return new AmqpQueueFactory($channelFactory, $definition);
-    }
-
-    protected function createProxyExchangeFactory(ExchangeDefinition $definition): ExchangeFactoryInterface
-    {
-        $connectionFactory = new AmqpSocketsConnectionFactory($this->getRabbitMqDsn(Driver::AmqpSockets, ['read_timeout' => 1]));
-
-        $channelFactory = new AmqpChannelFactory($connectionFactory, new ChannelDefinition());
-
-        return new AmqpExchangeFactory($channelFactory, $definition);
     }
 }
