@@ -41,6 +41,16 @@ class OutputListenerTest extends TestCase
     }
 
     #[Test]
+    public function shouldSuccessGetListeners(): void
+    {
+        self::assertEquals([
+            'console.command'           => ['onConsoleCommand', 0],
+            ConsumerStoppedEvent::class => ['onConsumerStopped', 0],
+            ReceiveMessageEvent::class  => ['onReceiveMessage', 0],
+        ], OutputListener::getSubscribedEvents());
+    }
+
+    #[Test]
     #[TestWith([ConsumerStoppedReason::Timeout, '<comment>Receive consumer timeout exceed error.</comment>'])]
     #[TestWith([ConsumerStoppedReason::StopConsuming, '<comment>Stop consuming.</comment>'])]
     #[TestWith([ConsumerStoppedReason::ChangeConsumer, 'Select next consumer for queue <comment>next_queue</comment>.'])]

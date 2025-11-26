@@ -27,6 +27,13 @@ class StopAfterNExecutesListener implements EventSubscriberInterface
     {
     }
 
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            ProcessedMessageEvent::class => ['onProcessedMessage', -1024],
+        ];
+    }
+
     public function onProcessedMessage(ProcessedMessageEvent $event): void
     {
         $this->executesCounter++;
@@ -38,12 +45,5 @@ class StopAfterNExecutesListener implements EventSubscriberInterface
 
             $event->consumer->stop();
         }
-    }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ProcessedMessageEvent::class => ['onProcessedMessage', 0],
-        ];
     }
 }

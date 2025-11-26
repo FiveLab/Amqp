@@ -24,6 +24,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class StopAfterNExecutesListenerTest extends TestCase
 {
     #[Test]
+    public function shouldSuccessGetListeners(): void
+    {
+        self::assertEquals([
+            ProcessedMessageEvent::class => ['onProcessedMessage', -1024],
+        ], StopAfterNExecutesListener::getSubscribedEvents());
+    }
+
+    #[Test]
     public function shouldSuccessStopAfterReachedLimit(): void
     {
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);

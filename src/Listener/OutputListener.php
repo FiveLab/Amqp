@@ -16,12 +16,23 @@ namespace FiveLab\Component\Amqp\Listener;
 use FiveLab\Component\Amqp\Consumer\ConsumerStoppedReason;
 use FiveLab\Component\Amqp\Event\ConsumerStoppedEvent;
 use FiveLab\Component\Amqp\Event\ReceiveMessageEvent;
+use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class OutputListener
+class OutputListener implements EventSubscriberInterface
 {
     private ?OutputInterface $output = null;
+
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            ConsoleEvents::COMMAND      => ['onConsoleCommand', 0],
+            ConsumerStoppedEvent::class => ['onConsumerStopped', 0],
+            ReceiveMessageEvent::class  => ['onReceiveMessage', 0],
+        ];
+    }
 
     public function onConsoleCommand(ConsoleCommandEvent $event): void
     {
