@@ -1,8 +1,8 @@
 CHANGELOG
 =========
 
-Next release
-------------
+v2.3.0
+------
 
 * Remove consumer middleware layer. Use `symfony/event-dispatcher` instead of.
 * Remove `RamseyUuidMessageIdGenerator` (use `SymfonyUuidMessageIdGenerator` instead). 
