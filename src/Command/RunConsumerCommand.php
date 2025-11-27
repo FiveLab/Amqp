@@ -96,7 +96,7 @@ class RunConsumerCommand extends Command implements SignalableCommandInterface
 
         $this->consumer = $this->consumerRegistry->get($consumerKey);
 
-        if ($this->consumer instanceof EventableConsumerInterface) {
+        if ($this->consumer instanceof EventableConsumerInterface && !$this->consumer->getEventDispatcher()) {
             $this->consumer->setEventDispatcher($this->eventDispatcher);
         }
 
@@ -109,7 +109,7 @@ class RunConsumerCommand extends Command implements SignalableCommandInterface
                 ));
             }
 
-            if (!$this->eventDispatcher) {
+            if (!$this->consumer->getEventDispatcher()) {
                 throw new \RuntimeException('A message limit can\'t be applied, since the command has no access to the event dispatcher.');
             }
 

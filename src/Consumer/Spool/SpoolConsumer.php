@@ -33,6 +33,8 @@ readonly class SpoolConsumer extends AbstractConsumer
 {
     public function run(): void
     {
+        $this->allowConsuming();
+
         $channel = null;
         $receivedMessages = new MutableReceivedMessages();
 
@@ -69,7 +71,7 @@ readonly class SpoolConsumer extends AbstractConsumer
                         }
                     }
                 );
-            } catch (ConsumerTimeoutExceedException $error) {
+            } catch (ConsumerTimeoutExceedException) {
                 $this->flushMessages($receivedMessages);
 
                 $channel->getConnection()->disconnect();

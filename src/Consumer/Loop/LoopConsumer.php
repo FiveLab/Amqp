@@ -27,6 +27,8 @@ readonly class LoopConsumer extends AbstractConsumer
 {
     public function run(): void
     {
+        $this->allowConsuming();
+
         $channel = null;
 
         while (!$this->isStopConsuming()) {

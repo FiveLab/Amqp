@@ -17,9 +17,12 @@ use FiveLab\Component\Amqp\AmqpEvents;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Consumer\ConsumerStoppedReason;
+use FiveLab\Component\Amqp\Consumer\Loop\LoopConsumer;
+use FiveLab\Component\Amqp\Consumer\Loop\LoopConsumerConfiguration;
 use FiveLab\Component\Amqp\Consumer\Spool\SpoolConsumer;
 use FiveLab\Component\Amqp\Consumer\Spool\SpoolConsumerConfiguration;
 use FiveLab\Component\Amqp\Event\ConsumerStoppedEvent;
+use FiveLab\Component\Amqp\Event\ProcessedMessageEvent;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Listener\StopAfterNExecutesListener;
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
@@ -405,6 +408,24 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
             $flushCalledTimes,
             \sprintf('expected %d "flush" calls, actually called %d times', $expectedFlushCallTimes, $flushCalledTimes)
         );
+    }
+
+    #[Test]
+    public function shouldSuccessReRunAfterStop(): void
+    {
+        $this->publishMessages(10);
+
+        $consumer = new SpoolConsumer($this->queueFactory, $this->messageHandler, new SpoolConsumerConfiguration(10, 1, 1, true));
+        $consumer->setEventDispatcher($eventDispatcher = new EventDispatcher());
+
+        $eventDispatcher->addListener(AmqpEvents::PROCESSED_MESSAGE, static function (ProcessedMessageEvent $event): void {
+            $event->consumer->stop();
+        });
+
+        $this->runConsumer($consumer);
+        $this->runConsumer($consumer);
+
+        self::assertCount(2, $this->messageHandler->getReceivedMessages());
     }
 
     public static function providePrefetchAndMessageCount(): array

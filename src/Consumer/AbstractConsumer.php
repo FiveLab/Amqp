@@ -21,6 +21,7 @@ use FiveLab\Component\Amqp\Consumer\Strategy\DefaultConsumeStrategy;
 use FiveLab\Component\Amqp\Event\ConsumerStoppedEvent;
 use FiveLab\Component\Amqp\Event\ProcessedMessageEvent;
 use FiveLab\Component\Amqp\Event\ReceiveMessageEvent;
+use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
@@ -78,6 +79,11 @@ abstract readonly class AbstractConsumer implements EventableConsumerInterface
     public function getEventDispatcher(): ?EventDispatcherInterface
     {
         return $this->options->offsetGet('event_dispatcher'); // @phpstan-ignore-line return.type
+    }
+
+    protected function allowConsuming(): void
+    {
+        $this->options->offsetSet('stop_consuming', false);
     }
 
     protected function isStopConsuming(): bool

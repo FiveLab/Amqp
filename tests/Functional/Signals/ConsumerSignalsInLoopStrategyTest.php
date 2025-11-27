@@ -89,7 +89,7 @@ OUTPUT;
         $process->setTimeout(10);
 
         $process->run(static function (string $type, string $buffer) use ($process): void {
-            if ('tick 1' === \trim($buffer)) {
+            if ('bla bla' === \trim($buffer)) {
                 $process->signal(\SIGTERM);
             }
         });
@@ -97,8 +97,8 @@ OUTPUT;
         $output = $process->getOutput();
 
         $expectedOutput = <<<OUTPUT
-bla bla
 tick 1
+bla bla
 handle signal: 15
 flush messages
 

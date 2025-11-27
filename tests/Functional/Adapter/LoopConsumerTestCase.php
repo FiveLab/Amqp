@@ -20,6 +20,7 @@ use FiveLab\Component\Amqp\Consumer\ConsumerStoppedReason;
 use FiveLab\Component\Amqp\Consumer\Loop\LoopConsumer;
 use FiveLab\Component\Amqp\Consumer\Loop\LoopConsumerConfiguration;
 use FiveLab\Component\Amqp\Event\ConsumerStoppedEvent;
+use FiveLab\Component\Amqp\Event\ProcessedMessageEvent;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Listener\StopAfterNExecutesListener;
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
@@ -249,6 +250,24 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
 
         self::assertCount(5, $this->messageHandler->getReceivedMessages());
         self::assertQueueContainsCountMessages($this->queueFactory, 7);
+    }
+
+    #[Test]
+    public function shouldSuccessReRunAfterStop(): void
+    {
+        $this->publishMessages(10);
+
+        $consumer = new LoopConsumer($this->queueFactory, $this->messageHandler, new LoopConsumerConfiguration(1));
+        $consumer->setEventDispatcher($eventDispatcher = new EventDispatcher());
+
+        $eventDispatcher->addListener(AmqpEvents::PROCESSED_MESSAGE, static function (ProcessedMessageEvent $event): void {
+            $event->consumer->stop();
+        });
+
+        $this->runConsumer($consumer);
+        $this->runConsumer($consumer);
+
+        self::assertCount(2, $this->messageHandler->getReceivedMessages());
     }
 
     private function runConsumer(LoopConsumer $consumer, bool $changeReadTimeout = true, bool $registerTimeoutListener = true): void
