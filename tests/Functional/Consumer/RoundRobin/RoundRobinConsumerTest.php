@@ -16,6 +16,7 @@ namespace FiveLab\Component\Amqp\Tests\Functional\Consumer\RoundRobin;
 use FiveLab\Component\Amqp\Adapter\Amqp\Channel\AmqpChannelFactory;
 use FiveLab\Component\Amqp\Adapter\Amqp\Connection\AmqpConnectionFactory;
 use FiveLab\Component\Amqp\Adapter\Amqp\Queue\AmqpQueueFactory;
+use FiveLab\Component\Amqp\AmqpEvents;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Channel\Definition\ChannelDefinition;
@@ -89,7 +90,7 @@ class RoundRobinConsumerTest extends RabbitMqTestCase
         $roundRobin = new RoundRobinConsumer($configuration, $consumerRegistry, ['c1', 'c2']);
         $roundRobin->setEventDispatcher($eventDispatcher = new EventDispatcher());
 
-        $eventDispatcher->addListener(ConsumerStoppedEvent::class, static function (ConsumerStoppedEvent $event): void {
+        $eventDispatcher->addListener(AmqpEvents::CONSUMER_STOPPED, static function (ConsumerStoppedEvent $event): void {
             if ($event->reason === ConsumerStoppedReason::ChangeConsumer && !\count($event->options['remaining_consumers'])) {
                 $event->consumer->stop();
             }

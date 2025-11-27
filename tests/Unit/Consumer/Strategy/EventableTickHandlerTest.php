@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Unit\Consumer\Strategy;
 
+use FiveLab\Component\Amqp\AmqpEvents;
 use FiveLab\Component\Amqp\Consumer\Strategy\EventableTickHandler;
 use FiveLab\Component\Amqp\Event\ConsumerTickEvent;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
@@ -30,7 +31,7 @@ class EventableTickHandlerTest extends TestCase
 
         $dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(new ConsumerTickEvent($queue, 'bla'));
+            ->with(new ConsumerTickEvent($queue, 'bla'), AmqpEvents::CONSUMER_TICK);
 
         $handler = new EventableTickHandler($dispatcher);
 

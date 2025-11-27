@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Listener;
 
+use FiveLab\Component\Amqp\AmqpEvents;
 use FiveLab\Component\Amqp\Consumer\ConsumerStoppedReason;
 use FiveLab\Component\Amqp\Event\ConsumerStoppedEvent;
 use FiveLab\Component\Amqp\Event\ProcessedMessageEvent;
@@ -30,7 +31,7 @@ class StopAfterNExecutesListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ProcessedMessageEvent::class => ['onProcessedMessage', -1024],
+            AmqpEvents::PROCESSED_MESSAGE => ['onProcessedMessage', -1024],
         ];
     }
 
@@ -41,7 +42,7 @@ class StopAfterNExecutesListener implements EventSubscriberInterface
         if ($this->executesCounter >= $this->stopAfterExecutes) {
             $this->executesCounter = 0;
 
-            $this->eventDispatcher->dispatch(new ConsumerStoppedEvent($event->consumer, ConsumerStoppedReason::StopConsuming));
+            $this->eventDispatcher->dispatch(new ConsumerStoppedEvent($event->consumer, ConsumerStoppedReason::StopConsuming), AmqpEvents::CONSUMER_STOPPED);
 
             $event->consumer->stop();
         }

@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Consumer\Strategy;
 
+use FiveLab\Component\Amqp\AmqpEvents;
 use FiveLab\Component\Amqp\Event\ConsumerTickEvent;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -25,6 +26,6 @@ readonly class EventableTickHandler
 
     public function __invoke(QueueInterface $queue, string $consumerTag): void
     {
-        $this->eventDispatcher->dispatch(new ConsumerTickEvent($queue, $consumerTag));
+        $this->eventDispatcher->dispatch(new ConsumerTickEvent($queue, $consumerTag), AmqpEvents::CONSUMER_TICK);
     }
 }

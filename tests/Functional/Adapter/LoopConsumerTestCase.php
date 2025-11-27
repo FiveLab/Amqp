@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Functional\Adapter;
 
+use FiveLab\Component\Amqp\AmqpEvents;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Consumer\ConsumerStoppedReason;
@@ -243,7 +244,7 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
 
         $consumer = new LoopConsumer($this->queueFactory, $this->messageHandler, new LoopConsumerConfiguration(1));
         $consumer->setEventDispatcher($eventDispatcher = new EventDispatcher());
-        $eventDispatcher->addListener(ProcessedMessageEvent::class, (new StopAfterNExecutesListener($eventDispatcher, 5))->onProcessedMessage(...));
+        $eventDispatcher->addListener(AmqpEvents::PROCESSED_MESSAGE, (new StopAfterNExecutesListener($eventDispatcher, 5))->onProcessedMessage(...));
 
         $this->runConsumer($consumer);
 
@@ -270,7 +271,7 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
 
     private function registerTimeoutListenerForStop(LoopConsumer $consumer): void
     {
-        $consumer->getEventDispatcher()->addListener(ConsumerStoppedEvent::class, static function (ConsumerStoppedEvent $event): void {
+        $consumer->getEventDispatcher()->addListener(AmqpEvents::CONSUMER_STOPPED, static function (ConsumerStoppedEvent $event): void {
             if ($event->reason === ConsumerStoppedReason::Timeout) {
                 $event->consumer->stop();
             }

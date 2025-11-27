@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Tests\Functional\Adapter;
 
+use FiveLab\Component\Amqp\AmqpEvents;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Consumer\ConsumerConfiguration;
@@ -117,7 +118,7 @@ abstract class SingleConsumerTestCase extends RabbitMqTestCase
 
         $consumer = new SingleConsumer($this->queueFactory, $handler, new ConsumerConfiguration());
         $consumer->setEventDispatcher($eventDispatcher = new EventDispatcher());
-        $eventDispatcher->addListener(ProcessedMessageEvent::class, (new StopAfterNExecutesListener($eventDispatcher, 2))->onProcessedMessage(...));
+        $eventDispatcher->addListener(AmqpEvents::PROCESSED_MESSAGE, (new StopAfterNExecutesListener($eventDispatcher, 2))->onProcessedMessage(...));
 
         $this->runConsumer($consumer);
 

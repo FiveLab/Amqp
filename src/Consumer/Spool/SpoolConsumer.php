@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Consumer\Spool;
 
+use FiveLab\Component\Amqp\AmqpEvents;
 use FiveLab\Component\Amqp\Channel\ChannelInterface;
 use FiveLab\Component\Amqp\Consumer\AbstractConsumer;
 use FiveLab\Component\Amqp\Consumer\ConsumerStoppedReason;
@@ -72,7 +73,7 @@ readonly class SpoolConsumer extends AbstractConsumer
                 $this->flushMessages($receivedMessages);
 
                 $channel->getConnection()->disconnect();
-                $this->getEventDispatcher()?->dispatch(new ConsumerStoppedEvent($this, ConsumerStoppedReason::Timeout));
+                $this->getEventDispatcher()?->dispatch(new ConsumerStoppedEvent($this, ConsumerStoppedReason::Timeout), AmqpEvents::CONSUMER_STOPPED);
 
                 continue;
             } catch (\Throwable $error) {

@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Consumer\RoundRobin;
 
+use FiveLab\Component\Amqp\AmqpEvents;
 use FiveLab\Component\Amqp\Consumer\ConsumerInterface;
 use FiveLab\Component\Amqp\Consumer\ConsumerStoppedReason;
 use FiveLab\Component\Amqp\Consumer\EventableConsumerInterface;
@@ -105,7 +106,7 @@ class RoundRobinConsumer implements EventableConsumerInterface
                     'remaining_consumers' => $consumers,
                 ]);
 
-                $this->getEventDispatcher()?->dispatch($event);
+                $this->getEventDispatcher()?->dispatch($event, AmqpEvents::CONSUMER_STOPPED);
 
                 try {
                     $consumer->run();

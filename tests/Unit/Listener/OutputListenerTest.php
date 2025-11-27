@@ -44,9 +44,9 @@ class OutputListenerTest extends TestCase
     public function shouldSuccessGetListeners(): void
     {
         self::assertEquals([
-            'console.command'           => ['onConsoleCommand', 0],
-            ConsumerStoppedEvent::class => ['onConsumerStopped', 0],
-            ReceiveMessageEvent::class  => ['onReceiveMessage', 0],
+            'console.command'       => ['onConsoleCommand', 0],
+            'amqp.consumer_stopped' => ['onConsumerStopped', 0],
+            'amqp.receive_message'  => ['onReceiveMessage', 0],
         ], OutputListener::getSubscribedEvents());
     }
 

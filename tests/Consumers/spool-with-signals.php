@@ -8,6 +8,7 @@ include_once __DIR__.'/../../vendor/autoload.php';
 include_once __DIR__.'/utils.php';
 
 use FiveLab\Component\Amqp\AmqpBuilder;
+use FiveLab\Component\Amqp\AmqpEvents;
 use FiveLab\Component\Amqp\Consumer\ConsumerStoppedReason;
 use FiveLab\Component\Amqp\Consumer\Spool\SpoolConsumer;
 use FiveLab\Component\Amqp\Consumer\Spool\SpoolConsumerConfiguration;
@@ -34,7 +35,7 @@ $consumer = new SpoolConsumer(
 
 $consumer->setEventDispatcher($eventDispatcher = new EventDispatcher());
 
-$eventDispatcher->addListener(ConsumerStoppedEvent::class, function (ConsumerStoppedEvent $event): void {
+$eventDispatcher->addListener(AmqpEvents::CONSUMER_STOPPED, function (ConsumerStoppedEvent $event): void {
     if ($event->reason === ConsumerStoppedReason::Timeout) {
         $event->consumer->stop();
     }

@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Consumer\Loop;
 
+use FiveLab\Component\Amqp\AmqpEvents;
 use FiveLab\Component\Amqp\Channel\ChannelInterface;
 use FiveLab\Component\Amqp\Consumer\AbstractConsumer;
 use FiveLab\Component\Amqp\Consumer\ConsumerStoppedReason;
@@ -40,7 +41,7 @@ readonly class LoopConsumer extends AbstractConsumer
                 // We full disconnect and try reconnect
                 $channel->getConnection()->disconnect();
 
-                $this->getEventDispatcher()?->dispatch(new ConsumerStoppedEvent($this, ConsumerStoppedReason::Timeout));
+                $this->getEventDispatcher()?->dispatch(new ConsumerStoppedEvent($this, ConsumerStoppedReason::Timeout), AmqpEvents::CONSUMER_STOPPED);
             } catch (\Throwable $e) {
                 // Disconnect, because inner system can has buffer for sending to amqp service.
                 $channel->getConnection()->disconnect();

@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Listener;
 
+use FiveLab\Component\Amqp\AmqpEvents;
 use FiveLab\Component\Amqp\Consumer\ConsumerStoppedReason;
 use FiveLab\Component\Amqp\Event\ConsumerStoppedEvent;
 use FiveLab\Component\Amqp\Event\ReceiveMessageEvent;
@@ -28,9 +29,9 @@ class OutputListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ConsoleEvents::COMMAND      => ['onConsoleCommand', 0],
-            ConsumerStoppedEvent::class => ['onConsumerStopped', 0],
-            ReceiveMessageEvent::class  => ['onReceiveMessage', 0],
+            ConsoleEvents::COMMAND       => ['onConsoleCommand', 0],
+            AmqpEvents::CONSUMER_STOPPED => ['onConsumerStopped', 0],
+            AmqpEvents::RECEIVE_MESSAGE  => ['onReceiveMessage', 0],
         ];
     }
 

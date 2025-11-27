@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Consumer;
 
+use FiveLab\Component\Amqp\AmqpEvents;
 use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlerInterface;
 use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlers;
 use FiveLab\Component\Amqp\Consumer\Strategy\ConsumeStrategyInterface;
@@ -61,7 +62,7 @@ abstract readonly class AbstractConsumer implements EventableConsumerInterface
     {
         $this->options->offsetSet('stop_consuming', true);
         $this->strategy->stopConsume();
-        $this->getEventDispatcher()?->dispatch(new ConsumerStoppedEvent($this, ConsumerStoppedReason::StopConsuming));
+        $this->getEventDispatcher()?->dispatch(new ConsumerStoppedEvent($this, ConsumerStoppedReason::StopConsuming), AmqpEvents::CONSUMER_STOPPED);
     }
 
     public function getQueue(): QueueInterface
@@ -87,7 +88,7 @@ abstract readonly class AbstractConsumer implements EventableConsumerInterface
     protected function doRun(bool $autoAck = true, ?\Closure $beforeCallback = null, ?\Closure $afterCallback = null): void
     {
         $this->strategy->consume($this->queueFactory->create(), function (ReceivedMessage $message) use ($autoAck, $beforeCallback, $afterCallback): void {
-            $this->getEventDispatcher()?->dispatch(new ReceiveMessageEvent($message, $this));
+            $this->getEventDispatcher()?->dispatch(new ReceiveMessageEvent($message, $this), AmqpEvents::RECEIVE_MESSAGE);
 
             if ($beforeCallback) {
                 ($beforeCallback)($message);
@@ -108,7 +109,7 @@ abstract readonly class AbstractConsumer implements EventableConsumerInterface
                 $message->ack();
             }
 
-            $this->getEventDispatcher()?->dispatch(new ProcessedMessageEvent($message, $this));
+            $this->getEventDispatcher()?->dispatch(new ProcessedMessageEvent($message, $this), AmqpEvents::PROCESSED_MESSAGE);
 
             if ($afterCallback) {
                 ($afterCallback)($message);

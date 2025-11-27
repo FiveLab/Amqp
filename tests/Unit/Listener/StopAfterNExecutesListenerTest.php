@@ -27,7 +27,7 @@ class StopAfterNExecutesListenerTest extends TestCase
     public function shouldSuccessGetListeners(): void
     {
         self::assertEquals([
-            ProcessedMessageEvent::class => ['onProcessedMessage', -1024],
+            'amqp.processed_message' => ['onProcessedMessage', -1024],
         ], StopAfterNExecutesListener::getSubscribedEvents());
     }
 
