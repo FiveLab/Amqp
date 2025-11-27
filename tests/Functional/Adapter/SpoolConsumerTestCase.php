@@ -17,8 +17,6 @@ use FiveLab\Component\Amqp\AmqpEvents;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Consumer\ConsumerStoppedReason;
-use FiveLab\Component\Amqp\Consumer\Loop\LoopConsumer;
-use FiveLab\Component\Amqp\Consumer\Loop\LoopConsumerConfiguration;
 use FiveLab\Component\Amqp\Consumer\Spool\SpoolConsumer;
 use FiveLab\Component\Amqp\Consumer\Spool\SpoolConsumerConfiguration;
 use FiveLab\Component\Amqp\Event\ConsumerStoppedEvent;
