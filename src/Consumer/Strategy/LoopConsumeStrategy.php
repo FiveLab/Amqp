@@ -50,6 +50,10 @@ class LoopConsumeStrategy implements ConsumeStrategyInterface
 
         $this->stopConsuming = false;
 
+        if ($this->tickHandler) {
+            ($this->tickHandler)($queue, $tag);
+        }
+
         while (!$this->stopConsuming) { // @phpstan-ignore-line booleanNot.alwaysTrue
             if ($readTimeout && $readTimeout < $idleReadTimer) {
                 throw new ConsumerTimeoutExceedException('Consumer timeout exceed.');
