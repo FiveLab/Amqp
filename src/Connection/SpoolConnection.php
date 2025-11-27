@@ -92,6 +92,11 @@ class SpoolConnection implements ConnectionInterface
 
     public function disconnect(): void
     {
+        if (!$this->originConnection) {
+            // Already disconnected.
+            return;
+        }
+
         $this->getOriginConnection()->disconnect();
         $this->notify();
 

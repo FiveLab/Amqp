@@ -41,6 +41,26 @@ abstract class SpoolConnectionTestCase extends RabbitMqTestCase
     }
 
     #[Test]
+    public function shouldSuccessDisconnectTwice(): void
+    {
+        $connection = $this->makeSpoolConnectionFactory()->create();
+
+        self::assertFalse($connection->isConnected());
+
+        $connection->connect();
+
+        self::assertTrue($connection->isConnected());
+
+        $connection->disconnect();
+
+        self::assertFalse($connection->isConnected());
+
+        $connection->disconnect();
+
+        self::assertFalse($connection->isConnected());
+    }
+
+    #[Test]
     public function shouldSuccessGetChannel(): void
     {
         $connectionFactory = $this->makeSpoolConnectionFactory();

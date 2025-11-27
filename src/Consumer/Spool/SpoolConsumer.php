@@ -114,6 +114,8 @@ readonly class SpoolConsumer extends AbstractConsumer
                 }
             }
 
+            $messages->clear();
+
             $this->getQueue()->getChannel()->getConnection()->disconnect();
 
             throw $e;
