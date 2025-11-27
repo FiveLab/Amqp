@@ -95,9 +95,15 @@ class RunConsumerCommand extends Command implements SignalableCommandInterface
         }
 
         $this->consumer = $this->consumerRegistry->get($consumerKey);
+        $consumerEventDispatcher = null;
 
-        if ($this->consumer instanceof EventableConsumerInterface && !$this->consumer->getEventDispatcher()) {
-            $this->consumer->setEventDispatcher($this->eventDispatcher);
+        if ($this->consumer instanceof EventableConsumerInterface) {
+            $consumerEventDispatcher = $this->consumer->getEventDispatcher();
+
+            if (!$consumerEventDispatcher) {
+                $consumerEventDispatcher = $this->eventDispatcher;
+                $this->consumer->setEventDispatcher($consumerEventDispatcher);
+            }
         }
 
         if ($input->getOption('messages')) {
@@ -109,12 +115,12 @@ class RunConsumerCommand extends Command implements SignalableCommandInterface
                 ));
             }
 
-            if (!$this->consumer->getEventDispatcher()) {
+            if (!$consumerEventDispatcher) {
                 throw new \RuntimeException('A message limit can\'t be applied, since the command has no access to the event dispatcher.');
             }
 
-            $listener = new StopAfterNExecutesListener($this->eventDispatcher, (int) $input->getOption('messages'));
-            $this->consumer->getEventDispatcher()?->addListener(ProcessedMessageEvent::class, $listener->onProcessedMessage(...));
+            $listener = new StopAfterNExecutesListener($consumerEventDispatcher, (int) $input->getOption('messages'));
+            $consumerEventDispatcher->addListener(ProcessedMessageEvent::class, $listener->onProcessedMessage(...));
         }
 
         if ($input->getOption('read-timeout')) {

@@ -21,7 +21,6 @@ use FiveLab\Component\Amqp\Consumer\Strategy\DefaultConsumeStrategy;
 use FiveLab\Component\Amqp\Event\ConsumerStoppedEvent;
 use FiveLab\Component\Amqp\Event\ProcessedMessageEvent;
 use FiveLab\Component\Amqp\Event\ReceiveMessageEvent;
-use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Queue\QueueInterface;
