@@ -58,11 +58,14 @@ abstract readonly class AbstractConsumer implements EventableConsumerInterface
         $this->options = new \ArrayObject(['stop_consuming' => false, 'event_dispatcher' => null]);
     }
 
-    public function stop(): void
+    public function stop(bool $dispatchEvent = true): void
     {
         $this->options->offsetSet('stop_consuming', true);
         $this->strategy->stopConsume();
-        $this->getEventDispatcher()?->dispatch(new ConsumerStoppedEvent($this, ConsumerStoppedReason::StopConsuming), AmqpEvents::CONSUMER_STOPPED);
+
+        if ($dispatchEvent) {
+            $this->getEventDispatcher()?->dispatch(new ConsumerStoppedEvent($this, ConsumerStoppedReason::StopConsuming), AmqpEvents::CONSUMER_STOPPED);
+        }
     }
 
     public function getQueue(): QueueInterface

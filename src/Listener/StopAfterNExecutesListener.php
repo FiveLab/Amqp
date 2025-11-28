@@ -14,17 +14,14 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Listener;
 
 use FiveLab\Component\Amqp\AmqpEvents;
-use FiveLab\Component\Amqp\Consumer\ConsumerStoppedReason;
-use FiveLab\Component\Amqp\Event\ConsumerStoppedEvent;
 use FiveLab\Component\Amqp\Event\ProcessedMessageEvent;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class StopAfterNExecutesListener implements EventSubscriberInterface
 {
     private int $executesCounter = 0;
 
-    public function __construct(private readonly EventDispatcherInterface $eventDispatcher, private readonly int $stopAfterExecutes)
+    public function __construct(private readonly int $stopAfterExecutes)
     {
     }
 
@@ -41,9 +38,6 @@ class StopAfterNExecutesListener implements EventSubscriberInterface
 
         if ($this->executesCounter >= $this->stopAfterExecutes) {
             $this->executesCounter = 0;
-
-            $this->eventDispatcher->dispatch(new ConsumerStoppedEvent($event->consumer, ConsumerStoppedReason::StopConsuming), AmqpEvents::CONSUMER_STOPPED);
-
             $event->consumer->stop();
         }
     }

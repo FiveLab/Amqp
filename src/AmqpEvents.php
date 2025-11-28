@@ -30,6 +30,13 @@ final readonly class AmqpEvents
     public const PROCESSED_MESSAGE = 'amqp.processed_message';
 
     /**
+     * Call to this event after start consumer.
+     *
+     * @see \FiveLab\Component\Amqp\Event\ConsumerStartedEvent
+     */
+    public const CONSUMER_STARTED = 'amqp.consumer_started';
+
+    /**
      * Call to this event on stop consumer.
      *
      * @see \FiveLab\Component\Amqp\Event\ConsumerStoppedEvent

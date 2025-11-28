@@ -77,7 +77,7 @@ class RoundRobinConsumer implements EventableConsumerInterface
             throw new \LogicException('Can\'t run round-robin consumer without event dispatcher.');
         }
 
-        $eventDispatcher->addSubscriber(new StopAfterNExecutesListener($eventDispatcher, $this->configuration->executesMessagesPerConsumer));
+        $eventDispatcher->addSubscriber(new StopAfterNExecutesListener($this->configuration->executesMessagesPerConsumer));
 
         $eventDispatcher->addListener(ConsumerStoppedEvent::class, static function (ConsumerStoppedEvent $event): void {
             if ($event->reason === ConsumerStoppedReason::Timeout) {

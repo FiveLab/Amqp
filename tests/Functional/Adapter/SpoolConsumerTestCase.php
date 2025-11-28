@@ -19,6 +19,9 @@ use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Consumer\ConsumerStoppedReason;
 use FiveLab\Component\Amqp\Consumer\Spool\SpoolConsumer;
 use FiveLab\Component\Amqp\Consumer\Spool\SpoolConsumerConfiguration;
+use FiveLab\Component\Amqp\Consumer\Strategy\EventableTickHandler;
+use FiveLab\Component\Amqp\Consumer\Strategy\LoopConsumeStrategy;
+use FiveLab\Component\Amqp\Event\ConsumerStartedEvent;
 use FiveLab\Component\Amqp\Event\ConsumerStoppedEvent;
 use FiveLab\Component\Amqp\Event\ProcessedMessageEvent;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
@@ -27,10 +30,11 @@ use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Message\ReceivedMessages;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
+use FiveLab\Component\Amqp\Tests\CatchEventsSubscriber;
 use FiveLab\Component\Amqp\Tests\Functional\Consumer\Handler\MessageHandlerMock;
 use FiveLab\Component\Amqp\Tests\Functional\RabbitMqTestCase;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 abstract class SpoolConsumerTestCase extends RabbitMqTestCase
@@ -359,7 +363,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
 
         $consumer = new SpoolConsumer($this->queueFactory, $this->messageHandler, new SpoolConsumerConfiguration(100, 1));
         $consumer->setEventDispatcher($eventDispatcher = new EventDispatcher());
-        $eventDispatcher->addListener(AmqpEvents::PROCESSED_MESSAGE, (new StopAfterNExecutesListener($eventDispatcher, 5))->onProcessedMessage(...));
+        $eventDispatcher->addListener(AmqpEvents::PROCESSED_MESSAGE, (new StopAfterNExecutesListener(5))->onProcessedMessage(...));
 
         $this->runConsumer($consumer);
 
@@ -369,7 +373,10 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
     }
 
     #[Test]
-    #[DataProvider('providePrefetchAndMessageCount')]
+    #[TestWith([10, 10, 1], 'message amount equal to prefetch count')]
+    #[TestWith([5, 15, 3], 'message amount multiple of prefetch count')]
+    #[TestWith([10, 7, 1], 'message amount less than prefetch count')]
+    #[TestWith([10, 13, 2], 'message amount more than prefetch count')]
     public function shouldFlushWithZeroReadTimeout(int $prefetchCount, int $messageCount, int $expectedFlushCallTimes): void
     {
         $this->publishMessages($messageCount);
@@ -426,14 +433,40 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         self::assertCount(2, $this->messageHandler->getReceivedMessages());
     }
 
-    public static function providePrefetchAndMessageCount(): array
+    #[Test]
+    public function shouldSuccessDispatchEvents(): void
     {
-        return [
-            'message amount equal to prefetch count'    => [10, 10, 1],
-            'message amount multiple of prefetch count' => [5, 15, 3],
-            'message amount less than prefetch count'   => [10, 7, 1],
-            'message amount more than prefetch count'   => [10, 13, 2],
-        ];
+        $this->publishMessages(1);
+
+        $eventDispatcher = new EventDispatcher();
+
+        $consumer = new SpoolConsumer(
+            $this->queueFactory,
+            $this->messageHandler,
+            new SpoolConsumerConfiguration(10, 1, 1, true),
+            new LoopConsumeStrategy(tickHandler: new EventableTickHandler($eventDispatcher))
+        );
+
+        $consumer->setEventDispatcher($eventDispatcher);
+        $eventDispatcher->addSubscriber($listener = new CatchEventsSubscriber());
+
+        $this->runConsumer($consumer);
+
+        $events = $listener->getCatchedEvents(null);
+
+        self::assertArrayHasKey(AmqpEvents::CONSUMER_STARTED, $events);
+        self::assertEquals([new ConsumerStartedEvent($consumer)], $events[AmqpEvents::CONSUMER_STARTED]);
+
+        self::assertArrayHasKey(AmqpEvents::CONSUMER_TICK, $events);
+
+        self::assertArrayHasKey(AmqpEvents::CONSUMER_STOPPED, $events, 'missed consumer stopped events');
+        self::assertEquals([new ConsumerStoppedEvent($consumer, ConsumerStoppedReason::Timeout)], $events[AmqpEvents::CONSUMER_STOPPED]);
+
+        self::assertArrayHasKey(AmqpEvents::RECEIVE_MESSAGE, $events, 'missed receive message events');
+        self::assertCount(1, $events[AmqpEvents::RECEIVE_MESSAGE]);
+
+        self::assertArrayHasKey(AmqpEvents::PROCESSED_MESSAGE, $events, 'missed processed message events');
+        self::assertCount(1, $events[AmqpEvents::PROCESSED_MESSAGE]);
     }
 
     private function runConsumer(SpoolConsumer $consumer, bool $changeReadTimeout = true, bool $registerTimeoutListener = true): void
@@ -457,7 +490,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
     {
         $consumer->getEventDispatcher()->addListener(AmqpEvents::CONSUMER_STOPPED, static function (ConsumerStoppedEvent $event): void {
             if ($event->reason === ConsumerStoppedReason::Timeout) {
-                $event->consumer->stop();
+                $event->consumer->stop(false);
             }
         });
     }

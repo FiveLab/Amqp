@@ -19,7 +19,6 @@ use FiveLab\Component\Amqp\Listener\StopAfterNExecutesListener;
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class StopAfterNExecutesListenerTest extends TestCase
 {
@@ -34,10 +33,8 @@ class StopAfterNExecutesListenerTest extends TestCase
     #[Test]
     public function shouldSuccessStopAfterReachedLimit(): void
     {
-        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-
         $stopped = false;
-        $listener = new StopAfterNExecutesListener($eventDispatcher, 2);
+        $listener = new StopAfterNExecutesListener(2);
         $consumer = $this->createMock(ConsumerInterface::class);
 
         $consumer->expects($this->any())

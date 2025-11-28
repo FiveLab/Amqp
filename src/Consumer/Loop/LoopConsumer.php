@@ -17,6 +17,7 @@ use FiveLab\Component\Amqp\AmqpEvents;
 use FiveLab\Component\Amqp\Channel\ChannelInterface;
 use FiveLab\Component\Amqp\Consumer\AbstractConsumer;
 use FiveLab\Component\Amqp\Consumer\ConsumerStoppedReason;
+use FiveLab\Component\Amqp\Event\ConsumerStartedEvent;
 use FiveLab\Component\Amqp\Event\ConsumerStoppedEvent;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 
@@ -30,6 +31,8 @@ readonly class LoopConsumer extends AbstractConsumer
         $this->allowConsuming();
 
         $channel = null;
+
+        $this->getEventDispatcher()?->dispatch(new ConsumerStartedEvent($this), AmqpEvents::CONSUMER_STARTED);
 
         while (!$this->isStopConsuming()) {
             $channel = $this->getQueue()->getChannel();

@@ -17,15 +17,18 @@ use FiveLab\Component\Amqp\AmqpEvents;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Consumer\ConsumerConfiguration;
+use FiveLab\Component\Amqp\Consumer\ConsumerStoppedReason;
 use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlers;
 use FiveLab\Component\Amqp\Consumer\SingleConsumer;
-use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
+use FiveLab\Component\Amqp\Event\ConsumerStartedEvent;
+use FiveLab\Component\Amqp\Event\ConsumerStoppedEvent;
 use FiveLab\Component\Amqp\Exception\MessageHandlerNotSupportedException;
 use FiveLab\Component\Amqp\Exchange\Registry\ExchangeFactoryRegistryInterface;
 use FiveLab\Component\Amqp\Listener\StopAfterNExecutesListener;
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
+use FiveLab\Component\Amqp\Tests\CatchEventsSubscriber;
 use FiveLab\Component\Amqp\Tests\Functional\Consumer\Handler\MessageHandlerMock;
 use FiveLab\Component\Amqp\Tests\Functional\Consumer\Handler\ThrowableMessageHandlerMock;
 use FiveLab\Component\Amqp\Tests\Functional\RabbitMqTestCase;
@@ -117,7 +120,7 @@ abstract class SingleConsumerTestCase extends RabbitMqTestCase
 
         $consumer = new SingleConsumer($this->queueFactory, $handler, new ConsumerConfiguration());
         $consumer->setEventDispatcher($eventDispatcher = new EventDispatcher());
-        $eventDispatcher->addListener(AmqpEvents::PROCESSED_MESSAGE, (new StopAfterNExecutesListener($eventDispatcher, 2))->onProcessedMessage(...));
+        $eventDispatcher->addListener(AmqpEvents::PROCESSED_MESSAGE, (new StopAfterNExecutesListener(2))->onProcessedMessage(...));
 
         $this->runConsumer($consumer);
 
@@ -197,14 +200,34 @@ abstract class SingleConsumerTestCase extends RabbitMqTestCase
         $consumer->run();
     }
 
+    #[Test]
+    public function shouldSuccessDispatchEvents(): void
+    {
+        $handler = new MessageHandlerMock('test');
+        $consumer = new SingleConsumer($this->queueFactory, $handler, new ConsumerConfiguration());
+        $consumer->setEventDispatcher($eventDispatcher = new EventDispatcher());
+        $eventDispatcher->addSubscriber($listener = new CatchEventsSubscriber());
+
+        $this->runConsumer($consumer);
+
+        $events = $listener->getCatchedEvents(null);
+
+        self::assertArrayHasKey(AmqpEvents::CONSUMER_STARTED, $events);
+        self::assertEquals([new ConsumerStartedEvent($consumer)], $events[AmqpEvents::CONSUMER_STARTED]);
+
+        self::assertArrayHasKey(AmqpEvents::CONSUMER_STOPPED, $events, 'missed consumer stopped events');
+        self::assertEquals([new ConsumerStoppedEvent($consumer, ConsumerStoppedReason::Timeout)], $events[AmqpEvents::CONSUMER_STOPPED]);
+
+        self::assertArrayHasKey(AmqpEvents::RECEIVE_MESSAGE, $events, 'missed receive message events');
+        self::assertCount(1, $events[AmqpEvents::RECEIVE_MESSAGE]);
+
+        self::assertArrayHasKey(AmqpEvents::PROCESSED_MESSAGE, $events, 'missed processed message events');
+        self::assertCount(1, $events[AmqpEvents::PROCESSED_MESSAGE]);
+    }
+
     private function runConsumer(SingleConsumer $consumer): void
     {
         $consumer->getQueue()->getChannel()->getConnection()->setReadTimeout(0.2);
-
-        try {
-            $consumer->run();
-        } catch (ConsumerTimeoutExceedException) {
-            // Timeout or max executes. Normal flow.
-        }
+        $consumer->run();
     }
 }

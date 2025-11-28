@@ -119,7 +119,7 @@ class RunConsumerCommand extends Command implements SignalableCommandInterface
                 throw new \RuntimeException('A message limit can\'t be applied, since the command has no access to the event dispatcher.');
             }
 
-            $listener = new StopAfterNExecutesListener($consumerEventDispatcher, (int) $input->getOption('messages'));
+            $listener = new StopAfterNExecutesListener((int) $input->getOption('messages'));
             $consumerEventDispatcher->addListener(ProcessedMessageEvent::class, $listener->onProcessedMessage(...));
         }
 

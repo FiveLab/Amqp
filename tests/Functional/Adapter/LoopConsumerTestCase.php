@@ -19,6 +19,9 @@ use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Consumer\ConsumerStoppedReason;
 use FiveLab\Component\Amqp\Consumer\Loop\LoopConsumer;
 use FiveLab\Component\Amqp\Consumer\Loop\LoopConsumerConfiguration;
+use FiveLab\Component\Amqp\Consumer\Strategy\EventableTickHandler;
+use FiveLab\Component\Amqp\Consumer\Strategy\LoopConsumeStrategy;
+use FiveLab\Component\Amqp\Event\ConsumerStartedEvent;
 use FiveLab\Component\Amqp\Event\ConsumerStoppedEvent;
 use FiveLab\Component\Amqp\Event\ProcessedMessageEvent;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
@@ -26,6 +29,7 @@ use FiveLab\Component\Amqp\Listener\StopAfterNExecutesListener;
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
+use FiveLab\Component\Amqp\Tests\CatchEventsSubscriber;
 use FiveLab\Component\Amqp\Tests\Functional\Consumer\Handler\MessageHandlerMock;
 use FiveLab\Component\Amqp\Tests\Functional\Consumer\Handler\ThrowableMessageHandlerMock;
 use FiveLab\Component\Amqp\Tests\Functional\RabbitMqTestCase;
@@ -244,7 +248,7 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
 
         $consumer = new LoopConsumer($this->queueFactory, $this->messageHandler, new LoopConsumerConfiguration(1));
         $consumer->setEventDispatcher($eventDispatcher = new EventDispatcher());
-        $eventDispatcher->addListener(AmqpEvents::PROCESSED_MESSAGE, (new StopAfterNExecutesListener($eventDispatcher, 5))->onProcessedMessage(...));
+        $eventDispatcher->addListener(AmqpEvents::PROCESSED_MESSAGE, (new StopAfterNExecutesListener(5))->onProcessedMessage(...));
 
         $this->runConsumer($consumer);
 
@@ -270,6 +274,42 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
         self::assertCount(2, $this->messageHandler->getReceivedMessages());
     }
 
+    #[Test]
+    public function shouldSuccessDispatchEvents(): void
+    {
+        $this->publishMessages(1);
+
+        $eventDispatcher = new EventDispatcher();
+
+        $consumer = new LoopConsumer(
+            $this->queueFactory,
+            $this->messageHandler,
+            new LoopConsumerConfiguration(1),
+            new LoopConsumeStrategy(tickHandler: new EventableTickHandler($eventDispatcher))
+        );
+
+        $consumer->setEventDispatcher($eventDispatcher);
+        $eventDispatcher->addSubscriber($listener = new CatchEventsSubscriber());
+
+        $this->runConsumer($consumer);
+
+        $events = $listener->getCatchedEvents(null);
+
+        self::assertArrayHasKey(AmqpEvents::CONSUMER_STARTED, $events);
+        self::assertEquals([new ConsumerStartedEvent($consumer)], $events[AmqpEvents::CONSUMER_STARTED]);
+
+        self::assertArrayHasKey(AmqpEvents::CONSUMER_TICK, $events);
+
+        self::assertArrayHasKey(AmqpEvents::CONSUMER_STOPPED, $events, 'missed consumer stopped events');
+        self::assertEquals([new ConsumerStoppedEvent($consumer, ConsumerStoppedReason::Timeout)], $events[AmqpEvents::CONSUMER_STOPPED]);
+
+        self::assertArrayHasKey(AmqpEvents::RECEIVE_MESSAGE, $events, 'missed receive message events');
+        self::assertCount(1, $events[AmqpEvents::RECEIVE_MESSAGE]);
+
+        self::assertArrayHasKey(AmqpEvents::PROCESSED_MESSAGE, $events, 'missed processed message events');
+        self::assertCount(1, $events[AmqpEvents::PROCESSED_MESSAGE]);
+    }
+
     private function runConsumer(LoopConsumer $consumer, bool $changeReadTimeout = true, bool $registerTimeoutListener = true): void
     {
         if (!$consumer->getEventDispatcher()) {
@@ -291,7 +331,7 @@ abstract class LoopConsumerTestCase extends RabbitMqTestCase
     {
         $consumer->getEventDispatcher()->addListener(AmqpEvents::CONSUMER_STOPPED, static function (ConsumerStoppedEvent $event): void {
             if ($event->reason === ConsumerStoppedReason::Timeout) {
-                $event->consumer->stop();
+                $event->consumer->stop(false);
             }
         });
     }
