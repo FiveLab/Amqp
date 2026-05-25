@@ -30,11 +30,6 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
     ) {
     }
 
-    public function withPassive(): QueueFactoryInterface
-    {
-        return new AmqpQueueFactory($this->channelFactory, $this->definition->withPassive(true));
-    }
-
     public function create(): QueueInterface
     {
         if ($this->queue) {
@@ -54,10 +49,6 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
 
         $queue = new AmqpQueue($channel, $this->definition);
         $queue->declare();
-
-        if ($this->definition->passive) {
-            return $queue;
-        }
 
         $connection->attach($this);
 

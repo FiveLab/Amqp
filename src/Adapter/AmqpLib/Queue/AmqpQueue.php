@@ -52,13 +52,14 @@ readonly class AmqpQueue implements QueueInterface
                 false,
                 $this->definition->exclusive,
                 false,
-                function (AMQPMessage $message) use ($handler, $queueName, &$stopConsuming): void {
+                function (AMQPMessage $message) use ($handler, $queueName, &$stopConsuming, &$amqplibChannel): void {
                     $receivedMessage = new AmqpReceivedMessage($message, $queueName);
 
                     $result = $handler($receivedMessage);
 
                     if (false === $result) {
                         $stopConsuming = true;
+                        $amqplibChannel->basic_cancel($message->getConsumerTag(), false, true);
                     }
                 }
             );

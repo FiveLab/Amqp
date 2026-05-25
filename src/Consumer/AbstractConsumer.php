@@ -124,18 +124,4 @@ abstract readonly class AbstractConsumer implements EventableConsumerInterface
             }
         }, $this->configuration->tagGenerator->generate());
     }
-
-    /**
-     * Performs a graceful AMQP disconnect.
-     *
-     * A passively declared queue is created first to force a synchronous AMQP
-     * round-trip on the current channel. This guarantees that all previously
-     * sent frames (e.g. acknowledgements) were processed by the broker before
-     * the connection is closed.
-     */
-    protected function gracefulDisconnect(): void
-    {
-        $queue = $this->queueFactory->withPassive()->create();
-        $queue->getChannel()->getConnection()->disconnect();
-    }
 }
