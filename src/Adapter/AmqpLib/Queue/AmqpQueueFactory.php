@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Adapter\AmqpLib\Queue;
 
 use FiveLab\Component\Amqp\Adapter\AmqpLib\Channel\AmqpChannel;
-use FiveLab\Component\Amqp\Adapter\AmqpLib\Connection\AmqpConnection;
 use FiveLab\Component\Amqp\Channel\ChannelFactoryInterface;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;

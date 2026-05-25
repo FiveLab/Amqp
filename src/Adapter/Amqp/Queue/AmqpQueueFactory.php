@@ -45,6 +45,7 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
         }
 
         $queue = new \AMQPQueue($channel->getChannel());
+        $channel->getConnection()->attach($this);
 
         $flags = $this->calculateFlagsForQueue();
 
@@ -55,7 +56,6 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
         $queue->declareQueue();
 
         $this->queue = new AmqpQueue($channel, $queue);
-        $channel->getConnection()->attach($this);
 
         foreach ($this->definition->bindings as $binding) {
             $queue->bind($binding->exchangeName, $binding->routingKey);

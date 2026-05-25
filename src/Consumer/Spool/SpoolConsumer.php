@@ -16,19 +16,13 @@ namespace FiveLab\Component\Amqp\Consumer\Spool;
 use FiveLab\Component\Amqp\AmqpEvents;
 use FiveLab\Component\Amqp\Channel\ChannelInterface;
 use FiveLab\Component\Amqp\Consumer\AbstractConsumer;
-use FiveLab\Component\Amqp\Consumer\ConsumerConfiguration;
 use FiveLab\Component\Amqp\Consumer\ConsumerStoppedReason;
-use FiveLab\Component\Amqp\Consumer\Handler\MessageHandlerInterface;
-use FiveLab\Component\Amqp\Consumer\Strategy\ConsumeStrategyInterface;
-use FiveLab\Component\Amqp\Consumer\Strategy\DefaultConsumeStrategy;
 use FiveLab\Component\Amqp\Consumer\Strategy\LoopConsumeStrategy;
 use FiveLab\Component\Amqp\Event\ConsumerStartedEvent;
 use FiveLab\Component\Amqp\Event\ConsumerStoppedEvent;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Message\MutableReceivedMessages;
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
-use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
-use FiveLab\Component\Amqp\Queue\QueueInterface;
 
 /**
  * The consumer for buffer all received messages by configuration and flush by configuration.
