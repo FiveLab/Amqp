@@ -57,9 +57,9 @@ class AmqpReceivedMessage extends ReceivedMessage
         );
     }
 
-    protected function doAck(): void
+    protected function doAck(bool $multiple = false): void
     {
-        $this->message->ack();
+        $this->message->ack($multiple);
     }
 
     protected function doNack(bool $requeue = true): void

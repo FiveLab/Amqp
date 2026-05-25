@@ -60,17 +60,23 @@ class AmqpReceivedMessage extends ReceivedMessage
         );
     }
 
-    protected function doAck(): void
+    protected function doAck(bool $multiple = false): void
     {
-        $this->queue->ack((int) $this->envelope->getDeliveryTag());
+        $flags = \AMQP_NOPARAM;
+
+        if ($multiple) {
+            $flags |= \AMQP_MULTIPLE;
+        }
+
+        $this->queue->ack((int) $this->envelope->getDeliveryTag(), $flags);
     }
 
     protected function doNack(bool $requeue = true): void
     {
-        $flags = AMQP_NOPARAM;
+        $flags = \AMQP_NOPARAM;
 
         if ($requeue) {
-            $flags |= AMQP_REQUEUE;
+            $flags |= \AMQP_REQUEUE;
         }
 
         $this->queue->nack((int) $this->envelope->getDeliveryTag(), $flags);

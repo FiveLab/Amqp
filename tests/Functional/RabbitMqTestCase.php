@@ -97,7 +97,7 @@ abstract class RabbitMqTestCase extends TestCase
         $queue = $queueFactory->create();
         $lastMessage = $queue->get();
 
-        self::assertNull($lastMessage, \sprintf('The queue %s is not empty.', $queue->getName()));
+        self::assertFalse((bool) $lastMessage, \sprintf('The queue %s is not empty.', $queue->getName()));
     }
 
     protected static function assertQueueContainsCountMessages(QueueFactoryInterface $queueFactory, int $countMessages): void

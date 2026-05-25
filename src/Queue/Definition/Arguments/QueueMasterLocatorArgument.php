@@ -15,6 +15,9 @@ namespace FiveLab\Component\Amqp\Queue\Definition\Arguments;
 
 use FiveLab\Component\Amqp\Argument\ArgumentDefinition;
 
+/**
+ * @deprecated for RabbitMQ 4.*
+ */
 readonly class QueueMasterLocatorArgument extends ArgumentDefinition
 {
     public function __construct(string $masterLocator)

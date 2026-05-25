@@ -40,7 +40,7 @@ abstract class ReceivedMessage extends Message
         return $this->answered;
     }
 
-    final public function ack(): void
+    final public function ack(bool $multiple = false): void
     {
         if ($this->answered) {
             throw new \LogicException('We already answered to broker.');
@@ -48,7 +48,7 @@ abstract class ReceivedMessage extends Message
 
         $this->answered = true;
 
-        $this->doAck();
+        $this->doAck($multiple);
     }
 
     final public function nack(bool $requeue = true): void
@@ -62,7 +62,7 @@ abstract class ReceivedMessage extends Message
         $this->doNack($requeue);
     }
 
-    abstract protected function doAck(): void;
+    abstract protected function doAck(bool $multiple = false): void;
 
     abstract protected function doNack(bool $requeue = true): void;
 }

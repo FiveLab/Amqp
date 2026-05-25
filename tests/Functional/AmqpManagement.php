@@ -29,12 +29,12 @@ readonly class AmqpManagement
         ]);
     }
 
-    public function createQueue(string $name, bool $durable = true): void
+    public function createQueue(string $name, bool $durable = true, array $args = []): void
     {
         $data = [
             'auto_delete' => false,
             'durable'     => $durable,
-            'arguments'   => [],
+            'arguments'   => $args,
         ];
 
         $json = \json_encode($data);

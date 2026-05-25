@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Tests\Functional\Adapter;
 
 use FiveLab\Component\Amqp\AmqpEvents;
+use FiveLab\Component\Amqp\Argument\ArgumentDefinitions;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinition;
 use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Consumer\ConsumerStoppedReason;
@@ -28,6 +29,7 @@ use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Listener\StopAfterNExecutesListener;
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
 use FiveLab\Component\Amqp\Message\ReceivedMessages;
+use FiveLab\Component\Amqp\Queue\Definition\Arguments\QueueTypeArgument;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
 use FiveLab\Component\Amqp\Tests\CatchEventsSubscriber;
@@ -467,6 +469,38 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
 
         self::assertArrayHasKey(AmqpEvents::PROCESSED_MESSAGE, $events, 'missed processed message events');
         self::assertCount(1, $events[AmqpEvents::PROCESSED_MESSAGE]);
+    }
+
+    #[Test]
+    public function shouldSuccessAck2KMessagesForQuorumQueue(): void
+    {
+        $this->management->createQueue('q-spool-quorum', true, [
+            'x-queue-type' => 'quorum',
+        ]);
+
+        $this->management->queueBind('q-spool-quorum', 'ex-spool', '');
+
+        $definition = new QueueDefinition(
+            'q-spool-quorum',
+            new BindingDefinitions(new BindingDefinition('ex-spool', '')),
+            arguments: new ArgumentDefinitions(
+                new QueueTypeArgument('quorum'),
+            )
+        );
+
+        $quorumQueueFactory = $this->createQueueFactory($definition);
+
+        $this->publishMessages(2500);
+
+        $consumer = new SpoolConsumer(
+            $quorumQueueFactory,
+            $this->messageHandler,
+            new SpoolConsumerConfiguration(2000, 2)
+        );
+
+        $this->runConsumer($consumer);
+
+        self::assertQueueEmpty($quorumQueueFactory);
     }
 
     private function runConsumer(SpoolConsumer $consumer, bool $changeReadTimeout = true, bool $registerTimeoutListener = true): void

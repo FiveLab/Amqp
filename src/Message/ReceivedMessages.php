@@ -42,4 +42,13 @@ class ReceivedMessages implements \IteratorAggregate, \Countable
     {
         return \count($this->messages);
     }
+
+    public function last(): ReceivedMessage
+    {
+        if (!\count($this->messages)) {
+            throw new \LogicException('Messages not found.');
+        }
+
+        return $this->messages[\count($this->messages) - 1];
+    }
 }

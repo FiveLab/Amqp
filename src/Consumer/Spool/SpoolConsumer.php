@@ -126,11 +126,14 @@ readonly class SpoolConsumer extends AbstractConsumer
             throw $e;
         }
 
-        foreach ($messages as $message) {
-            // The flush mechanism can ack or non-ack some messages.
-            if (!$message->isAnswered()) {
-                $message->ack();
-            }
+        /** @var ReceivedMessage[] $sortedMessages */
+        $sortedMessages = \iterator_to_array($messages);
+        \usort($sortedMessages, static fn(ReceivedMessage $a, ReceivedMessage $b) => $a->deliveryTag <=> $b->deliveryTag);
+
+        $lastMessage = $sortedMessages[\count($sortedMessages) - 1];
+
+        if (!$lastMessage->isAnswered()) {
+            $lastMessage->ack(true);
         }
 
         $messages->clear();

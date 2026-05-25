@@ -30,7 +30,7 @@ class ReceivedMessageStub extends ReceivedMessage
         parent::__construct($payload, $deliveryTag, $queueName, $routingKey, $exchangeName, $options, $headers, $identifier);
     }
 
-    protected function doAck(): void
+    protected function doAck(bool $multiple = false): void
     {
     }
 

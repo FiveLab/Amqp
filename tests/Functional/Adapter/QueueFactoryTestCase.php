@@ -45,24 +45,6 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
     }
 
     #[Test]
-    public function shouldSuccessCreateWithoutDurable(): void
-    {
-        $definition = new QueueDefinition(
-            'some',
-            null,
-            null,
-            false
-        );
-
-        $factory = $this->createQueueFactory($definition);
-        $factory->create();
-
-        $queueInfo = $this->management->queueByName('some');
-
-        self::assertFalse($queueInfo['durable']);
-    }
-
-    #[Test]
     public function shouldSuccessCreateWithPassiveFlag(): void
     {
         $this->management->createQueue('foo');
@@ -130,7 +112,7 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
             'test_queue_auto_delete',
             null,
             null,
-            false,
+            true,
             false,
             false,
             true
@@ -206,13 +188,12 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
             'some',
             null,
             null,
-            false,
+            true,
             false,
             false,
             false,
             new ArgumentDefinitions(
-                new QueueModeArgument('default'),
-                new QueueMasterLocatorArgument('random')
+                new QueueModeArgument('default')
             )
         );
 
@@ -222,7 +203,6 @@ abstract class QueueFactoryTestCase extends RabbitMqTestCase
         $queueInfo = $this->management->queueByName('some');
         $arguments = $queueInfo['arguments'];
 
-        self::assertEquals('random', $arguments['x-queue-master-locator']);
         self::assertEquals('default', $arguments['x-queue-mode']);
 
         if (\array_key_exists('x-queue-type', $arguments)) {
