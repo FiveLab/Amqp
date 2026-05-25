@@ -22,6 +22,7 @@ use FiveLab\Component\Amqp\Event\ConsumerStoppedEvent;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Message\MutableReceivedMessages;
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
+use FiveLab\Component\Amqp\Queue\QueueInterface;
 
 /**
  * The consumer for buffer all received messages by configuration and flush by configuration.
@@ -38,7 +39,6 @@ readonly class SpoolConsumer extends AbstractConsumer
 
         $this->getEventDispatcher()?->dispatch(new ConsumerStartedEvent($this), AmqpEvents::CONSUMER_STARTED);
 
-        $channel = null;
         $receivedMessages = new MutableReceivedMessages();
 
         while (!$this->isStopConsuming()) {
@@ -77,7 +77,8 @@ readonly class SpoolConsumer extends AbstractConsumer
             } catch (ConsumerTimeoutExceedException) {
                 $this->flushMessages($receivedMessages);
 
-                $channel->getConnection()->disconnect();
+                $this->gracefulDisconnect();
+
                 $this->getEventDispatcher()?->dispatch(new ConsumerStoppedEvent($this, ConsumerStoppedReason::Timeout), AmqpEvents::CONSUMER_STOPPED);
 
                 continue;
@@ -90,17 +91,18 @@ readonly class SpoolConsumer extends AbstractConsumer
 
                 $receivedMessages->clear();
 
-                $channel->getConnection()->disconnect();
+                $this->gracefulDisconnect();
 
                 throw $error;
             }
 
             $this->flushMessages($receivedMessages);
-            $channel->getConnection()->disconnect();
+            // @todo: critical case, we can't reconnect per each batch block.
+            $this->gracefulDisconnect();
         }
 
         $this->flushMessages($receivedMessages);
-        $channel?->getConnection()->disconnect();
+        $this->gracefulDisconnect();
     }
 
     private function flushMessages(MutableReceivedMessages $messages): void
@@ -121,7 +123,7 @@ readonly class SpoolConsumer extends AbstractConsumer
 
             $messages->clear();
 
-            $this->getQueue()->getChannel()->getConnection()->disconnect();
+            $this->gracefulDisconnect();
 
             throw $e;
         }
@@ -146,7 +148,7 @@ readonly class SpoolConsumer extends AbstractConsumer
         $connectionOriginalReadTimeout = $connection->getReadTimeout();
         $spoolReadTimeout = $this->configuration->readTimeout;
 
-        if ($spoolReadTimeout && (0 === (int) $connectionOriginalReadTimeout || $connectionOriginalReadTimeout > $spoolReadTimeout)) {
+        if ($spoolReadTimeout && (!$connectionOriginalReadTimeout || $connectionOriginalReadTimeout > $spoolReadTimeout)) {
             // Change the read timeout.
             $connection->setReadTimeout($spoolReadTimeout);
         }

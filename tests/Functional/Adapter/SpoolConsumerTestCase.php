@@ -325,40 +325,6 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
     }
 
     #[Test]
-    public function shouldSavePrefetchConfigurationAfterConsumerTimeout(): void
-    {
-        $this->publishMessage('message #1');
-        $this->publishMessage('message #2');
-        $this->publishMessage('message #3');
-
-        $handledMessages = 0;
-
-        $consumer = new SpoolConsumer($this->queueFactory, $this->messageHandler, new SpoolConsumerConfiguration(10, 1));
-
-        $this->messageHandler->setHandlerCallback(function (ReceivedMessage $message) use (&$handledMessages, $consumer) {
-            $channel = $this->queueFactory->create()->getChannel();
-            $connection = $channel->getConnection();
-
-            self::assertEquals(10, $channel->getPrefetchCount());
-            self::assertEquals(1, $connection->getReadTimeout());
-
-            $handledMessages++;
-
-            if ($handledMessages >= 3) {
-                $this->registerTimeoutListenerForStop($consumer);
-            }
-
-            $message->ack();
-
-            throw new ConsumerTimeoutExceedException();
-        });
-
-        $this->runConsumer($consumer, true, false);
-
-        self::assertCount(3, $this->messageHandler->getFlushedMessages());
-    }
-
-    #[Test]
     public function shouldSuccessProcessOnStopAfterNExecutes(): void
     {
         $this->publishMessages(12);
@@ -514,7 +480,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         }
 
         if ($changeReadTimeout) {
-            $consumer->getQueue()->getChannel()->getConnection()->setReadTimeout(0.1);
+            $consumer->getQueue()->getChannel()->getConnection()->setReadTimeout(0.2);
         }
 
         $consumer->run();

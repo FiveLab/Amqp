@@ -30,10 +30,23 @@ readonly class QueueDefinition
         public bool          $passive = false,
         public bool          $exclusive = false,
         public bool          $autoDelete = false,
-        ?ArgumentDefinitions $arguments = null
+        ?ArgumentDefinitions $arguments = null,
     ) {
         $this->bindings = $bindings ?: new BindingDefinitions();
         $this->unbindings = $unBindings ?: new BindingDefinitions();
         $this->arguments = $arguments ?: new ArgumentDefinitions();
+    }
+
+    public function withPassive(bool $passive): self
+    {
+        return new self(
+            $this->name,
+            $this->bindings,
+            $this->unbindings,
+            $this->durable,
+            $passive,
+            $this->exclusive,
+            $this->autoDelete,
+        );
     }
 }

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+Next release
+------------
+
+* Add graceful disconnect for consumers. 
+
 v2.4.0
 ------
 

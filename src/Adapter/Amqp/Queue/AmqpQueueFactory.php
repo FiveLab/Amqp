@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Adapter\Amqp\Queue;
 
 use FiveLab\Component\Amqp\Adapter\Amqp\Channel\AmqpChannel;
-use FiveLab\Component\Amqp\Adapter\Amqp\Connection\AmqpConnection;
 use FiveLab\Component\Amqp\Channel\ChannelFactoryInterface;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
@@ -26,8 +25,13 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
 
     public function __construct(
         private readonly ChannelFactoryInterface $channelFactory,
-        private readonly QueueDefinition         $definition
+        private readonly QueueDefinition         $definition,
     ) {
+    }
+
+    public function withPassive(): QueueFactoryInterface
+    {
+        return new AmqpQueueFactory($this->channelFactory, $this->definition->withPassive(true));
     }
 
     public function create(): QueueInterface
@@ -45,10 +49,6 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
             ));
         }
 
-        /** @var AmqpConnection $connection */
-        $connection = $channel->getConnection();
-        $connection->attach($this);
-
         $queue = new \AMQPQueue($channel->getChannel());
 
         $flags = $this->calculateFlagsForQueue();
@@ -59,6 +59,16 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
 
         $queue->declareQueue();
 
+        $amqpQueue = new AmqpQueue($channel, $queue);
+
+        if ($this->definition->passive) {
+            return $amqpQueue;
+        }
+
+        $this->queue = $amqpQueue;
+
+        $channel->getConnection()->attach($this);
+
         foreach ($this->definition->bindings as $binding) {
             $queue->bind($binding->exchangeName, $binding->routingKey);
         }
@@ -66,8 +76,6 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
         foreach ($this->definition->unbindings as $unBinding) {
             $queue->unbind($unBinding->exchangeName, $unBinding->routingKey);
         }
-
-        $this->queue = new AmqpQueue($channel, $queue);
 
         return $this->queue;
     }
@@ -79,22 +87,22 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
 
     private function calculateFlagsForQueue(): int
     {
-        $flags = AMQP_NOPARAM;
+        $flags = \AMQP_NOPARAM;
 
         if ($this->definition->durable) {
-            $flags |= AMQP_DURABLE;
+            $flags |= \AMQP_DURABLE;
         }
 
         if ($this->definition->exclusive) {
-            $flags |= AMQP_EXCLUSIVE;
+            $flags |= \AMQP_EXCLUSIVE;
         }
 
         if ($this->definition->passive) {
-            $flags |= AMQP_PASSIVE;
+            $flags |= \AMQP_PASSIVE;
         }
 
         if ($this->definition->autoDelete) {
-            $flags |= AMQP_AUTODELETE;
+            $flags |= \AMQP_AUTODELETE;
         }
 
         return $flags;

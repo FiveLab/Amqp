@@ -21,4 +21,11 @@ interface QueueFactoryInterface
      * @return QueueInterface
      */
     public function create(): QueueInterface;
+
+    /**
+     * Create the queue factory with passive mode
+     *
+     * @return QueueFactoryInterface
+     */
+    public function withPassive(): QueueFactoryInterface;
 }
