@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace FiveLab\Component\Amqp\Message;
 
-abstract class ReceivedMessage extends Message
+abstract class ReceivedMessage extends Message // phpcs:ignore Generic.NamingConventions.AbstractClassNamePrefix.Missing
 {
     protected bool $answered = false;
 
