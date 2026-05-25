@@ -3,6 +3,7 @@
     <exclude-pattern>tests/Consumers/*</exclude-pattern>
 
     <rule ref="../src/phpcs-ruleset.xml">
+        <exclude name="Generic.NamingConventions.AbstractClassNamePrefix.Missing"/>
         <exclude name="Zend.NamingConventions.ValidVariableName.MemberVarContainsNumbers"/>
 
         <exclude name="Symfony.Commenting.ClassComment.Missing"/>

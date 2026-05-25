@@ -158,6 +158,7 @@ abstract class RabbitMqTestCase extends TestCase
 
             if ($expectedExchangeName === $bindingInfo['source'] && $expectedRoutingKey === $bindingInfo['routing_key']) {
                 $entry = $bindingInfo;
+
                 break;
             }
         }

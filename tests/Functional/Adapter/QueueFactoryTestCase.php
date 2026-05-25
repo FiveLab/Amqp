@@ -19,7 +19,6 @@ use FiveLab\Component\Amqp\Binding\Definition\BindingDefinitions;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Message\Payload;
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
-use FiveLab\Component\Amqp\Queue\Definition\Arguments\QueueMasterLocatorArgument;
 use FiveLab\Component\Amqp\Queue\Definition\Arguments\QueueModeArgument;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
