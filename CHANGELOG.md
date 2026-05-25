@@ -1,8 +1,8 @@
 CHANGELOG
 =========
 
-Next release
-------------
+v2.4.0
+------
 
 * Set the minimum PHP version to 8.4
 * Use [multiple](https://www.rabbitmq.com/docs/confirms#consumer-acks-multiple-parameter) ack for spool consumers.
