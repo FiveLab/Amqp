@@ -93,7 +93,7 @@ OUTPUT;
     {
         $consumerFile = \realpath(__DIR__.'/../../Consumers/spool-with-signals.php');
 
-        $process = new PhpSubprocess([$consumerFile, 'consume']);
+        $process = new PhpSubprocess([$consumerFile, 'loop']);
         $process->setTimeout(10);
 
         $sendSignal = false;
@@ -108,8 +108,9 @@ OUTPUT;
         $output = $process->getOutput();
 
         $expectedOutput = <<<OUTPUT
-bla 0
+tick 1
 handle signal: 15
+bla 0
 flush messages
 
 OUTPUT;

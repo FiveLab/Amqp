@@ -17,12 +17,12 @@ use FiveLab\Component\Amqp\AmqpEvents;
 use FiveLab\Component\Amqp\Channel\ChannelInterface;
 use FiveLab\Component\Amqp\Consumer\AbstractConsumer;
 use FiveLab\Component\Amqp\Consumer\ConsumerStoppedReason;
+use FiveLab\Component\Amqp\Consumer\Strategy\LoopConsumeStrategy;
 use FiveLab\Component\Amqp\Event\ConsumerStartedEvent;
 use FiveLab\Component\Amqp\Event\ConsumerStoppedEvent;
 use FiveLab\Component\Amqp\Exception\ConsumerTimeoutExceedException;
 use FiveLab\Component\Amqp\Message\MutableReceivedMessages;
 use FiveLab\Component\Amqp\Message\ReceivedMessage;
-use FiveLab\Component\Amqp\Queue\QueueInterface;
 
 /**
  * The consumer for buffer all received messages by configuration and flush by configuration.
@@ -35,6 +35,13 @@ readonly class SpoolConsumer extends AbstractConsumer
 {
     public function run(): void
     {
+        if (!$this->strategy instanceof LoopConsumeStrategy) {
+            throw new \LogicException(\sprintf(
+                'The "%s" consume strategy is not supported for spool consumer (only loop supported).',
+                \get_class($this->strategy)
+            ));
+        }
+
         $this->allowConsuming();
 
         $this->getEventDispatcher()?->dispatch(new ConsumerStartedEvent($this), AmqpEvents::CONSUMER_STARTED);
@@ -49,16 +56,13 @@ readonly class SpoolConsumer extends AbstractConsumer
             $receivedMessages = new MutableReceivedMessages();
             $endTime = \microtime(true) + $this->configuration->timeout;
 
-            $countOfProcessedMessages = 0;
-
             try {
                 $this->doRun(
                     false,
-                    function (ReceivedMessage $message) use ($receivedMessages, &$countOfProcessedMessages, &$endTime): void {
+                    function (ReceivedMessage $message) use ($receivedMessages, &$endTime): void {
                         $receivedMessages->push($message);
-                        $countOfProcessedMessages++;
 
-                        if ($countOfProcessedMessages >= $this->configuration->prefetchCount) {
+                        if (\count($receivedMessages) >= $this->configuration->prefetchCount) {
                             $this->strategy->stopConsume();
                         }
 
@@ -77,8 +81,6 @@ readonly class SpoolConsumer extends AbstractConsumer
             } catch (ConsumerTimeoutExceedException) {
                 $this->flushMessages($receivedMessages);
 
-                $this->gracefulDisconnect();
-
                 $this->getEventDispatcher()?->dispatch(new ConsumerStoppedEvent($this, ConsumerStoppedReason::Timeout), AmqpEvents::CONSUMER_STOPPED);
 
                 continue;
@@ -91,18 +93,13 @@ readonly class SpoolConsumer extends AbstractConsumer
 
                 $receivedMessages->clear();
 
-                $this->gracefulDisconnect();
-
                 throw $error;
             }
 
             $this->flushMessages($receivedMessages);
-            // @todo: critical case, we can't reconnect per each batch block.
-            $this->gracefulDisconnect();
         }
 
         $this->flushMessages($receivedMessages);
-        $this->gracefulDisconnect();
     }
 
     private function flushMessages(MutableReceivedMessages $messages): void
@@ -122,8 +119,6 @@ readonly class SpoolConsumer extends AbstractConsumer
             }
 
             $messages->clear();
-
-            $this->gracefulDisconnect();
 
             throw $e;
         }

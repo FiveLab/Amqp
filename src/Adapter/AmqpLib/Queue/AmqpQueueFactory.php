@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace FiveLab\Component\Amqp\Adapter\AmqpLib\Queue;
 
 use FiveLab\Component\Amqp\Adapter\AmqpLib\Channel\AmqpChannel;
-use FiveLab\Component\Amqp\Adapter\AmqpLib\Connection\AmqpConnection;
 use FiveLab\Component\Amqp\Channel\ChannelFactoryInterface;
 use FiveLab\Component\Amqp\Queue\Definition\QueueDefinition;
 use FiveLab\Component\Amqp\Queue\QueueFactoryInterface;
@@ -28,11 +27,6 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
         private readonly ChannelFactoryInterface $channelFactory,
         private readonly QueueDefinition         $definition
     ) {
-    }
-
-    public function withPassive(): QueueFactoryInterface
-    {
-        return new AmqpQueueFactory($this->channelFactory, $this->definition->withPassive(true));
     }
 
     public function create(): QueueInterface
@@ -54,10 +48,6 @@ class AmqpQueueFactory implements QueueFactoryInterface, \SplObserver
 
         $queue = new AmqpQueue($channel, $this->definition);
         $queue->declare();
-
-        if ($this->definition->passive) {
-            return $queue;
-        }
 
         $connection->attach($this);
 

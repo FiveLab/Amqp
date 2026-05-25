@@ -71,7 +71,8 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         $consumer = new SpoolConsumer(
             $this->queueFactory,
             $this->messageHandler,
-            new SpoolConsumerConfiguration(10, 1)
+            new SpoolConsumerConfiguration(10, 1),
+            new LoopConsumeStrategy(),
         );
 
         $this->runConsumer($consumer);
@@ -99,7 +100,8 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         $consumer = new SpoolConsumer(
             $this->queueFactory,
             $this->messageHandler,
-            new SpoolConsumerConfiguration(10, 1, 0, true)
+            new SpoolConsumerConfiguration(10, 1, 0, true),
+            new LoopConsumeStrategy(),
         );
 
         try {
@@ -131,7 +133,8 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         $consumer = new SpoolConsumer(
             $this->queueFactory,
             $this->messageHandler,
-            new SpoolConsumerConfiguration(10, 1, 0, false)
+            new SpoolConsumerConfiguration(10, 1, 0, false),
+            new LoopConsumeStrategy(),
         );
 
         try {
@@ -158,7 +161,8 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         $consumer = new SpoolConsumer(
             $this->queueFactory,
             $this->messageHandler,
-            new SpoolConsumerConfiguration(5, 1, 0, true)
+            new SpoolConsumerConfiguration(5, 1, 0, true),
+            new LoopConsumeStrategy(),
         );
 
         try {
@@ -185,7 +189,8 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         $consumer = new SpoolConsumer(
             $this->queueFactory,
             $this->messageHandler,
-            new SpoolConsumerConfiguration(5, 1, 0, false)
+            new SpoolConsumerConfiguration(5, 1, 0, false),
+            new LoopConsumeStrategy(),
         );
 
         try {
@@ -221,7 +226,8 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         $consumer = new SpoolConsumer(
             $this->queueFactory,
             $this->messageHandler,
-            new SpoolConsumerConfiguration(5, 1)
+            new SpoolConsumerConfiguration(5, 1),
+            new LoopConsumeStrategy(),
         );
 
         try {
@@ -260,7 +266,8 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         $consumer = new SpoolConsumer(
             $this->queueFactory,
             $this->messageHandler,
-            new SpoolConsumerConfiguration(10, 1)
+            new SpoolConsumerConfiguration(10, 1),
+            new LoopConsumeStrategy(),
         );
 
         $this->expectException(\LogicException::class);
@@ -284,7 +291,8 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         $consumer = new SpoolConsumer(
             $this->queueFactory,
             $this->messageHandler,
-            new SpoolConsumerConfiguration(10, 1)
+            new SpoolConsumerConfiguration(10, 1),
+            new LoopConsumeStrategy()
         );
 
         $this->messageHandler->setHandlerCallback(function (ReceivedMessage $message) use (&$handledMessages, $consumer) {
@@ -329,7 +337,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
     {
         $this->publishMessages(12);
 
-        $consumer = new SpoolConsumer($this->queueFactory, $this->messageHandler, new SpoolConsumerConfiguration(100, 1));
+        $consumer = new SpoolConsumer($this->queueFactory, $this->messageHandler, new SpoolConsumerConfiguration(100, 1), new LoopConsumeStrategy());
         $consumer->setEventDispatcher($eventDispatcher = new EventDispatcher());
         $eventDispatcher->addListener(AmqpEvents::PROCESSED_MESSAGE, (new StopAfterNExecutesListener(5))->onProcessedMessage(...));
 
@@ -363,7 +371,8 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         $consumer = new SpoolConsumer(
             $this->queueFactory,
             $this->messageHandler,
-            new SpoolConsumerConfiguration($prefetchCount, 1, 1, true)
+            new SpoolConsumerConfiguration($prefetchCount, 1, 1, true),
+            new LoopConsumeStrategy(),
         );
 
         $this->queueFactory->create()->getChannel()->getConnection()->setReadTimeout(0);
@@ -388,7 +397,7 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
     {
         $this->publishMessages(10);
 
-        $consumer = new SpoolConsumer($this->queueFactory, $this->messageHandler, new SpoolConsumerConfiguration(10, 1, 1, true));
+        $consumer = new SpoolConsumer($this->queueFactory, $this->messageHandler, new SpoolConsumerConfiguration(10, 1, 1, true), new LoopConsumeStrategy());
         $consumer->setEventDispatcher($eventDispatcher = new EventDispatcher());
 
         $eventDispatcher->addListener(AmqpEvents::PROCESSED_MESSAGE, static function (ProcessedMessageEvent $event): void {
@@ -461,7 +470,8 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
         $consumer = new SpoolConsumer(
             $quorumQueueFactory,
             $this->messageHandler,
-            new SpoolConsumerConfiguration(2000, 2)
+            new SpoolConsumerConfiguration(2000, 2),
+            new LoopConsumeStrategy(),
         );
 
         $this->runConsumer($consumer);
@@ -483,7 +493,13 @@ abstract class SpoolConsumerTestCase extends RabbitMqTestCase
             $consumer->getQueue()->getChannel()->getConnection()->setReadTimeout(0.2);
         }
 
-        $consumer->run();
+        try {
+            $consumer->run();
+        } finally {
+            \usleep(10_000);
+            $consumer->getQueue()->getChannel()->getConnection()->disconnect();
+            \usleep(10_000);
+        }
     }
 
     private function registerTimeoutListenerForStop(SpoolConsumer $consumer): void
