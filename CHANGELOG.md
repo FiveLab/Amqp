@@ -1,10 +1,11 @@
 CHANGELOG
 =========
 
-Next release
-------------
+v2.4.1
+------
 
-* Add graceful disconnect for consumers. 
+* Not use disconnect for spool consumers.
+* Allow only loop consume strategy for spool consumers. 
 
 v2.4.0
 ------
