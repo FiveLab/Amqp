@@ -195,6 +195,46 @@ class AmqpReceivedMessageTest extends TestCase
         $receivedMessage->ack();
     }
 
+    #[Test]
+    public function shouldSuccessRejectWithoutRequeue(): void
+    {
+        $receivedMessage = $this->makeReceivedMessage(deliveryTag: 123);
+
+        $this->queue->expects(self::once())
+            ->method('reject')
+            ->with(123, AMQP_NOPARAM);
+
+        $receivedMessage->reject(false);
+
+        self::assertTrue($receivedMessage->isAnswered());
+    }
+
+    #[Test]
+    public function shouldSuccessRejectWithRequeue(): void
+    {
+        $receivedMessage = $this->makeReceivedMessage(deliveryTag: 321);
+
+        $this->queue->expects(self::once())
+            ->method('reject')
+            ->with(321, AMQP_NOPARAM | AMQP_REQUEUE);
+
+        $receivedMessage->reject();
+
+        self::assertTrue($receivedMessage->isAnswered());
+    }
+
+    #[Test]
+    public function shouldThrowExceptionOnRejectForAlreadyAnswered(): void
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('We already answered to broker.');
+
+        $receivedMessage = $this->makeReceivedMessage();
+
+        $receivedMessage->reject();
+        $receivedMessage->ack();
+    }
+
     private function makeReceivedMessage(
         string|false $body = '',
         array        $headers = [],

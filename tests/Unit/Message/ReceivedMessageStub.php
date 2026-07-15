@@ -37,4 +37,8 @@ class ReceivedMessageStub extends ReceivedMessage
     protected function doNack(bool $requeue = true): void
     {
     }
+
+    protected function doReject(bool $requeue = true): void
+    {
+    }
 }

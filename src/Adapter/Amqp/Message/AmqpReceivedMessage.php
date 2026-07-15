@@ -81,4 +81,15 @@ class AmqpReceivedMessage extends ReceivedMessage
 
         $this->queue->nack((int) $this->envelope->getDeliveryTag(), $flags);
     }
+
+    protected function doReject(bool $requeue = true): void
+    {
+        $flags = \AMQP_NOPARAM;
+
+        if ($requeue) {
+            $flags |= \AMQP_REQUEUE;
+        }
+
+        $this->queue->reject((int) $this->envelope->getDeliveryTag(), $flags);
+    }
 }

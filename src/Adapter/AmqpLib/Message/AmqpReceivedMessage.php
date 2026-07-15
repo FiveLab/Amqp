@@ -66,4 +66,9 @@ class AmqpReceivedMessage extends ReceivedMessage
     {
         $this->message->nack($requeue);
     }
+
+    protected function doReject(bool $requeue = true): void
+    {
+        $this->message->reject($requeue);
+    }
 }

@@ -62,7 +62,20 @@ abstract class ReceivedMessage extends Message // phpcs:ignore Generic.NamingCon
         $this->doNack($requeue);
     }
 
+    final public function reject(bool $requeue = true): void
+    {
+        if ($this->answered) {
+            throw new \LogicException('We already answered to broker.');
+        }
+
+        $this->answered = true;
+
+        $this->doReject($requeue);
+    }
+
     abstract protected function doAck(bool $multiple = false): void;
 
     abstract protected function doNack(bool $requeue = true): void;
+
+    abstract protected function doReject(bool $requeue = true): void;
 }

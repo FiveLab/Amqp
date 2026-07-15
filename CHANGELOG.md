@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+v2.4.2
+------
+
+* Add `reject` method to `ReceivedMessage`.
+
 v2.4.1
 ------
 
