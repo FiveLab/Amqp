@@ -97,6 +97,53 @@ class FlushSavepointPublisherTransactionalTest extends TestCase
     }
 
     #[Test]
+    public function shouldSuccessNotReuseSavepointNameInOneTransaction(): void
+    {
+        $startMatcher = self::exactly(3);
+        $startedSavepoints = [];
+
+        $this->publisher->expects($startMatcher)
+            ->method('start')
+            ->with(self::callback(static function (string $point) use (&$startedSavepoints) {
+                $startedSavepoints[] = $point;
+
+                return true;
+            }));
+
+        // The nested transaction is committed and the next nested transaction must receive a new savepoint name.
+        $this->transactional->begin();
+        $this->transactional->begin();
+        $this->transactional->commit();
+        $this->transactional->begin();
+
+        self::assertEquals($startedSavepoints, \array_unique($startedSavepoints));
+    }
+
+    #[Test]
+    public function shouldSuccessResetStateAfterFlush(): void
+    {
+        $startMatcher = self::exactly(2);
+
+        $this->publisher->expects($startMatcher)
+            ->method('start')
+            ->with(self::callback(static function (string $point) use ($startMatcher) {
+                $expected = match ($startMatcher->numberOfInvocations()) {
+                    1 => 'savepoint_0',
+                    2 => 'savepoint_0'
+                };
+
+                self::assertEquals($expected, $point);
+
+                return true;
+            }));
+
+        // The flush clears all savepoints in the publisher, so the next transaction must start from scratch.
+        $this->transactional->begin();
+        $this->transactional->commit();
+        $this->transactional->begin();
+    }
+
+    #[Test]
     public function shouldSuccessExecuteWithControlNestingLevel(): void
     {
         $startMatcher = self::exactly(2);

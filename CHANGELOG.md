@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+v2.4.3
+------
+
+* Fix restore the active savepoint in `SavepointPublisherDecorator` after commit or rollback.
+* Fix generate an already declared savepoint name in `FlushSavepointPublisherTransactional`.
+
 v2.4.2
 ------
 
