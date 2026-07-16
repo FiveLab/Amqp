@@ -117,6 +117,54 @@ class FlushSavepointPublisherTransactionalTest extends RabbitMqTestCase
     }
 
     #[Test]
+    public function shouldSuccessOnTwoSequentialNestedTransactions(): void
+    {
+        $this->transactional->begin();
+
+        $this->transactional->begin();
+        $this->savepointPublisher->publish(new Message(new Payload('foo')), 'foo.bar');
+        $this->transactional->commit();
+
+        // Publish in the parent scope, after the nested transaction was committed.
+        $this->savepointPublisher->publish(new Message(new Payload('bar')), 'foo.bar');
+
+        // The second nested transaction must not fail with "The savepoint ... already declared".
+        $this->transactional->begin();
+        $this->savepointPublisher->publish(new Message(new Payload('some')), 'foo.bar');
+        $this->transactional->commit();
+
+        $this->transactional->commit();
+
+        $messages = $this->getAllMessagesFromQueue($this->queueFactory);
+
+        self::assertCount(3, $messages);
+    }
+
+    #[Test]
+    public function shouldSuccessOnTwoSequentialNestedTransactionsWithRollback(): void
+    {
+        $this->transactional->begin();
+
+        $this->transactional->begin();
+        $this->savepointPublisher->publish(new Message(new Payload('foo')), 'foo.bar');
+        $this->transactional->rollback();
+
+        // Publish in the parent scope, after the nested transaction was rolled back.
+        $this->savepointPublisher->publish(new Message(new Payload('bar')), 'foo.bar');
+
+        // The second nested transaction must not fail with "The savepoint ... already declared".
+        $this->transactional->begin();
+        $this->savepointPublisher->publish(new Message(new Payload('some')), 'foo.bar');
+        $this->transactional->commit();
+
+        $this->transactional->commit();
+
+        $messages = $this->getAllMessagesFromQueue($this->queueFactory);
+
+        self::assertCount(2, $messages);
+    }
+
+    #[Test]
     public function shouldSuccessOnThreeDepthWithRollbackOnSecondLevel(): void
     {
         $this->transactional->begin();

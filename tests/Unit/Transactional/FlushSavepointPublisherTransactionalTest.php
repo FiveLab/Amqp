@@ -97,6 +97,81 @@ class FlushSavepointPublisherTransactionalTest extends TestCase
     }
 
     #[Test]
+    public function shouldSuccessNotReuseSavepointNameInOneTransaction(): void
+    {
+        $startMatcher = self::exactly(3);
+        $startedSavepoints = [];
+
+        $this->publisher->expects($startMatcher)
+            ->method('start')
+            ->with(self::callback(static function (string $point) use (&$startedSavepoints) {
+                $startedSavepoints[] = $point;
+
+                return true;
+            }));
+
+        // The nested transaction is committed and the next nested transaction must receive a new savepoint name.
+        $this->transactional->begin();
+        $this->transactional->begin();
+        $this->transactional->commit();
+        $this->transactional->begin();
+
+        self::assertEquals($startedSavepoints, \array_unique($startedSavepoints));
+    }
+
+    #[Test]
+    public function shouldSuccessResetStateAfterFlush(): void
+    {
+        $startMatcher = self::exactly(2);
+
+        $this->publisher->expects($startMatcher)
+            ->method('start')
+            ->with(self::callback(static function (string $point) use ($startMatcher) {
+                $expected = match ($startMatcher->numberOfInvocations()) {
+                    1 => 'savepoint_0',
+                    2 => 'savepoint_0'
+                };
+
+                self::assertEquals($expected, $point);
+
+                return true;
+            }));
+
+        // The flush clears all savepoints in the publisher, so the next transaction must start from scratch.
+        $this->transactional->begin();
+        $this->transactional->commit();
+        $this->transactional->begin();
+    }
+
+    #[Test]
+    public function shouldSuccessNotLeakNestingLevelIfStartFails(): void
+    {
+        $startMatcher = self::exactly(2);
+
+        $this->publisher->expects($startMatcher)
+            ->method('start')
+            ->willReturnCallback(static function () use ($startMatcher) {
+                if (1 === $startMatcher->numberOfInvocations()) {
+                    throw new \RuntimeException('some error in publisher');
+                }
+            });
+
+        // The failed begin must not leak the nesting level, else the next transaction never returns to the zero
+        // level and never flushes.
+        $this->publisher->expects(self::once())
+            ->method('flush');
+
+        try {
+            $this->transactional->begin();
+        } catch (\RuntimeException) {
+            // Nothing action.
+        }
+
+        $this->transactional->begin();
+        $this->transactional->commit();
+    }
+
+    #[Test]
     public function shouldSuccessExecuteWithControlNestingLevel(): void
     {
         $startMatcher = self::exactly(2);

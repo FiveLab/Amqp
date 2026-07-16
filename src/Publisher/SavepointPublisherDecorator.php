@@ -35,6 +35,13 @@ class SavepointPublisherDecorator implements SavepointPublisherInterface
         }
 
         if ($this->activeSavepoint) {
+            if (!\array_key_exists($this->activeSavepoint, $this->savepoints)) {
+                throw new \RuntimeException(\sprintf(
+                    'The active savepoint "%s" was not found.',
+                    $this->activeSavepoint
+                ));
+            }
+
             $this->savepoints[$this->activeSavepoint][] = [$message, $routingKey];
         } else {
             $this->publisher->publish($message, $routingKey);
@@ -76,6 +83,10 @@ class SavepointPublisherDecorator implements SavepointPublisherInterface
         $this->savepoints[$parentSavepoint] = $parentMessages;
 
         unset($this->savepoints[$savepoint]);
+
+        if ($savepoint === $this->activeSavepoint) {
+            $this->activeSavepoint = $parentSavepoint;
+        }
     }
 
     public function rollback(string $savepoint): void
@@ -102,6 +113,11 @@ class SavepointPublisherDecorator implements SavepointPublisherInterface
 
         foreach ($mustDeleteSavepoints as $mustDeleteSavepoint) {
             unset($this->savepoints[$mustDeleteSavepoint]);
+        }
+
+        if (\in_array($this->activeSavepoint, $mustDeleteSavepoints, true)) {
+            // The active savepoint was removed. Move to the previous savepoint, all next was removed too.
+            $this->activeSavepoint = (string) \array_key_last($this->savepoints);
         }
     }
 

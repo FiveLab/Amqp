@@ -120,6 +120,50 @@ class SavepointPublisherTest extends TestCase
     }
 
     #[Test]
+    public function shouldSuccessStartSavepointWithSameNameAfterCommit(): void
+    {
+        $this->publisher->start('savepoint_1');
+        $this->publisher->start('savepoint_2');
+        $this->publisher->commit('savepoint_2', 'savepoint_1');
+
+        // The savepoint_2 is committed. The message must be stored in the parent savepoint, and must not
+        // resurrect the committed savepoint.
+        $this->publisher->publish(new Message(new Payload('2')), 'foo.2');
+
+        $this->publisher->start('savepoint_2');
+
+        self::assertTrue(true);
+    }
+
+    #[Test]
+    public function shouldSuccessStartSavepointWithSameNameAfterRollback(): void
+    {
+        $this->publisher->start('savepoint_1');
+        $this->publisher->start('savepoint_2');
+        $this->publisher->rollback('savepoint_2');
+
+        // The savepoint_2 is rolled back. The message must be stored in the parent savepoint, and must not
+        // resurrect the removed savepoint.
+        $this->publisher->publish(new Message(new Payload('2')), 'foo.2');
+
+        $this->publisher->start('savepoint_2');
+
+        self::assertTrue(true);
+    }
+
+    #[Test]
+    public function shouldSuccessPublishDirectlyAfterRollbackLastSavepoint(): void
+    {
+        $this->expectPublish(self::once(), 'foo.1', new Message(new Payload('1')));
+
+        $this->publisher->start('savepoint_1');
+        $this->publisher->rollback('savepoint_1');
+
+        // No any active savepoint. The message must be published directly.
+        $this->publisher->publish(new Message(new Payload('1')), 'foo.1');
+    }
+
+    #[Test]
     public function shouldThrowExceptionIfStartWithExistenceSavepoint(): void
     {
         $this->expectException(\RuntimeException::class);
