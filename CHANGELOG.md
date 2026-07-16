@@ -6,6 +6,7 @@ v2.4.3
 
 * Fix restore the active savepoint in `SavepointPublisherDecorator` after commit or rollback.
 * Fix generate an already declared savepoint name in `FlushSavepointPublisherTransactional`.
+* Fix leak the nesting level in `FlushSavepointPublisherTransactional` if the publisher fails on start.
 
 v2.4.2
 ------

@@ -144,6 +144,34 @@ class FlushSavepointPublisherTransactionalTest extends TestCase
     }
 
     #[Test]
+    public function shouldSuccessNotLeakNestingLevelIfStartFails(): void
+    {
+        $startMatcher = self::exactly(2);
+
+        $this->publisher->expects($startMatcher)
+            ->method('start')
+            ->willReturnCallback(static function () use ($startMatcher) {
+                if (1 === $startMatcher->numberOfInvocations()) {
+                    throw new \RuntimeException('some error in publisher');
+                }
+            });
+
+        // The failed begin must not leak the nesting level, else the next transaction never returns to the zero
+        // level and never flushes.
+        $this->publisher->expects(self::once())
+            ->method('flush');
+
+        try {
+            $this->transactional->begin();
+        } catch (\RuntimeException) {
+            // Nothing action.
+        }
+
+        $this->transactional->begin();
+        $this->transactional->commit();
+    }
+
+    #[Test]
     public function shouldSuccessExecuteWithControlNestingLevel(): void
     {
         $startMatcher = self::exactly(2);

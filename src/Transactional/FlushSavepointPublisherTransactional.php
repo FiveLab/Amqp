@@ -32,14 +32,17 @@ class FlushSavepointPublisherTransactional extends AbstractTransactional
 
     public function begin(): void
     {
-        $this->nestingLevel++;
-
         // Don't use the count of keys for generate a name. The keys are popped on commit and rollback, and in
         // this case we can generate a name which already declared in the publisher.
-        $key = 'savepoint_'.$this->savepointIndex++;
-        $this->keys[] = $key;
+        $key = 'savepoint_'.$this->savepointIndex;
 
+        // Change the state only after successfully start. If the publisher throws an error, the nesting level
+        // must not leak, else the transaction never returns to zero level and never flushes.
         $this->publisher->start($key);
+
+        $this->savepointIndex++;
+        $this->keys[] = $key;
+        $this->nestingLevel++;
     }
 
     public function commit(): void
